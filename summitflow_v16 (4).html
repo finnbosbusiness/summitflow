@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SummitFlow — AI Lead Generation for Heat Pump Installers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;background:#0C0C0C;color:#EDECEA;}
+body{background:#0C0C0C;color:#EDECEA;font-family:'Inter',system-ui,sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+/* ── LOGO ── */
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;user-select:none;flex-shrink:0;}
+.logo svg{width:16px;height:16px;flex-shrink:0;}
+.logo-t{font-size:15px;font-weight:700;letter-spacing:-0.05em;color:#EDECEA;line-height:1;}
+.logo-t span{color:#2563EB;}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:58px;padding:0 56px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(12,12,12,0.92);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.nav-links{list-style:none;display:flex;gap:28px;}
+.nav-links a{font-size:13px;font-weight:500;color:rgba(237,236,234,0.4);text-decoration:none;transition:color .15s;}
+.nav-links a:hover{color:#EDECEA;}
+.nav-cta{font-size:13px;font-weight:600;background:#2563EB;color:#fff;padding:8px 18px;border-radius:4px;text-decoration:none;transition:background .15s;}
+.nav-cta:hover{background:#1D4ED8;}
+
+.ham{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;align-items:flex-end;padding:4px;}
+.ham span{display:block;height:1.5px;background:#EDECEA;border-radius:2px;transition:.25s;}
+.ham span:nth-child(1){width:20px;}.ham span:nth-child(2){width:13px;}.ham span:nth-child(3){width:20px;}
+.ham.open span:nth-child(1){width:20px;transform:translateY(6.5px) rotate(45deg);}
+.ham.open span:nth-child(2){opacity:0;}
+.ham.open span:nth-child(3){width:20px;transform:translateY(-6.5px) rotate(-45deg);}
+
+.drawer{
+  display:none;position:fixed;top:58px;left:0;right:0;
+  background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:0 24px 24px;flex-direction:column;z-index:199;
+  opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s;pointer-events:none;
+}
+.drawer.open{opacity:1;transform:translateY(0);pointer-events:all;}
+.drawer a{font-size:18px;font-weight:500;color:rgba(237,236,234,0.5);text-decoration:none;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:block;transition:color .15s;}
+.drawer a:hover{color:#EDECEA;}
+.drawer .d-cta{margin-top:20px;display:inline-flex;background:#2563EB;color:#fff;font-size:14px;font-weight:600;padding:13px 24px;border-radius:4px;text-decoration:none;border:none !important;align-items:center;justify-content:center;}
+
+/* ════════════════════════════════
+   HERO
+════════════════════════════════ */
+.hero{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:48px;
+  padding:120px 56px 48px;
+  background:#0C0C0C;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero::before{
+  content:'';
+  position:absolute;
+  top:-10%;right:-5%;
+  width:55%;height:80%;
+  background:radial-gradient(ellipse at 60% 40%, rgba(37,99,235,0.08) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.hero-label{
+  font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:rgba(237,236,234,0.35);
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:28px;
+  opacity:0;animation:up .5s .05s cubic-bezier(.16,1,.3,1) forwards;
+}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:#2563EB;box-shadow:0 0 7px rgba(37,99,235,.9);}
+
+.hero-h1{
+  font-size:clamp(52px,6vw,88px);
+  font-weight:700;
+  line-height:1.0;
+  letter-spacing:-0.04em;
+  color:#EDECEA;
+  margin-bottom:24px;
+  opacity:0;animation:up .6s .12s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.hero-h1 em{
+  font-style:normal;
+  color:#2563EB;
+}
+
+.hero-sub{
+  font-size:16px;font-weight:400;
+  color:rgba(237,236,234,0.45);
+  max-width:380px;line-height:1.7;
+  margin-bottom:40px;
+  opacity:0;animation:up .6s .2s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.hero-btns{
+  display:flex;align-items:center;gap:20px;
+  opacity:0;animation:up .6s .28s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.btn-blue{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#2563EB;color:#fff;
+  font-size:14px;font-weight:600;
+  padding:12px 24px;border-radius:4px;
+  text-decoration:none;transition:background .15s,transform .15s;
+  white-space:nowrap;
+}
+.btn-blue:hover{background:#1D4ED8;transform:translateY(-1px);}
+
+.btn-text{font-size:13px;font-weight:500;color:rgba(237,236,234,0.3);text-decoration:none;transition:color .15s;}
+.btn-text:hover{color:rgba(237,236,234,0.65);}
+
+/* Mountain SVG */
+.hero-fig{
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;animation:fadeIn .8s .3s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.mtn{width:100%;max-width:480px;height:auto;}
+
+/* Stroke-dashoffset draw animation */
+.p{fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.p-main{stroke:#EDECEA;stroke-width:1.2;stroke-dasharray:850;stroke-dashoffset:850;animation:draw 1.4s .4s cubic-bezier(.65,0,.35,1) forwards;}
+.p-back{stroke:rgba(237,236,234,0.15);stroke-width:.9;stroke-dasharray:600;stroke-dashoffset:600;animation:draw 1.1s .6s cubic-bezier(.65,0,.35,1) forwards;}
+.p-ridge{stroke:#2563EB;stroke-width:1.4;stroke-dasharray:380;stroke-dashoffset:380;animation:draw 1s .9s cubic-bezier(.65,0,.35,1) forwards;}
+.p-c1{stroke:rgba(37,99,235,0.3);stroke-width:.7;stroke-dasharray:280;stroke-dashoffset:280;animation:draw .7s 1.2s cubic-bezier(.65,0,.35,1) forwards;}
+.p-c2{stroke:rgba(37,99,235,0.2);stroke-width:.6;stroke-dasharray:310;stroke-dashoffset:310;animation:draw .7s 1.32s cubic-bezier(.65,0,.35,1) forwards;}
+.p-c3{stroke:rgba(37,99,235,0.12);stroke-width:.5;stroke-dasharray:340;stroke-dashoffset:340;animation:draw .7s 1.44s cubic-bezier(.65,0,.35,1) forwards;}
+.p-horiz{stroke:rgba(237,236,234,0.07);stroke-width:.5;stroke-dasharray:520;stroke-dashoffset:520;animation:draw 1s .95s cubic-bezier(.65,0,.35,1) forwards;}
+.p-vert{stroke:rgba(237,236,234,0.05);stroke-width:.5;stroke-dasharray:400;stroke-dashoffset:400;animation:draw .9s 1.55s cubic-bezier(.65,0,.35,1) forwards;}
+.p-dot{fill:#2563EB;opacity:0;animation:pop .4s 1.7s cubic-bezier(.16,1,.3,1) forwards;}
+.p-ring{fill:none;stroke:#2563EB;stroke-width:.8;opacity:0;animation:pop .5s 1.85s cubic-bezier(.16,1,.3,1) forwards;}
+.p-ring2{opacity:0;animation:pop .6s 2s cubic-bezier(.16,1,.3,1) forwards;}
+
+/* Wave field — all draw simultaneously, staggered slightly */
+.wv{stroke-dasharray:900;stroke-dashoffset:900;}
+.w1{animation:draw 1.2s 0.3s cubic-bezier(.4,0,.2,1) forwards;}
+.w2{animation:draw 1.2s 0.38s cubic-bezier(.4,0,.2,1) forwards;}
+.w3{animation:draw 1.2s 0.46s cubic-bezier(.4,0,.2,1) forwards;}
+.w4{animation:draw 1.2s 0.54s cubic-bezier(.4,0,.2,1) forwards;}
+.w5{animation:draw 1.2s 0.62s cubic-bezier(.4,0,.2,1) forwards;}
+.w6{animation:draw 1.2s 0.70s cubic-bezier(.4,0,.2,1) forwards;}
+.w7{animation:draw 1.2s 0.78s cubic-bezier(.4,0,.2,1) forwards;}
+.w8{animation:draw 1.2s 0.86s cubic-bezier(.4,0,.2,1) forwards;}
+.w9{animation:draw 1.2s 0.94s cubic-bezier(.4,0,.2,1) forwards;}
+.w10{animation:draw 1.2s 1.02s cubic-bezier(.4,0,.2,1) forwards;}
+
+@keyframes draw{to{stroke-dashoffset:0;}}
+@keyframes pop{from{opacity:0;transform:scale(0);transform-origin:250px 100px;}to{opacity:1;transform:scale(1);transform-origin:250px 100px;}}
+
+/* ════════════════════════════
+   TICKER — MUCH MORE VISIBLE
+════════════════════════════ */
+.ticker{
+  border-top:1px solid rgba(12,12,12,0.1);
+  border-bottom:1px solid rgba(12,12,12,0.1);
+  padding:0;overflow:hidden;
+  background:#fff;
+}
+.ticker-inner{
+  display:flex;
+  align-items:center;
+  padding:13px 0;
+  border-top:none;
+}
+.ticker-track{display:flex;animation:scroll 34s linear infinite;width:max-content;align-items:center;}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.ti{
+  font-size:11px;font-weight:700;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:rgba(12,12,12,0.7);
+  padding:0 28px;white-space:nowrap;
+  display:flex;align-items:center;gap:28px;
+}
+.ti::after{content:'';display:inline-block;width:4px;height:4px;border-radius:50%;background:#2563EB;margin-left:0;}
+
+/* ════════════════════════════
+   SECTIONS
+════════════════════════════ */
+.s{padding:104px 56px;border-top:1px solid rgba(255,255,255,0.07);background:#0C0C0C;}
+.s-alt{background:#0F0F0F;}
+.s-white{background:#F0EFEB;color:#0C0C0C;border-top:none;}
+
+.s-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:rgba(237,236,234,0.28);margin-bottom:16px;}
+.s-white .s-eyebrow{color:rgba(12,12,12,0.3);}
+
+.s-h2{font-size:clamp(32px,3.8vw,52px);font-weight:700;letter-spacing:-0.04em;line-height:1.06;color:#EDECEA;}
+.s-white .s-h2{color:#0C0C0C;}
+.s-h2 em{font-style:normal;color:#2563EB;}
+.s-white .s-h2 em{color:#1D4ED8;}
+
+/* ════════════════════════════
+   PROCESS — 4 steps, short
+════════════════════════════ */
+.process-header{display:flex;align-items:flex-end;justify-content:space-between;gap:48px;margin-bottom:48px;}
+.process-note{font-size:14px;font-weight:400;color:rgba(237,236,234,0.35);max-width:220px;line-height:1.6;}
+
+.process-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;
+}
+
+.step{
+  background:#0F0F0F;padding:52px 40px 64px;position:relative;
+  transition:background .2s;
+}
+.step:hover{background:#131313;}
+.step::before{content:'';position:absolute;top:0;left:40px;width:16px;height:2px;background:#2563EB;}
+.step-n{display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;color:rgba(237,236,234,0.35);margin-bottom:32px;}
+.step-title{font-size:20px;font-weight:600;color:#EDECEA;letter-spacing:-0.02em;margin-bottom:12px;line-height:1.3;}
+.step-body{font-size:14px;color:rgba(237,236,234,0.5);line-height:1.7;font-weight:400;}
+
+/* ════════════════════════════
+   COMBINED STATS + SERVICES
+   Full-bleed, no padding wrapper.
+   Stats left = editorial black column.
+   Services right = clean white list.
+════════════════════════════ */
+.combined{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  min-height:640px;
+  border-top:1px solid rgba(12,12,12,0.09);
+}
+
+/* Left — dark background, big numbers */
+.combined-stats{
+  background:#0C0C0C;
+  display:flex;
+  flex-direction:column;
+}
+
+.cs-block{
+  flex:1;
+  padding:52px 56px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:200px;
+}
+
+.cs-block:last-child{border-bottom:none;}
+
+.cs-block--blue{
+  background:#1D4ED8;
+}
+
+.cs-val{
+  font-size:clamp(56px,5.8vw,82px);
+  font-weight:700;
+  letter-spacing:-0.05em;
+  color:#EDECEA;
+  line-height:1;
+  margin-bottom:20px;
+}
+
+/* accent part of number — strong, not faded */
+.cs-val span{color:#2563EB;}
+.cs-val--blue{color:#fff;}
+.cs-val--blue span{color:rgba(255,255,255,0.8);}
+
+.cs-text{
+  font-size:14px;
+  font-weight:400;
+  color:rgba(237,236,234,0.72);
+  line-height:1.55;
+  max-width:240px;
+}
+
+.cs-block--blue .cs-text{
+  color:rgba(255,255,255,0.75);
+}
+
+/* Right — white, services list */
+.combined-services{
+  background:#F0EFEB;
+  padding:56px 56px 56px 60px;
+  display:flex;
+  flex-direction:column;
+  border-left:1px solid rgba(12,12,12,0.09);
+}
+
+.svc-list{
+  display:flex;
+  flex-direction:column;
+  flex:1;
+}
+
+.svc{
+  display:grid;
+  grid-template-columns:32px 1fr;
+  gap:16px;
+  padding:22px 0;
+  border-bottom:1px solid rgba(12,12,12,0.08);
+  transition:padding-left .15s;
+}
+.svc:hover{padding-left:6px;}
+.svc:first-child{border-top:1px solid rgba(12,12,12,0.08);}
+
+.svc-n{font-size:11px;font-weight:600;color:rgba(37,99,235,0.65);letter-spacing:0.06em;padding-top:2px;}
+.svc-title{font-size:14px;font-weight:700;color:#0C0C0C;letter-spacing:-0.02em;margin-bottom:4px;line-height:1.2;}
+.svc-body{font-size:13px;color:rgba(12,12,12,0.52);line-height:1.55;}
+
+/* btn-solid — used in combined services */
+.btn-solid{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#2563EB;color:#fff;
+  font-size:13px;font-weight:600;
+  padding:12px 22px;border-radius:4px;
+  text-decoration:none;transition:background .15s;
+  white-space:nowrap;align-self:flex-start;
+}
+.btn-solid:hover{background:#1D4ED8;}
+
+@media(max-width:900px){
+  .combined{grid-template-columns:1fr;}
+  .cs-block{padding:40px 24px;min-height:auto;}
+  .combined-services{padding:44px 24px;}
+}
+
+/* ── APPLY SECTION ── */
+.apply-wrap{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:96px;
+  align-items:start;
+}
+
+.apply-left-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;font-weight:600;letter-spacing:0.13em;text-transform:uppercase;
+  color:rgba(237,236,234,0.3);
+  margin-bottom:16px;
+}
+
+.apply-note{
+  font-size:13px;
+  font-weight:400;
+  color:rgba(237,236,234,0.32);
+  margin-top:16px;
+  line-height:1.6;
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding-top:16px;
+}
+
+.apply-right .form{
+  background:#141414;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:4px;
+  padding:36px;
+}
+
+.c-links{display:flex;flex-direction:column;gap:10px;margin-top:32px;}
+.c-link{font-size:14px;color:rgba(237,236,234,0.45);display:flex;align-items:center;gap:9px;}
+.c-link a{color:rgba(237,236,234,0.45);text-decoration:none;transition:color .15s;}
+.c-link a:hover{color:#EDECEA;}
+.c-arr{color:#2563EB;font-size:12px;}
+
+.form{display:flex;flex-direction:column;gap:11px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(237,236,234,0.22);}
+.field input,.field select{
+  background:#141414;border:1px solid rgba(255,255,255,0.08);border-radius:4px;
+  padding:11px 14px;font-size:14px;color:#EDECEA;
+  font-family:'Inter',system-ui,sans-serif;font-weight:400;
+  outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;
+}
+.field input:focus,.field select:focus{border-color:rgba(37,99,235,0.5);}
+.field input::placeholder{color:rgba(237,236,234,0.15);}
+.field select option{background:#141414;}
+
+.form-btn{
+  display:flex;align-items:center;justify-content:space-between;
+  background:#2563EB;color:#fff;border:none;border-radius:4px;
+  padding:13px 18px;font-size:14px;font-weight:600;
+  font-family:'Inter',system-ui,sans-serif;
+  cursor:pointer;transition:background .15s;margin-top:2px;
+}
+.form-btn:hover{background:#1D4ED8;}
+.form-note{font-size:11px;color:rgba(237,236,234,0.18);line-height:1.5;margin-top:4px;}
+
+/* ════════════════════════════
+   FOOTER
+════════════════════════════ */
+footer{background:#0F0F0F;border-top:1px solid rgba(255,255,255,0.07);padding:52px 56px 32px;}
+.ft{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:44px;}
+.f-tag{font-size:12px;color:rgba(237,236,234,0.3);margin-top:10px;max-width:200px;line-height:1.5;}
+.f-cols{display:flex;gap:52px;}
+.f-col-h{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(237,236,234,0.18);margin-bottom:14px;}
+.f-col a{display:block;font-size:13px;color:rgba(237,236,234,0.36);text-decoration:none;margin-bottom:9px;transition:color .15s;}
+.f-col a:hover{color:#EDECEA;}
+.f-bot{display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:1px solid rgba(255,255,255,0.06);}
+.f-legal{font-size:12px;color:rgba(237,236,234,0.16);}
+.f-soc{display:flex;gap:8px;}
+.soc{width:30px;height:30px;border:1px solid rgba(255,255,255,0.08);border-radius:4px;display:flex;align-items:center;justify-content:center;color:rgba(237,236,234,0.26);text-decoration:none;font-size:11px;font-weight:600;transition:border-color .15s,color .15s;}
+.soc:hover{border-color:rgba(37,99,235,0.4);color:#2563EB;}
+
+/* ════════════════════════════
+   ANIMATIONS
+════════════════════════════ */
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);}
+.reveal.in{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}.d4{transition-delay:.24s}
+
+@media(max-width:768px){
+  .proof-grid{grid-template-columns:1fr 1fr !important;}
+}
+@media(max-width:480px){
+  .proof-grid{grid-template-columns:1fr !important;}
+}
+@media(max-width:900px){
+  .nav{padding:0 20px;}
+  .nav-links,.nav-cta{display:none;}
+  .ham{display:flex;}
+  .drawer{display:flex;}
+  .hero{grid-template-columns:1fr;padding:100px 20px 32px;min-height:100svh;gap:40px;}
+  .hero-h1{font-size:clamp(48px,12vw,76px);}
+  .hero-sub{font-size:15px;max-width:100%;}
+  .hero-btns{flex-direction:column;align-items:flex-start;gap:12px;}
+  .s{padding:72px 20px;}
+  .s-white{padding:72px 20px;}
+  .s-alt{padding:72px 20px;}
+  .process-header{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:36px;}
+  .process-grid{grid-template-columns:1fr;}
+  .combined{grid-template-columns:1fr;}
+  .cs-block{padding:40px 24px;min-height:auto;}
+  .combined-services{padding:44px 24px;border-left:none;border-top:1px solid rgba(12,12,12,0.09);}
+  .apply-wrap{grid-template-columns:1fr;gap:44px;}
+  .apply-right .form{padding:24px;}
+  .form-row{grid-template-columns:1fr;}
+  footer{padding:44px 20px 28px;}
+  .ft{flex-direction:column;gap:24px;margin-bottom:28px;}
+  .f-cols{gap:28px;flex-wrap:wrap;}
+  .f-bot{flex-direction:column;gap:10px;align-items:flex-start;}
+}
+@media(max-width:900px){
+  .white-compare-grid{grid-template-columns:1fr !important;}
+  .white-compare-left{border-right:none !important;padding-right:0 !important;border-bottom:1px solid rgba(12,12,12,0.1);padding-bottom:32px !important;}
+  .white-compare-right{padding-left:0 !important;}
+}
+@media(max-width:480px){
+  .hero-h1{font-size:clamp(42px,13vw,64px);}
+  .btn-blue{width:100%;justify-content:center;}
+}
+/* ════════════════════════════
+   GUARANTEE FULL-PAGE
+════════════════════════════ */
+.guarantee-full{
+  min-height:70vh;
+  background:#0C0C0C;
+  border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:80px 24px;
+}
+.gf-inner{
+  max-width:680px;
+}
+.gf-label{
+  font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:rgba(237,236,234,0.35);
+  display:inline-flex;align-items:center;gap:8px;
+  margin-bottom:32px;
+}
+.gf-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:#2563EB;box-shadow:0 0 7px rgba(37,99,235,.9);
+  display:inline-block;flex-shrink:0;
+}
+.gf-h{
+  font-size:clamp(32px,4vw,58px);
+  font-weight:700;
+  letter-spacing:-0.04em;
+  line-height:1.05;
+  color:#EDECEA;
+  margin-bottom:28px;
+}
+.gf-h em{
+  font-style:normal;
+  color:#2563EB;
+}
+.gf-sub{
+  font-size:15px;
+  font-weight:400;
+  color:rgba(237,236,234,0.35);
+  letter-spacing:0.01em;
+}
+@media(max-width:900px){
+  .gf-h{font-size:clamp(28px,8vw,48px);}
+}
+</style>
+</head>
+<body style="background:#0C0C0C!important;color:#EDECEA!important;">
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="logo">
+    <svg viewBox="0 0 16 16" fill="none">
+      <path d="M1 14L8 2L15 14" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M0 14L5 7L7.5 10.5" stroke="rgba(37,99,235,0.3)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-t">Summit<span>Flow</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#process">Process</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#contact">Apply</a></li>
+  </ul>
+  <a href="https://calendly.com/finn-summitflow" target="_blank" class="nav-cta">Book a call</a>
+  <button class="ham" id="ham"><span></span><span></span><span></span></button>
+</nav>
+
+<nav class="drawer" id="drawer">
+  <a href="#process" onclick="closeD()">Process</a>
+  <a href="#services" onclick="closeD()">Services</a>
+  <a href="#results" onclick="closeD()">Results</a>
+  <a href="#contact" onclick="closeD()">Apply</a>
+  <a href="https://calendly.com/finn-summitflow" target="_blank" class="d-cta" onclick="closeD()">Book a call &#x2192;</a>
+</nav>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <div>
+    <div class="hero-label">
+      <div class="hero-dot"></div>
+      MCS-Certified Installers · England
+    </div>
+
+    <h1 class="hero-h1">A full calendar.<br><em>Every month.</em></h1>
+
+    <p class="hero-sub">
+      More qualified surveys. A fuller pipeline. Consistent revenue — without chasing leads yourself.
+    </p>
+
+    <div class="hero-btns">
+      <a href="https://calendly.com/finn-summitflow" target="_blank" class="btn-blue">
+        Book a free call
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Hero figure: wave field sweeps right half, mountain sits in front -->
+  <div class="hero-fig" style="position:relative;overflow:hidden;border-radius:2px;">
+
+    <!-- Wave canvas: full bleed behind the mountain -->
+    <canvas id="waveCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+
+    <!-- Mountain SVG on top -->
+    <svg class="mtn" viewBox="0 0 500 380" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:2;">
+      <defs>
+        <linearGradient id="ridgeGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2563EB"/>
+          <stop offset="100%" stop-color="#0EA5E9"/>
+        </linearGradient>
+        <radialGradient id="peakGlow" cx="50%" cy="25%" r="45%">
+          <stop offset="0%" stop-color="#2563EB" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="sf">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- soft glow field -->
+      <ellipse cx="250" cy="160" rx="180" ry="130" fill="url(#peakGlow)"/>
+
+      <!-- horizon -->
+      <line class="p p-horiz" x1="30" y1="345" x2="470" y2="345"/>
+      <!-- background ridge -->
+      <polyline class="p p-back" points="30,345 90,258 148,294 206,218 262,274 316,202 372,246 426,184 470,212 470,345"/>
+      <!-- main mountain — thicker, more presence -->
+      <polyline class="p p-main" style="stroke-width:1.6;" points="75,345 250,62 425,345"/>
+      <!-- right ridge gradient -->
+      <line x1="250" y1="62" x2="425" y2="345" stroke="url(#ridgeGrad)" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- contours -->
+      <line class="p p-c1" x1="150" y1="200" x2="350" y2="200"/>
+      <line class="p p-c2" x1="113" y1="262" x2="387" y2="262"/>
+      <line class="p p-c3" x1="76"  y1="322" x2="424" y2="322"/>
+      <!-- verticals -->
+      <line class="p p-vert" x1="250" y1="62" x2="250" y2="345"/>
+      <line class="p p-vert" x1="182" y1="148" x2="182" y2="345" style="animation-delay:1.6s"/>
+      <line class="p p-vert" x1="318" y1="148" x2="318" y2="345" style="animation-delay:1.65s"/>
+      <!-- summit -->
+      <circle class="p-dot" cx="250" cy="62" r="5" fill="url(#ridgeGrad)" filter="url(#sf)"/>
+      <circle class="p-ring" cx="250" cy="62" r="12"/>
+      <circle class="p-ring2" cx="250" cy="62" r="20" stroke="#2563EB" stroke-width="0.5" fill="none"/>
+    </svg>
+  </div>
+</section>
+
+<script>
+(function(){
+  const canvas = document.getElementById('waveCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, progress = 0, raf;
+  const WAVE_COUNT = 14;
+
+  // Each wave: y offset at left edge, amplitude, frequency, phase, color
+  const waves = Array.from({length: WAVE_COUNT}, (_, i) => ({
+    yBase: 0.35 + i * 0.045,   // fractional y start on left
+    amp: 0.18 - i * 0.009,     // amplitude as fraction of height
+    freq: 1.1 + i * 0.05,
+    phase: i * 0.18,
+    // Colour: blue -> cyan gradient across wave index
+    r: Math.round(37 + i * 4),
+    g: Math.round(99 + i * 12),
+    b: Math.round(235 - i * 8),
+    opacity: 0.85 - i * 0.045,
+    width: 1.4 - i * 0.08,
+  }));
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width  = rect.width  * devicePixelRatio;
+    H = canvas.height = rect.height * devicePixelRatio;
+    canvas.style.width  = rect.width  + 'px';
+    canvas.style.height = rect.height + 'px';
+  }
+
+  function drawWaves(p) {
+    ctx.clearRect(0, 0, W, H);
+    waves.forEach((w, i) => {
+      const pts = [];
+      const STEPS = 120;
+      for (let s = 0; s <= STEPS; s++) {
+        const t = s / STEPS;
+        const x = t * W;
+        // S-curve: sine wave that shifts as it travels right
+        const y = (w.yBase * H) + Math.sin(t * Math.PI * w.freq + w.phase) * w.amp * H;
+        pts.push([x, y]);
+      }
+
+      // Draw only up to progress
+      const endIdx = Math.floor(p * pts.length);
+      if(endIdx < 2) return;
+
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for(let j = 1; j < endIdx; j++) {
+        const [x1,y1] = pts[j-1], [x2,y2] = pts[j];
+        ctx.lineTo(x2, y2);
+      }
+
+      // Gradient along the path
+      const grad = ctx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0,   `rgba(${w.r},${w.g},${w.b},0)`);
+      grad.addColorStop(0.15, `rgba(${w.r},${w.g},${w.b},${w.opacity})`);
+      grad.addColorStop(0.6,  `rgba(${Math.min(w.r+40,255)},${Math.min(w.g+60,255)},${Math.min(w.b+20,255)},${w.opacity})`);
+      grad.addColorStop(1,   `rgba(${Math.min(w.r+60,255)},${Math.min(w.g+80,255)},255,0.05)`);
+
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = (w.width * devicePixelRatio);
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+      ctx.stroke();
+    });
+  }
+
+  function animate(ts) {
+    if(!animate.start) animate.start = ts;
+    const elapsed = ts - animate.start;
+    progress = Math.min(elapsed / 1400, 1); // 1.4s draw-in
+    drawWaves(progress);
+    if(progress < 1) raf = requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', () => { resize(); drawWaves(progress); });
+  resize();
+  // Start after brief delay so mountain starts drawing first
+  setTimeout(() => requestAnimationFrame(animate), 200);
+})();
+</script>
+
+
+<!-- ══════ PROCESS ══════ -->
+<section class="s s-alt" id="process">
+  <div class="process-header reveal">
+    <div>
+      <p class="s-eyebrow">Process</p>
+      <h2 class="s-h2" style="font-size:clamp(40px,4.5vw,64px);">How it works</h2>
+    </div>
+
+  </div>
+  <div class="process-grid">
+    <div class="step reveal d1">
+      <span class="step-n">01</span>
+      <h3 class="step-title">Market audit</h3>
+      <p class="step-body">We map demand and competitor spend across your postcode before touching a budget.</p>
+    </div>
+    <div class="step reveal d2">
+      <span class="step-n">02</span>
+      <h3 class="step-title">System build</h3>
+      <p class="step-body">Ads, AI qualification, and calendar integration — configured and approved by you.</p>
+    </div>
+    <div class="step reveal d3">
+      <span class="step-n">03</span>
+      <h3 class="step-title">Surveys land</h3>
+      <p class="step-body">Pre-qualified homeowners book directly into your diary with their full details.</p>
+    </div>
+    <div class="step reveal d4">
+      <span class="step-n">04</span>
+      <h3 class="step-title">Compound</h3>
+      <p class="step-body">Weekly optimisation. The system improves every month as it learns your area.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ SERVICES ══════ -->
+<section class="s" id="services" style="padding-top:72px;">
+  <p class="s-eyebrow reveal">What you get</p>
+  <h2 class="s-h2 reveal" style="margin-bottom:52px;">Everything included.<br><em>Nothing to manage.</em></h2>
+  <div class="process-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="step reveal d1">
+      <span class="step-n">01</span>
+      <h3 class="step-title">Homeowners who want heat pumps</h3>
+      <p class="step-body">We put your business in front of the right people in your area — homeowners actively looking to move away from gas, at the moment they're ready.</p>
+    </div>
+    <div class="step reveal d2">
+      <span class="step-n">02</span>
+      <h3 class="step-title">No time-wasters</h3>
+      <p class="step-body">Every enquiry is qualified before it reaches you. Wrong property type, wrong location, not serious — filtered out automatically, before it touches your day.</p>
+    </div>
+    <div class="step reveal d3">
+      <span class="step-n">03</span>
+      <h3 class="step-title">Surveys in your diary</h3>
+      <p class="step-body">Qualified homeowners booked directly into your calendar. You show up, run the survey, and close the job. No chasing, no admin.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ RESULTS ══════ -->
+<section class="s s-alt" id="results">
+  <p class="s-eyebrow reveal">Why it works</p>
+  <h2 class="s-h2 reveal" style="margin-bottom:52px;">The numbers<br>behind the <em>system.</em></h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;">
+    <div class="step reveal d1" style="padding:52px 40px 64px;">
+      <span style="display:block;font-size:clamp(48px,5vw,72px);font-weight:700;letter-spacing:-0.05em;color:#EDECEA;line-height:1;margin-bottom:20px;">5&#x2013;8<span style="color:#2563EB;">+</span></span>
+      <p style="font-size:14px;color:rgba(237,236,234,0.5);line-height:1.7;">Qualified survey appointments delivered to your diary every month &#x2014; or you don't pay.</p>
+    </div>
+    <div class="step reveal d2" style="padding:52px 40px 64px;">
+      <span style="display:block;font-size:clamp(48px,5vw,72px);font-weight:700;letter-spacing:-0.05em;color:#EDECEA;line-height:1;margin-bottom:20px;">&#xA3;0<span style="color:#2563EB;">.</span></span>
+      <p style="font-size:14px;color:rgba(237,236,234,0.5);line-height:1.7;">Risk to you. If we don't hit the guarantee in month one, you get a full refund. No small print.</p>
+    </div>
+    <div class="step reveal d3" style="padding:52px 40px 64px;background:#1D4ED8;">
+      <span style="display:block;font-size:clamp(48px,5vw,72px);font-weight:700;letter-spacing:-0.05em;color:#fff;line-height:1;margin-bottom:20px;">1<span style="color:rgba(255,255,255,0.6);font-size:32px;font-weight:500;"> area</span></span>
+      <p style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.7;">We work with one installer per postcode area. Your territory stays yours for the life of the retainer.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════ GUARANTEE STATEMENT ══════ -->
+<section class="guarantee-full">
+  <div class="gf-inner reveal">
+    <p class="gf-label"><span class="gf-dot"></span>Our guarantee</p>
+    <h2 class="gf-h">5–8 qualified surveys<br>in your diary.<br><em>Every month.</em></h2>
+    <p class="gf-sub">Or every penny back. No small print.</p>
+  </div>
+</section>
+
+
+<!-- ══════ WHITE BREAK ══════ -->
+<section class="s-white" style="padding:96px 56px;">
+  <div style="max-width:900px;margin:0 auto;">
+    <p style="font-size:11px;font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:rgba(12,12,12,0.3);margin-bottom:32px;" class="reveal">The difference</p>
+    <h2 style="font-size:clamp(36px,5vw,72px);font-weight:700;letter-spacing:-0.04em;line-height:1.04;color:#0C0C0C;margin-bottom:48px;" class="reveal">Most installers lose jobs<br>they never knew existed.<br><span style="color:#2563EB;">Not yours.</span></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid rgba(12,12,12,0.1);" class="reveal">
+      <div style="padding:36px 40px 36px 0;border-right:1px solid rgba(12,12,12,0.1);">
+        <p style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(12,12,12,0.3);margin-bottom:20px;">Without SummitFlow</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <p style="font-size:15px;color:rgba(12,12,12,0.5);display:flex;gap:12px;align-items:flex-start;"><span style="color:rgba(12,12,12,0.2);font-weight:600;">&#x2014;</span>Relying on word-of-mouth and slow seasons</p>
+          <p style="font-size:15px;color:rgba(12,12,12,0.5);display:flex;gap:12px;align-items:flex-start;"><span style="color:rgba(12,12,12,0.2);font-weight:600;">&#x2014;</span>Following up on cold leads that go nowhere</p>
+          <p style="font-size:15px;color:rgba(12,12,12,0.5);display:flex;gap:12px;align-items:flex-start;"><span style="color:rgba(12,12,12,0.2);font-weight:600;">&#x2014;</span>Boom and bust pipeline with no consistency</p>
+          <p style="font-size:15px;color:rgba(12,12,12,0.5);display:flex;gap:12px;align-items:flex-start;"><span style="color:rgba(12,12,12,0.2);font-weight:600;">&#x2014;</span>Competing on price because leads have options</p>
+        </div>
+      </div>
+      <div style="padding:36px 0 36px 40px;">
+        <p style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#2563EB;margin-bottom:20px;">With SummitFlow</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <p style="font-size:15px;color:#0C0C0C;display:flex;gap:12px;align-items:flex-start;"><span style="color:#2563EB;font-weight:600;">&#x2192;</span>Qualified surveys land in your diary every week</p>
+          <p style="font-size:15px;color:#0C0C0C;display:flex;gap:12px;align-items:flex-start;"><span style="color:#2563EB;font-weight:600;">&#x2192;</span>Every lead pre-screened before it reaches you</p>
+          <p style="font-size:15px;color:#0C0C0C;display:flex;gap:12px;align-items:flex-start;"><span style="color:#2563EB;font-weight:600;">&#x2192;</span>Consistent pipeline you can plan your team around</p>
+          <p style="font-size:15px;color:#0C0C0C;display:flex;gap:12px;align-items:flex-start;"><span style="color:#2563EB;font-weight:600;">&#x2192;</span>Homeowners who came to you — you set the terms</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:52px;padding-top:40px;border-top:1px solid rgba(12,12,12,0.1);display:flex;align-items:center;gap:24px;flex-wrap:wrap;" class="reveal">
+      <a href="https://calendly.com/finn-summitflow" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#0C0C0C;color:#fff;font-size:14px;font-weight:600;padding:12px 24px;border-radius:4px;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='#2563EB'" onmouseout="this.style.background='#0C0C0C'">Book a free call &#x2192;</a>
+      <p style="font-size:13px;color:rgba(12,12,12,0.35);">5–8 qualified surveys guaranteed in month one. Or your money back.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ APPLY — full-width dark, simple form ══════ -->
+<section class="s s-alt" id="contact">
+  <div class="apply-wrap">
+
+    <div class="apply-left reveal">
+      <p class="s-eyebrow">Apply to work with us</p>
+      <h2 class="s-h2" style="margin-top:12px;margin-bottom:0;">One installer<br>per <em>area.</em></h2>
+      <p class="apply-note">MCS-certified · England only · 5–8 surveys guaranteed in month one</p>
+      <div class="c-links">
+        <div class="c-link"><span class="c-arr">→</span><a href="mailto:finn@summitflow.co.uk">finn@summitflow.co.uk</a></div>
+        <div class="c-link"><span class="c-arr">→</span><a href="tel:07949845919">07949 845 919</a></div>
+      </div>
+    </div>
+
+    <div class="apply-right reveal d2">
+      <form class="form" id="cform" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="form-row">
+          <div class="field"><label>Full name</label><input type="text" name="full_name" placeholder="James Smith"></div>
+          <div class="field"><label>Business name</label><input type="text" name="business_name" placeholder="Avon Renewables Ltd"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Email</label><input type="email" name="email" placeholder="james@avonrenewables.co.uk"></div>
+          <div class="field"><label>Phone</label><input type="tel" name="phone" placeholder="07700 900000"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Primary postcode area</label><input type="text" name="postcode_area" placeholder="CV37"></div>
+          <div class="field">
+            <label>Monthly installs (current avg)</label>
+            <select name="monthly_installs">
+              <option value="" disabled selected>Select range</option>
+              <option>0–2 per month</option>
+              <option>3–5 per month</option>
+              <option>6–10 per month</option>
+              <option>10+ per month</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Are you MCS certified?</label>
+          <select name="mcs_certified">
+            <option value="" disabled selected>Select</option>
+            <option>Yes — fully certified</option>
+            <option>In progress</option>
+            <option>No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Biggest challenge getting new customers</label>
+          <select name="biggest_challenge">
+            <option value="" disabled selected>Select</option>
+            <option>Not enough leads coming in</option>
+            <option>Leads aren't qualified enough</option>
+            <option>Inconsistent pipeline month to month</option>
+            <option>Too much time spent on admin / follow-up</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Current monthly marketing spend</label>
+          <select name="marketing_spend">
+            <option value="" disabled selected>Select range</option>
+            <option>£0 — not currently running ads</option>
+            <option>£500–£1,000/month</option>
+            <option>£1,000–£2,500/month</option>
+            <option>£2,500+/month</option>
+          </select>
+        </div>
+        <button type="submit" class="form-btn">
+          Submit application
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 6.5h11M6.5 1l5.5 5.5-5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <p class="form-note">We review every application and respond within one business day.</p>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft">
+    <div>
+      <a href="#" class="logo">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M1 14L8 2L15 14" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M0 14L5 7L7.5 10.5" stroke="rgba(37,99,235,0.3)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-t">Summit<span>Flow</span></span>
+      </a>
+      <p class="f-tag">AI-powered lead generation for MCS-certified heat pump installers.</p>
+    </div>
+    <div class="f-cols">
+      <div class="f-col">
+        <p class="f-col-h">Navigate</p>
+        <a href="#process">Process</a>
+        <a href="#services">Services</a>
+        <a href="#results">Results</a>
+        <a href="#contact">Apply</a>
+      </div>
+      <div class="f-col">
+        <p class="f-col-h">Contact</p>
+        <a href="mailto:finn@summitflow.co.uk">finn@summitflow.co.uk</a>
+        <a href="tel:07949845919">07949 845 919</a>
+      </div>
+    </div>
+  </div>
+  <div class="f-bot">
+    <p class="f-legal">© 2026 SummitFlow. All rights reserved. &nbsp;·&nbsp; <a href="/privacy.html" style="color:rgba(237,236,234,0.16);text-decoration:underline;transition:color .15s;" onmouseover="this.style.color='rgba(237,236,234,0.5)'" onmouseout="this.style.color='rgba(237,236,234,0.16)'">Privacy Policy</a></p>
+    <div class="f-soc">
+      <a href="https://www.facebook.com/profile.php?id=61572411691102" class="soc" target="_blank">f</a>
+      <a href="https://www.instagram.com/summitflow.ai/" class="soc" target="_blank">ig</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const ham=document.getElementById('ham'),drawer=document.getElementById('drawer');
+ham.addEventListener('click',()=>{const o=ham.classList.toggle('open');drawer.classList.toggle('open',o);document.body.style.overflow=o?'hidden':'';});
+function closeD(){ham.classList.remove('open');drawer.classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('click',e=>{if(drawer.classList.contains('open')&&!drawer.contains(e.target)&&!ham.contains(e.target))closeD();});
+
+const io=new IntersectionObserver(ee=>{ee.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.06,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+document.getElementById('cform').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const b=e.target.querySelector('.form-btn');
+  const orig=b.innerHTML;
+  b.innerHTML='Sending...';
+  b.disabled=true;
+  b.style.opacity='0.7';
+  try{
+    const data=new FormData(e.target);
+    const res=await fetch(e.target.action,{method:'POST',body:data,headers:{Accept:'application/json'}});
+    if(res.ok){
+      b.innerHTML="Sent — we'll be in touch within one business day.";
+      b.style.cssText="background:rgba(37,99,235,.08);color:#2563EB;border:1px solid rgba(37,99,235,.18);border-radius:4px;padding:13px 18px;font-size:14px;font-weight:600;font-family:'Inter',system-ui,sans-serif;width:100%;cursor:default;text-align:left;opacity:1;";
+      e.target.reset();
+    }else{
+      b.innerHTML=orig;
+      b.disabled=false;
+      b.style.opacity='1';
+      alert('Something went wrong. Please email finn@summitflow.co.uk directly.');
+    }
+  }catch(err){
+    b.innerHTML=orig;
+    b.disabled=false;
+    b.style.opacity='1';
+    alert('Something went wrong. Please email finn@summitflow.co.uk directly.');
+  }
+});
+</script>
+</body>
+</html>
