@@ -531,7 +531,7 @@ footer{background:#0F0F0F;border-top:1px solid rgba(255,255,255,0.07);padding:52
     <li><a href="#results">Results</a></li>
     <li><a href="#contact">Apply</a></li>
   </ul>
-  <a href="https://calendly.com/finn-summitflow" target="_blank" class="nav-cta">Book a call</a>
+  <a href="#contact" class="nav-cta">Work with us</a>
   <button class="ham" id="ham"><span></span><span></span><span></span></button>
 </nav>
 
@@ -540,7 +540,7 @@ footer{background:#0F0F0F;border-top:1px solid rgba(255,255,255,0.07);padding:52
   <a href="#services" onclick="closeD()">Services</a>
   <a href="#results" onclick="closeD()">Results</a>
   <a href="#contact" onclick="closeD()">Apply</a>
-  <a href="https://calendly.com/finn-summitflow" target="_blank" class="d-cta" onclick="closeD()">Book a call &#x2192;</a>
+  <a href="#contact" class="d-cta" onclick="closeD()">Work with us &#x2192;</a>
 </nav>
 
 <!-- ══════ HERO ══════ -->
@@ -558,8 +558,8 @@ footer{background:#0F0F0F;border-top:1px solid rgba(255,255,255,0.07);padding:52
     </p>
 
     <div class="hero-btns">
-      <a href="https://calendly.com/finn-summitflow" target="_blank" class="btn-blue">
-        Book a free call
+      <a href="#contact" class="btn-blue">
+        Apply to work with us
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
@@ -813,7 +813,7 @@ footer{background:#0F0F0F;border-top:1px solid rgba(255,255,255,0.07);padding:52
       </div>
     </div>
     <div style="margin-top:52px;padding-top:40px;border-top:1px solid rgba(12,12,12,0.1);display:flex;align-items:center;gap:24px;flex-wrap:wrap;" class="reveal">
-      <a href="https://calendly.com/finn-summitflow" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#0C0C0C;color:#fff;font-size:14px;font-weight:600;padding:12px 24px;border-radius:4px;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='#2563EB'" onmouseout="this.style.background='#0C0C0C'">Book a free call &#x2192;</a>
+      <a href="#contact" style="display:inline-flex;align-items:center;gap:8px;background:#0C0C0C;color:#fff;font-size:14px;font-weight:600;padding:12px 24px;border-radius:4px;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='#2563EB'" onmouseout="this.style.background='#0C0C0C'">Apply now &#x2192;</a>
       <p style="font-size:13px;color:rgba(12,12,12,0.35);">5–8 qualified surveys guaranteed in month one. Or your money back.</p>
     </div>
   </div>
@@ -834,7 +834,7 @@ footer{background:#0F0F0F;border-top:1px solid rgba(255,255,255,0.07);padding:52
     </div>
 
     <div class="apply-right reveal d2">
-      <form class="form" id="cform" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <form class="form" id="cform" action="https://formspree.io/f/mlgzzzzp" method="POST">
         <div class="form-row">
           <div class="field"><label>Full name</label><input type="text" name="full_name" placeholder="James Smith"></div>
           <div class="field"><label>Business name</label><input type="text" name="business_name" placeholder="Avon Renewables Ltd"></div>
@@ -954,14 +954,15 @@ document.getElementById('cform').addEventListener('submit',async function(e){
     const data=new FormData(e.target);
     const res=await fetch(e.target.action,{method:'POST',body:data,headers:{Accept:'application/json'}});
     if(res.ok){
-      b.innerHTML="Sent — we'll be in touch within one business day.";
+      b.innerHTML="Application received — we'll be in touch within one business day.";
       b.style.cssText="background:rgba(37,99,235,.08);color:#2563EB;border:1px solid rgba(37,99,235,.18);border-radius:4px;padding:13px 18px;font-size:14px;font-weight:600;font-family:'Inter',system-ui,sans-serif;width:100%;cursor:default;text-align:left;opacity:1;";
       e.target.reset();
     }else{
+      const json=await res.json().catch(()=>({}));
       b.innerHTML=orig;
       b.disabled=false;
       b.style.opacity='1';
-      alert('Something went wrong. Please email finn@summitflow.co.uk directly.');
+      alert((json.errors&&json.errors.map(x=>x.message).join(', '))||'Something went wrong. Please email finn@summitflow.co.uk directly.');
     }
   }catch(err){
     b.innerHTML=orig;
