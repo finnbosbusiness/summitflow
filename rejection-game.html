@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Rejection Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --a:#4f46e5;--ah:#4338ca;--al:#eef2ff;--am:#818cf8;--abd:#c7d2fe;
+  --txt:#0f172a;--t2:#374151;--t3:#6b7280;--t4:#9ca3af;
+  --bg:#f1f5f9;--card:#ffffff;
+  --bd:#e2e8f0;--bd2:#f1f5f9;
+  --grn:#059669;--gnl:#ecfdf5;
+  --org:#ea580c;--orl:#fff7ed;
+  --red:#dc2626;--rdl:#fef2f2;
+  --gld:#d97706;--gdl:#fef3c7;
+  --prp:#7c3aed;--ppl:#f5f3ff;
+  --blu:#2563eb;--bll:#eff6ff;
+  --sh:0 1px 3px rgba(15,23,42,.07),0 1px 2px rgba(15,23,42,.05);
+  --sh2:0 4px 6px -1px rgba(15,23,42,.07),0 2px 4px rgba(15,23,42,.05);
+  --sh3:0 10px 15px -3px rgba(15,23,42,.08),0 4px 6px rgba(15,23,42,.04);
+  --r:12px;--rl:16px;--fn:'Outfit',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+input,textarea{font-family:var(--fb);outline:none;color:var(--txt);}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes noAnim{0%{transform:scale(1.04);opacity:.75}100%{transform:scale(1);opacity:1}}
+@keyframes msgAnim{0%{opacity:0;transform:translateY(-4px)}15%{opacity:1;transform:translateY(0)}75%{opacity:1}100%{opacity:0}}
+@keyframes shimmer{0%{background-position:-300% center}100%{background-position:300% center}}
+@keyframes lvlIn{0%{opacity:0;transform:scale(.7) translateY(24px)}65%{transform:scale(1.06) translateY(-4px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes bossIn{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+@keyframes tIn{from{opacity:0;transform:translateX(50px) scale(.96)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes calIn{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes streakPulse{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.4)}50%{box-shadow:0 0 0 8px rgba(249,115,22,0)}}
+
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--sh);}
+.lbl{font-family:var(--fb);font-size:.6rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--t3);}
+.num{font-family:var(--fn);font-weight:800;}
+.btn{border:none;cursor:pointer;font-family:var(--fb);font-weight:600;transition:all .12s;border-radius:var(--r);}
+.btn:active{transform:scale(.97);}
+.btn-a{background:var(--a);color:#fff;}.btn-a:hover{background:var(--ah);}
+.btn-out{background:transparent;border:1.5px solid var(--bd);color:var(--t2);}
+.btn-out:hover{border-color:var(--abd);color:var(--a);background:var(--al);}
+.layout{display:flex;height:100dvh;overflow:hidden;}
+.sidebar{width:220px;flex-shrink:0;background:var(--card);border-right:1px solid var(--bd);display:flex;flex-direction:column;height:100dvh;overflow-y:auto;}
+.main-scroll{flex:1;height:100dvh;overflow-y:auto;}
+.rp{width:280px;flex-shrink:0;background:var(--card);border-left:1px solid var(--bd);height:100dvh;overflow-y:auto;}
+.nv{display:flex;align-items:center;gap:.6rem;padding:.55rem .85rem;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:500;color:var(--t3);transition:all .15s;white-space:nowrap;margin:.1rem .5rem;}
+.nv:hover{background:var(--al);color:var(--a);}
+.nv.on{background:var(--al);color:var(--a);font-weight:700;}
+
+/* CALENDAR SCREEN */
+#cal-screen{
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding:2rem 1rem 6rem;
+  overflow-y:auto;
+  animation:fadeIn .4s ease;
+}
+.cal-header{text-align:center;margin-bottom:2rem;}
+.cal-header h1{font-family:var(--fn);font-weight:900;font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:-.5px;color:var(--txt);}
+.cal-header .sub{font-family:var(--fb);font-size:.85rem;color:var(--t3);margin-top:.35rem;}
+
+.cal-wrap{width:100%;max-width:480px;}
+
+/* streak banner */
+.streak-banner{
+  background:linear-gradient(135deg,#f97316,#ef4444);
+  border-radius:14px;padding:1.1rem 1.4rem;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.25rem;color:#fff;
+  box-shadow:0 4px 20px rgba(239,68,68,.3);
+}
+.streak-banner.zero{background:linear-gradient(135deg,var(--a),#6d28d9);}
+.streak-banner .s-num{font-family:var(--fn);font-weight:900;font-size:2.8rem;line-height:1;}
+.streak-banner .s-label{font-family:var(--fb);font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-top:.1rem;}
+.streak-banner .s-msg{font-family:var(--fb);font-size:.8rem;font-weight:600;max-width:220px;line-height:1.45;opacity:.95;}
+
+/* month nav */
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;}
+.month-nav .month-label{font-family:var(--fn);font-weight:800;font-size:1.1rem;color:var(--txt);}
+.month-nav button{width:32px;height:32px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--t2);transition:all .12s;}
+.month-nav button:hover{border-color:var(--abd);color:var(--a);background:var(--al);}
+
+/* calendar grid */
+.cal-grid{width:100%;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{font-family:var(--fb);font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t4);text-align:center;padding:.4rem 0;}
+.cal-day{
+  aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:pointer;
+  position:relative;transition:all .12s;border:1.5px solid transparent;
+}
+.cal-day .d-num{font-family:var(--fn);font-weight:700;font-size:.85rem;line-height:1;}
+.cal-day .d-calls{font-family:var(--fb);font-weight:700;font-size:.52rem;margin-top:2px;letter-spacing:.3px;}
+.cal-day.empty{cursor:default;}
+.cal-day.future{opacity:.35;cursor:default;}
+.cal-day.no-calls{background:var(--bd2);border-color:var(--bd);}
+.cal-day.no-calls .d-num{color:var(--t4);}
+.cal-day.has-calls{background:var(--al);border-color:var(--abd);}
+.cal-day.has-calls .d-num{color:var(--a);}
+.cal-day.has-calls .d-calls{color:var(--am);}
+.cal-day.full-day{background:linear-gradient(135deg,var(--a),var(--am));border-color:transparent;box-shadow:0 2px 8px rgba(79,70,229,.3);}
+.cal-day.full-day .d-num{color:#fff;}
+.cal-day.full-day .d-calls{color:rgba(255,255,255,.8);}
+.cal-day.today-marker{border-color:var(--a) !important;}
+.cal-day:not(.empty):not(.future):hover{transform:scale(1.06);z-index:1;}
+
+/* enter button */
+.enter-btn{
+  width:100%;padding:1.1rem;background:var(--a);color:#fff;
+  border:none;border-radius:14px;font-family:var(--fn);font-weight:800;
+  font-size:1.1rem;letter-spacing:.5px;cursor:pointer;
+  margin-top:1.5rem;transition:all .15s;
+  box-shadow:0 4px 20px rgba(79,70,229,.3);
+}
+.enter-btn:hover{background:var(--ah);transform:translateY(-1px);box-shadow:0 6px 24px rgba(79,70,229,.4);}
+.enter-btn:active{transform:translateY(0);}
+
+/* no-calls warning */
+.no-call-warning{
+  background:var(--rdl);border:1.5px solid #fca5a5;border-radius:12px;
+  padding:.9rem 1.1rem;margin-top:1rem;
+  font-family:var(--fb);font-size:.82rem;color:var(--red);font-weight:600;
+  display:none;
+}
+.no-call-warning.show{display:block;}
+
+/* overlay */
+#overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(15,23,42,.97);flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:2rem;
+}
+#overlay.show{display:flex;animation:fadeIn .3s ease;}
+
+/* toast */
+#toast-tray{position:fixed;top:1rem;right:1rem;display:flex;flex-direction:column;gap:8px;z-index:900;pointer-events:none;}
+.toast-item{background:var(--card);border:1px solid var(--abd);border-radius:14px;padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;animation:tIn .4s cubic-bezier(.34,1.3,.64,1);box-shadow:var(--sh3);max-width:280px;}
+.toast-icon{width:38px;height:38px;border-radius:50%;background:var(--al);border:1.5px solid var(--abd);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.toast-name{font-family:var(--fb);font-weight:700;font-size:.82rem;color:var(--a);}
+.toast-desc{font-family:var(--fb);font-size:.72rem;color:var(--t3);}
+
+@media(max-width:900px){
+  .sidebar,.rp{display:none;}
+  .desktop-only{display:none!important;}
+  .layout{flex-direction:column;}
+  .main-scroll{flex:1;height:auto;}
+  #cal-screen{padding:1.25rem 1rem 5rem;}
+  .cal-header{margin-bottom:1.25rem;}
+}
+@media(min-width:901px){.mobile-only{display:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- TOAST TRAY -->
+<div id="toast-tray"></div>
+
+<!-- OVERLAY (level up / boss / mission complete) -->
+<div id="overlay"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- CALENDAR SCREEN                                      -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="cal-screen">
+  <div class="cal-wrap">
+    <div class="cal-header">
+      <h1>The Rejection Game</h1>
+      <div class="sub">Your cold call record</div>
+    </div>
+
+    <!-- Streak banner -->
+    <div class="streak-banner zero" id="streak-banner">
+      <div>
+        <div class="s-num" id="streak-num">0</div>
+        <div class="s-label">Day Streak</div>
+      </div>
+      <div class="s-msg" id="streak-msg">Make your first 100 calls today to start the streak.</div>
+    </div>
+
+    <!-- Month nav -->
+    <div class="month-nav">
+      <button id="prev-month">&#8249;</button>
+      <div class="month-label" id="month-label"></div>
+      <button id="next-month">&#8250;</button>
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="cal-grid" id="cal-grid"></div>
+
+    <!-- Warning if today has no calls -->
+    <div class="no-call-warning" id="no-call-warning">
+      ⚠️ You haven't logged any calls today. Don't break the streak.
+    </div>
+
+    <button class="enter-btn" id="enter-btn">Enter the Game →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MAIN APP                                             -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="layout" id="app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div style="padding:1.5rem 1.25rem 1rem;">
+      <!-- Logo -->
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.5rem;">
+        <div style="width:32px;height:32px;background:var(--a);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <span style="color:#fff;font-size:1rem;font-weight:900;font-family:var(--fn)">R</span>
+        </div>
+        <div>
+          <div style="font-family:var(--fn);font-weight:800;font-size:.85rem;color:var(--txt);letter-spacing:.5px;line-height:1;">The Rejection</div>
+          <div style="font-family:var(--fn);font-weight:800;font-size:.85rem;color:var(--a);letter-spacing:.5px;line-height:1;">Game</div>
+        </div>
+      </div>
+      <!-- Nav -->
+      <div class="nv on" data-tab="dashboard" onclick="setTab('dashboard')">🎯 <span>Mission Control</span></div>
+      <div class="nv" data-tab="calendar" onclick="setTab('calendar')">📆 <span>Calendar</span></div>
+      <div class="nv" data-tab="stats" onclick="setTab('stats')">📊 <span>Stats</span></div>
+      <div class="nv" data-tab="achievements" onclick="setTab('achievements')">🏆 <span>Achievements</span></div>
+      <div class="nv" data-tab="journal" onclick="setTab('journal')">📝 <span>Journal</span></div>
+    </div>
+    <div style="flex:1;"></div>
+    <!-- Level badge -->
+    <div style="padding:1rem 1.25rem;border-top:1px solid var(--bd2);" id="sidebar-lv">
+      <div style="background:var(--al);border:1px solid var(--abd);border-radius:10px;padding:.75rem;">
+        <div class="lbl" style="margin-bottom:.3rem;">Current Level</div>
+        <div style="display:flex;align-items:baseline;gap:.35rem;">
+          <span id="sb-lv-num" style="font-family:var(--fn);font-weight:800;font-size:1.5rem;color:var(--a);">1</span>
+          <span id="sb-lv-title" style="font-family:var(--fb);font-weight:700;font-size:.78rem;color:var(--a);">Prospect</span>
+        </div>
+        <div style="margin-top:.5rem;height:3px;background:var(--abd);border-radius:999px;overflow:hidden;">
+          <div id="sb-xp-bar" style="height:100%;width:0%;background:var(--a);border-radius:999px;transition:width .6s ease;"></div>
+        </div>
+        <div class="lbl" style="margin-top:.3rem;" id="sb-xp-txt">0 / 2 XP</div>
+      </div>
+    </div>
+    <!-- Reset + Back -->
+    <div style="padding:0 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.4rem;">
+      <button onclick="goToCalendar()" style="width:100%;padding:.5rem;background:var(--al);border:1px solid var(--abd);border-radius:8px;font-family:var(--fb);font-size:.72rem;color:var(--a);cursor:pointer;font-weight:600;">← Back to Calendar</button>
+      <button onclick="if(confirm('Reset all data?')){localStorage.removeItem('rg1');location.reload();}" style="width:100%;padding:.5rem;background:none;border:1px solid var(--bd);border-radius:8px;font-family:var(--fb);font-size:.72rem;color:var(--t4);cursor:pointer;">Reset Data</button>
+    </div>
+  </aside>
+
+  <!-- MAIN SCROLL -->
+  <div class="main-scroll">
+    <div id="main-content" style="padding:1.75rem;max-width:820px;margin:0 auto;"></div>
+    <div class="mobile-only" style="height:64px;"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <aside class="rp desktop-only" id="right-panel" style="padding:1.5rem 1.25rem;display:flex;flex-direction:column;gap:1.1rem;"></aside>
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-only" style="position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--bd);display:flex;z-index:50;">
+    <button onclick="setTab('dashboard')" data-mobtab="dashboard" style="flex:1;border:none;background:none;cursor:pointer;padding:.6rem 0 .7rem;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:1;transition:opacity .15s;">
+      <span style="font-size:1.1rem;">🎯</span>
+      <span style="font-family:var(--fb);font-size:.5rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt);">Home</span>
+    </button>
+    <button onclick="setTab('calendar')" data-mobtab="calendar" style="flex:1;border:none;background:none;cursor:pointer;padding:.6rem 0 .7rem;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.35;transition:opacity .15s;">
+      <span style="font-size:1.1rem;">📆</span>
+      <span style="font-family:var(--fb);font-size:.5rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt);">Calendar</span>
+    </button>
+    <button onclick="setTab('stats')" data-mobtab="stats" style="flex:1;border:none;background:none;cursor:pointer;padding:.6rem 0 .7rem;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.35;transition:opacity .15s;">
+      <span style="font-size:1.1rem;">📊</span>
+      <span style="font-family:var(--fb);font-size:.5rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt);">Stats</span>
+    </button>
+    <button onclick="setTab('achievements')" data-mobtab="achievements" style="flex:1;border:none;background:none;cursor:pointer;padding:.6rem 0 .7rem;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.35;transition:opacity .15s;">
+      <span style="font-size:1.1rem;">🏆</span>
+      <span style="font-family:var(--fb);font-size:.5rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt);">Awards</span>
+    </button>
+    <button onclick="setTab('journal')" data-mobtab="journal" style="flex:1;border:none;background:none;cursor:pointer;padding:.6rem 0 .7rem;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.35;transition:opacity .15s;">
+      <span style="font-size:1.1rem;">📝</span>
+      <span style="font-family:var(--fb);font-size:.5rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt);">Journal</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const TOTAL=3500,DAILY=100;
+const TODAY=()=>new Date().toISOString().split("T")[0];
+const YDAY=()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().split("T")[0];};
+
+const QUOTES=[
+  {q:"Volume creates luck.",a:"Alex Hormozi"},
+  {q:"Nobody is coming to save you.",a:null},
+  {q:"Success is rented. Rent is due every day.",a:null},
+  {q:"The market rewards action, not intention.",a:null},
+  {q:"Every no is one step closer to yes.",a:null},
+  {q:"Clarity comes from action.",a:null},
+  {q:"The phone doesn't care how you feel.",a:null},
+  {q:"Rejection is the price of ambition.",a:null},
+  {q:"Do the work. Especially when you don't feel like it.",a:null},
+  {q:"Repetition is the price of mastery.",a:null},
+  {q:"Champions do it when they don't want to.",a:null},
+  {q:"Outwork your doubt.",a:null},
+  {q:"Small disciplines compound into massive results.",a:null},
+  {q:"What you do daily determines what you become permanently.",a:null},
+  {q:"The person who collects the most nos wins.",a:null},
+  {q:"Momentum is built one dial at a time.",a:null},
+  {q:"Do it afraid.",a:null},
+  {q:"You already know what to do. Now do it.",a:null},
+  {q:"Execution eats strategy for breakfast.",a:null},
+  {q:"Hard work is a strategy. Relentlessness is a superpower.",a:null},
+  {q:"Most people overestimate one day. Most underestimate one year.",a:null},
+  {q:"You don't rise to your goals. You fall to your systems.",a:"James Clear"},
+  {q:"Comfort is the enemy of progress.",a:null},
+  {q:"Rich or comfortable. Not both. Choose.",a:null},
+  {q:"Every empire started with one cold call.",a:null},
+  {q:"The days feel long. The years feel short.",a:null},
+  {q:"Become the person capable of doing it.",a:null},
+  {q:"Hesitation is the enemy of revenue.",a:null},
+  {q:"Nobody remembers the guy who almost made it.",a:null},
+  {q:"Each rejection is proof you showed up.",a:null},
+  {q:"The market doesn't reward intention. It rewards execution.",a:null},
+  {q:"Build the habit of courage.",a:null},
+  {q:"Your future self is watching. Make them proud.",a:null},
+  {q:"One more call. Always one more call.",a:null},
+  {q:"You are not afraid. You are preparing.",a:null},
+];
+
+const TITLES=["Prospect","Caller","Dialler","Cold Caller","Operator","Pipeline Builder","Outreach Engine","Volume King","Deal Seeker","Closer","Revenue Chaser","Cold Blood","The Dialler","Rejection Proof","No Fear","Street Fighter","Battle Tested","Iron Mind","Unbreakable","Rainmaker","Storm Caller","Revenue Engine","The Grinder","Momentum Keeper","Pipeline Master","Ice Veins","High Pressure","Commission Hungry","First Blood","Territory Owner","Account Slayer","Cold Call Monk","The Machine","Appointment Assassin","Deal Hunter","Elite Closer","Sharp Shooter","The Operator","Untouchable","Relentless","Stone Cold","Revenue Ghost","Pipeline God","Black Belt","War Dialler","Savage Closer","Conviction King","No Days Off","The Finisher","Agency Builder","Capital Accumulator","Growth Engine","Business Animal","Wealth Creator","Six Figure","Compound Effect","Relentless II","No Excuses","The Obsessed","Zero To One","Unstoppable","Apex Predator","Cold Blood II","Executive Closer","Revenue Commander","The Architect","Empire Mode","Market Mover","Top One Percent","Monopoly","The Summit","Ascendant","Sovereign","Invincible","Market Dominator","Category King","The Authority","Legacy Builder","The Visionary","Elite Of Elite","The Reckoning","Force Of Nature","Eternal Grinder","Beyond Human","The Anomaly","Final Form","Otherworldly","Absolute","Transcendent","Ascension","The Mythic","Immortal Mindset","Living Legend","Beyond Limits","The Untold","Epoch Maker","History Maker","The Monument","Godmode","Legend"];
+
+const LEVELS=Array.from({length:100},(_,i)=>({n:i+1,title:TITLES[i],xp:i*i*2}));
+
+const BOSSES=[
+  {id:1,name:"The Gatekeeper",target:500,tagline:"Get through the resistance"},
+  {id:2,name:"The Doubter",target:1000,tagline:"Silence the inner critic"},
+  {id:3,name:"The Comfort Zone",target:1500,tagline:"Break the familiar"},
+  {id:4,name:"The Quitter",target:2000,tagline:"When most give up"},
+  {id:5,name:"The Fear",target:2500,tagline:"Do it afraid"},
+  {id:6,name:"The Status Quo",target:3000,tagline:"Disrupt everything"},
+  {id:7,name:"The Final Boss",target:3500,tagline:"Achieve the impossible"},
+];
+
+const ACHS=[
+  {id:"n1",icon:"📞",name:"First No",desc:"Your first rejection logged",check:s=>s.totalNos>=1},
+  {id:"n10",icon:"⚡",name:"Ten Nos",desc:"10 rejections collected",check:s=>s.totalNos>=10},
+  {id:"n50",icon:"🔥",name:"Fifty Nos",desc:"50 rejections down",check:s=>s.totalNos>=50},
+  {id:"n100",icon:"💯",name:"100 Nos",desc:"100 rejections — first century",check:s=>s.totalNos>=100},
+  {id:"n250",icon:"🎯",name:"250 Nos",desc:"250 collected",check:s=>s.totalNos>=250},
+  {id:"n500",icon:"⭐",name:"500 Nos",desc:"500 rejections — keep going",check:s=>s.totalNos>=500},
+  {id:"n1k",icon:"🏆",name:"1000 Nos",desc:"1,000 rejections. Respect.",check:s=>s.totalNos>=1000},
+  {id:"n2k",icon:"🔱",name:"2000 Nos",desc:"Halfway to legend",check:s=>s.totalNos>=2000},
+  {id:"n3500",icon:"👑",name:"Mission Complete",desc:"3,500 rejections. You did it.",check:s=>s.totalNos>=3500},
+  {id:"fm",icon:"🤝",name:"First Meeting",desc:"First meeting booked",check:s=>s.meetings>=1},
+  {id:"m5",icon:"📅",name:"Five Meetings",desc:"5 meetings booked",check:s=>s.meetings>=5},
+  {id:"fp",icon:"📄",name:"First Proposal",desc:"First proposal sent",check:s=>s.proposals>=1},
+  {id:"fc",icon:"💰",name:"First Client",desc:"First client closed",check:s=>s.clients>=1},
+  {id:"c3",icon:"🏛️",name:"Three Clients",desc:"3 clients closed",check:s=>s.clients>=3},
+  {id:"s7",icon:"🔴",name:"7 Day Streak",desc:"7 consecutive days",check:s=>s.streak>=7},
+  {id:"s14",icon:"🟠",name:"14 Day Streak",desc:"14 consecutive days",check:s=>s.streak>=14},
+  {id:"s30",icon:"🟢",name:"30 Day Streak",desc:"30-day streak",check:s=>s.streak>=30},
+  {id:"r1k",icon:"💷",name:"£1,000 Revenue",desc:"£1k revenue tracked",check:s=>s.revenue>=1000},
+  {id:"r5k",icon:"💎",name:"£5,000 Revenue",desc:"£5k revenue tracked",check:s=>s.revenue>=5000},
+  {id:"r10k",icon:"🏦",name:"£10,000 Revenue",desc:"£10k revenue tracked",check:s=>s.revenue>=10000},
+];
+
+const NO_MSGS=["Good.","Closer.","Progress.","Another one collected.","Most people avoid this feeling.","One less no between you and success.","That's courage.","Keep going.","You're building immunity.","Embrace it.","Data point collected.","The market respects this.","One closer.","Every no is a step.","Rejection proof."];
+
+const XP_MAP={no:1,dm:5,convo:10,meeting:50,proposal:100,client:500};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const INIT={
+  totalNos:0,meetings:0,proposals:0,clients:0,revenue:0,
+  xp:0,streak:0,bestStreak:0,lastStreakDay:null,
+  nosToday:0,lastDayKey:null,
+  unlockedAchs:[],journals:{},
+  startDate:TODAY(),
+  // daily call history: { "2025-06-10": 47, ... }
+  dailyCalls:{},
+};
+
+let ST = (()=>{try{const s=localStorage.getItem("rg1");if(s)return{...INIT,...JSON.parse(s)};}catch{}return{...INIT};})();
+let currentTab="dashboard";
+let flashTimeout=null;
+let prevLvN=getLvl(ST.xp).cur.n;
+let prevBossId=getCurBoss(ST.totalNos).id;
+
+function save(){
+  try{localStorage.setItem("rg1",JSON.stringify(ST));}catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function getLvl(xp){
+  let cur=LEVELS[0],nxt=LEVELS[1];
+  for(let i=LEVELS.length-1;i>=0;i--){
+    if(xp>=LEVELS[i].xp){cur=LEVELS[i];nxt=LEVELS[i+1]??null;break;}
+  }
+  const into=xp-cur.xp,need=nxt?nxt.xp-cur.xp:1;
+  return{cur,nxt,into,need,pct:Math.min((into/need)*100,100)};
+}
+function getCurBoss(n){return BOSSES.find(b=>n<b.target)??BOSSES[6];}
+function getPrevTarget(id){return id===1?0:BOSSES[id-2].target;}
+function getQuote(start){return QUOTES[Math.floor((Date.now()-+new Date(start))/86400000)%QUOTES.length];}
+function getDayNum(start){return Math.min(1+Math.floor((Date.now()-+new Date(start))/86400000),35);}
+function fmt(n){return n>=1000?(n/1000).toFixed(1)+"k":String(n);}
+
+// ═══════════════════════════════════════════════
+// STREAK MESSAGES
+// ═══════════════════════════════════════════════
+function getStreakMsg(streak){
+  if(streak===0)return"Make your first 100 calls today to start the streak.";
+  if(streak===1)return"Day 1. The streak starts here. Don't let it die tomorrow.";
+  if(streak<7)return`${streak} days straight. Don't break it now.`;
+  if(streak<14)return`${streak} days. You're building something real. Don't stop.`;
+  if(streak<30)return`${streak} days. Most people quit before this. Keep going.`;
+  return`${streak} days. You're different. Protect this.`;
+}
+
+// ═══════════════════════════════════════════════
+// CALENDAR RENDER
+// ═══════════════════════════════════════════════
+let calViewDate = new Date();
+
+function renderCalScreen(){
+  // Update streak banner
+  const streak=ST.streak;
+  const banner=document.getElementById("streak-banner");
+  document.getElementById("streak-num").textContent=streak;
+  document.getElementById("streak-msg").textContent=getStreakMsg(streak);
+  if(streak>0){
+    banner.classList.remove("zero");
+    banner.style.background="linear-gradient(135deg,#f97316,#ef4444)";
+  } else {
+    banner.classList.add("zero");
+    banner.style.background="linear-gradient(135deg,var(--a),#6d28d9)";
+  }
+
+  // Check if today has calls
+  const todayKey=TODAY();
+  const todayCalls=ST.dailyCalls?.[todayKey]||ST.nosToday||0;
+  const warning=document.getElementById("no-call-warning");
+  // Show warning only if it's a weekday and no calls today
+  const dayOfWeek=new Date().getDay();
+  if(todayCalls===0 && ST.totalNos>0){
+    warning.classList.add("show");
+  } else {
+    warning.classList.remove("show");
+  }
+
+  renderCalGrid();
+}
+
+function renderCalGrid(){
+  const grid=document.getElementById("cal-grid");
+  const label=document.getElementById("month-label");
+  const year=calViewDate.getFullYear();
+  const month=calViewDate.getMonth();
+
+  label.textContent=new Date(year,month,1).toLocaleString("en-GB",{month:"long",year:"numeric"});
+
+  const dows=["M","T","W","T","F","S","S"];
+  let html=dows.map(d=>`<div class="cal-dow">${d}</div>`).join("");
+
+  const firstDay=new Date(year,month,1);
+  // Monday-based: 0=Mon,...6=Sun
+  let startDow=(firstDay.getDay()+6)%7;
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const todayStr=TODAY();
+
+  for(let i=0;i<startDow;i++){
+    html+=`<div class="cal-day empty"></div>`;
+  }
+
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isToday=dateStr===todayStr;
+    const isFuture=dateStr>todayStr;
+    const calls=ST.dailyCalls?.[dateStr]||0;
+    // also account for today's ongoing count
+    const callCount=(dateStr===todayStr)?Math.max(calls,ST.nosToday||0):calls;
+
+    let cls="cal-day";
+    if(isFuture) cls+=" future";
+    else if(callCount>=DAILY) cls+=" full-day";
+    else if(callCount>0) cls+=" has-calls";
+    else cls+=" no-calls";
+    if(isToday) cls+=" today-marker";
+
+    const callLabel=callCount>0?`<div class="d-calls">${callCount} calls</div>`:"";
+    html+=`<div class="${cls}" title="${dateStr}: ${callCount} calls"><div class="d-num">${d}</div>${callLabel}</div>`;
+  }
+
+  grid.innerHTML=html;
+}
+
+// Month nav
+document.getElementById("prev-month").addEventListener("click",()=>{
+  calViewDate=new Date(calViewDate.getFullYear(),calViewDate.getMonth()-1,1);
+  renderCalGrid();
+});
+document.getElementById("next-month").addEventListener("click",()=>{
+  calViewDate=new Date(calViewDate.getFullYear(),calViewDate.getMonth()+1,1);
+  renderCalGrid();
+});
+
+document.getElementById("enter-btn").addEventListener("click",()=>{
+  document.getElementById("cal-screen").style.display="none";
+  const app=document.getElementById("app");
+  app.style.display="flex";
+  renderApp();
+});
+
+function goToCalendar(){
+  renderCalScreen();
+  document.getElementById("app").style.display="none";
+  const cs=document.getElementById("cal-screen");
+  cs.style.display="flex";
+  cs.style.animation="none";
+  setTimeout(()=>cs.style.animation="fadeIn .4s ease",10);
+}
+
+// ═══════════════════════════════════════════════
+// TOASTS
+// ═══════════════════════════════════════════════
+function showToast(a){
+  const tray=document.getElementById("toast-tray");
+  const el=document.createElement("div");
+  el.className="toast-item";
+  el.innerHTML=`<div class="toast-icon">${a.icon}</div><div><div class="toast-name">${a.name}</div><div class="toast-desc">${a.desc}</div></div>`;
+  tray.appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+// ═══════════════════════════════════════════════
+// OVERLAY
+// ═══════════════════════════════════════════════
+function showOverlay(html,duration=4500){
+  const ov=document.getElementById("overlay");
+  ov.innerHTML=html+`<div style="margin-top:2rem;font-family:var(--fb);font-size:.78rem;color:rgba(255,255,255,.4);cursor:pointer;" onclick="document.getElementById('overlay').classList.remove('show')">Tap to continue</div>`;
+  ov.classList.add("show");
+  ov.onclick=()=>ov.classList.remove("show");
+  if(duration) setTimeout(()=>ov.classList.remove("show"),duration);
+}
+
+function showLvlUp(lv){
+  showOverlay(`
+    <div style="animation:lvlIn .65s cubic-bezier(.34,1.4,.64,1) forwards">
+      <div style="font-family:var(--fb);font-weight:800;font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:1rem;">Level Up</div>
+      <div style="font-family:var(--fn);font-weight:900;font-size:clamp(6rem,25vw,10rem);line-height:1;letter-spacing:-8px;color:#fff;">${lv.n}</div>
+      <div style="font-family:var(--fn);font-weight:800;font-size:clamp(1.5rem,5vw,2.5rem);color:rgba(255,255,255,.9);letter-spacing:2px;text-transform:uppercase;margin-top:.4rem;">${lv.title}</div>
+    </div>`,4500);
+  document.getElementById("overlay").style.background="rgba(79,70,229,.96)";
+}
+
+function showBossDefeated(boss){
+  showOverlay(`
+    <div style="animation:bossIn .5s ease">
+      <div style="font-size:3.5rem;margin-bottom:1rem;">⚔️</div>
+      <div style="font-family:var(--fb);font-weight:800;font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.75rem;">Boss Defeated</div>
+      <div style="font-family:var(--fn);font-weight:900;font-size:clamp(2rem,8vw,3.5rem);color:#f59e0b;margin-bottom:.5rem;">${boss.name}</div>
+      <div style="font-family:var(--fb);font-size:.9rem;color:rgba(255,255,255,.6);font-style:italic;margin-bottom:2rem;">${boss.tagline}</div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:1rem 1.5rem;">
+        <div style="font-family:var(--fn);font-weight:800;font-size:1.5rem;color:#f59e0b;">${boss.target.toLocaleString()} NOs Collected</div>
+      </div>
+    </div>`,4000);
+  document.getElementById("overlay").style.background="rgba(15,23,42,.97)";
+}
+
+// ═══════════════════════════════════════════════
+// GAME LOGIC
+// ═══════════════════════════════════════════════
+function chkAchs(){
+  ACHS.forEach(a=>{
+    if(!ST.unlockedAchs.includes(a.id)&&a.check(ST)){
+      ST.unlockedAchs.push(a.id);
+      setTimeout(()=>showToast(a),700);
+    }
+  });
+}
+
+function chkLv(oldXp,newXp){
+  const oldLv=getLvl(oldXp).cur.n;
+  const newLv=getLvl(newXp).cur.n;
+  if(newLv>oldLv) setTimeout(()=>showLvlUp(getLvl(newXp).cur),500);
+}
+
+function chkBoss(oldN,newN){
+  BOSSES.forEach(b=>{
+    if(oldN<b.target&&newN>=b.target) setTimeout(()=>showBossDefeated(b),700);
+  });
+}
+
+function logNo(){
+  const today=TODAY();
+  const oldXp=ST.xp;
+  const oldNos=ST.totalNos;
+
+  if(ST.lastDayKey!==today){ST.nosToday=0;ST.lastDayKey=today;}
+  ST.nosToday++;
+  ST.totalNos++;
+  ST.xp+=XP_MAP.no;
+
+  // update daily call history
+  if(!ST.dailyCalls) ST.dailyCalls={};
+  ST.dailyCalls[today]=(ST.dailyCalls[today]||0)+1;
+
+  // streak: award when daily target hit
+  if(ST.nosToday===DAILY){
+    const y=YDAY();
+    ST.streak=ST.lastStreakDay===y?ST.streak+1:1;
+    ST.bestStreak=Math.max(ST.bestStreak,ST.streak);
+    ST.lastStreakDay=today;
+  }
+
+  chkAchs();
+  chkLv(oldXp,ST.xp);
+  chkBoss(oldNos,ST.totalNos);
+  if(ST.totalNos>=TOTAL) setTimeout(()=>showMissionComplete(),1500);
+  save();
+
+  // flash message
+  const msg=NO_MSGS[Math.floor(Math.random()*NO_MSGS.length)];
+  showFlash(msg);
+  renderApp();
+}
+
+function logEvent(type){
+  const oldXp=ST.xp;
+  const field=type==="dm"||type==="convo"?null:type+"s";
+  ST.xp+=(XP_MAP[type]||0);
+  if(field) ST[field]=(ST[field]||0)+1;
+  chkAchs();
+  chkLv(oldXp,ST.xp);
+  save();
+  renderApp();
+}
+
+function addRev(n){
+  ST.revenue=(ST.revenue||0)+n;
+  chkAchs();
+  save();
+  renderApp();
+}
+
+let flashMsg=null;
+function showFlash(msg){
+  flashMsg=msg;
+  clearTimeout(flashTimeout);
+  flashTimeout=setTimeout(()=>{flashMsg=null;renderApp();},2000);
+}
+
+function showMissionComplete(){
+  const lv=getLvl(ST.xp);
+  const ov=document.getElementById("overlay");
+  ov.style.background="#fff";
+  ov.innerHTML=`
+    <div style="max-width:480px;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:1rem;">👑</div>
+      <div style="font-family:var(--fn);font-weight:900;font-size:clamp(2rem,8vw,3.5rem);letter-spacing:-2px;color:var(--a);margin-bottom:.5rem;">Mission Complete</div>
+      <div style="font-family:var(--fn);font-weight:700;font-size:1.2rem;color:var(--t3);margin-bottom:2rem;">3,500 Nos Collected</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:2rem;">
+        ${[["NOs",ST.totalNos.toLocaleString()],["Meetings",ST.meetings],["Clients",ST.clients],["Revenue","£"+ST.revenue.toLocaleString()],["Streak",ST.bestStreak+"d"],["Level","LV "+lv.cur.n]].map(([k,v])=>`
+          <div style="background:var(--al);border:1px solid var(--abd);border-radius:12px;padding:1rem;">
+            <div class="lbl" style="margin-bottom:.3rem;">${k}</div>
+            <div style="font-family:var(--fn);font-weight:800;font-size:1.3rem;color:var(--a);">${v}</div>
+          </div>`).join("")}
+      </div>
+      <div style="font-family:var(--fn);font-weight:700;font-size:clamp(1rem,3vw,1.2rem);color:var(--t2);line-height:1.7;margin-bottom:.75rem;font-style:italic;">
+        "Most people spend their lives avoiding rejection.<br>You collected 3,500 of them."
+      </div>
+      <button class="btn btn-a" style="padding:.9rem 2.5rem;font-size:1rem;border-radius:999px;" onclick="document.getElementById('overlay').classList.remove('show')">Continue</button>
+    </div>`;
+  ov.classList.add("show");
+  ov.onclick=null;
+}
+
+// ═══════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════
+function setTab(tab){
+  currentTab=tab;
+  document.querySelectorAll(".nv").forEach(el=>{
+    el.classList.toggle("on",el.dataset.tab===tab);
+  });
+  document.querySelectorAll("[data-mobtab]").forEach(btn=>{
+    btn.style.opacity=btn.dataset.mobtab===tab?"1":"0.35";
+  });
+  const rp=document.getElementById("right-panel");
+  rp.style.display=(tab==="dashboard")?"flex":"none";
+  renderApp();
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderApp(){
+  updateSidebar();
+  updateRightPanel();
+  const mc=document.getElementById("main-content");
+  if(currentTab==="dashboard") mc.innerHTML=renderDashboard();
+  else if(currentTab==="calendar") mc.innerHTML=renderInlineCalendar();
+  else if(currentTab==="stats") mc.innerHTML=renderStats();
+  else if(currentTab==="achievements") mc.innerHTML=renderAchievements();
+  else if(currentTab==="journal") mc.innerHTML=renderJournal();
+  bindJournalEvents();
+  bindRevEvent();
+}
+
+function updateSidebar(){
+  const lv=getLvl(ST.xp);
+  document.getElementById("sb-lv-num").textContent=lv.cur.n;
+  document.getElementById("sb-lv-title").textContent=lv.cur.title;
+  document.getElementById("sb-xp-bar").style.width=lv.pct+"%";
+  document.getElementById("sb-xp-txt").textContent=`${lv.into.toLocaleString()} / ${lv.need.toLocaleString()} XP`;
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard(){
+  const lv=getLvl(ST.xp);
+  const boss=getCurBoss(ST.totalNos);
+  const prevT=getPrevTarget(boss.id);
+  const bossP=ST.totalNos-prevT,bossN=boss.target-prevT;
+  const remaining=Math.max(TOTAL-ST.totalNos,0);
+  const pct=Math.min((ST.totalNos/TOTAL)*100,100);
+  const quote=getQuote(ST.startDate);
+  const dn=getDayNum(ST.startDate);
+  const nosToday=ST.nosToday||0;
+  const isMob=window.innerWidth<=900;
+
+  return `<div style="display:flex;flex-direction:column;gap:1.25rem;animation:fadeIn .4s ease;">
+    <!-- Quote -->
+    <div class="card" style="padding:1.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+        <div>
+          <div class="lbl" style="margin-bottom:.6rem;">Today's Mandate · Day ${dn}</div>
+          <div style="font-family:var(--fn);font-weight:700;font-size:clamp(1.1rem,2.5vw,1.4rem);line-height:1.45;color:var(--txt);margin-bottom:${quote.a?'.6rem':'0'};">
+            "${escHtml(quote.q)}"
+          </div>
+          ${quote.a?`<div style="font-family:var(--fb);font-size:.78rem;color:var(--t3);">— ${escHtml(quote.a)}</div>`:""}
+        </div>
+        <div style="flex-shrink:0;text-align:center;padding:.6rem 1rem;background:var(--al);border-radius:10px;border:1px solid var(--abd);">
+          <div style="font-family:var(--fn);font-weight:800;font-size:1.6rem;color:var(--a);line-height:1;">${dn}</div>
+          <div class="lbl" style="color:var(--a);">of 35</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NO HERO -->
+    <div class="card" style="padding:2rem 2rem 1.75rem;text-align:center;">
+      <div class="lbl" style="margin-bottom:.6rem;">NOs Remaining</div>
+      <div style="font-family:var(--fn);font-weight:900;font-size:clamp(5rem,11vw,7.5rem);line-height:1;letter-spacing:-6px;color:var(--a);margin-bottom:.5rem;">${remaining.toLocaleString()}</div>
+      <div style="height:1.4rem;margin-bottom:1.25rem;">
+        ${flashMsg
+          ?`<div style="font-family:var(--fb);font-size:.85rem;color:var(--t3);animation:msgAnim 2s ease forwards;">${escHtml(flashMsg)}</div>`
+          :`<div style="font-family:var(--fb);font-size:.82rem;color:var(--t4);">Every no gets you closer to a yes.</div>`
+        }
+      </div>
+      <button onclick="logNo()" class="btn btn-a" style="padding:.9rem 3.5rem;font-size:1rem;font-weight:700;letter-spacing:1.5px;border-radius:999px;box-shadow:0 4px 16px rgba(79,70,229,.28);margin-bottom:1.75rem;">
+        + LOG NO
+      </button>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;">
+          <span style="font-family:var(--fb);font-size:.74rem;color:var(--t3);">${ST.totalNos.toLocaleString()} / ${TOTAL.toLocaleString()} collected</span>
+          <span style="font-family:var(--fb);font-size:.74rem;color:var(--t3);">${pct.toFixed(1)}%</span>
+        </div>
+        <div style="height:6px;background:var(--al);border-radius:999px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--a),var(--am));border-radius:999px;transition:width .8s ease;${pct>0?'animation:shimmer 3s linear infinite;background-size:200%;':''}"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile today -->
+    ${isMob?`<div class="card" style="padding:1.1rem;display:flex;align-items:center;gap:1rem;">
+      ${progressRingHTML(nosToday,100,64,5)}
+      <div>
+        <div class="lbl">Today</div>
+        <div style="font-family:var(--fn);font-weight:800;font-size:1.3rem;color:var(--a);">${nosToday} / 100</div>
+        <div style="font-family:var(--fb);font-size:.72rem;color:var(--t3);">🔥 ${ST.streak} day streak</div>
+      </div>
+    </div>`:""}
+
+    <!-- Level + Boss -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+      <!-- Level Card -->
+      <div class="card" style="padding:1.25rem;">
+        <div class="lbl" style="margin-bottom:.75rem;">Level</div>
+        <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:.15rem;">
+          <span style="font-family:var(--fn);font-weight:900;font-size:2.2rem;color:var(--a);line-height:1;">${lv.cur.n}</span>
+        </div>
+        <div style="font-family:var(--fb);font-weight:700;font-size:1rem;color:var(--txt);margin-bottom:1rem;">${lv.cur.title}</div>
+        <div style="margin-bottom:.5rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
+            <span class="lbl">XP Progress</span>
+            <span style="font-family:var(--fb);font-size:.72rem;color:var(--t3);">${lv.into.toLocaleString()} / ${lv.need.toLocaleString()}</span>
+          </div>
+          <div style="height:5px;background:var(--al);border-radius:999px;overflow:hidden;">
+            <div style="height:100%;width:${lv.pct}%;background:linear-gradient(90deg,var(--a),var(--am));border-radius:999px;transition:width .6s ease;"></div>
+          </div>
+        </div>
+        ${lv.nxt?`<div class="lbl">Next: ${lv.nxt.title}</div>`:""}
+      </div>
+      <!-- Boss Card -->
+      <div class="card" style="padding:1.25rem;">
+        <div class="lbl" style="margin-bottom:.75rem;">Boss Battle · ${boss.id} of 7</div>
+        <div style="font-family:var(--fb);font-weight:700;font-size:1rem;color:var(--txt);margin-bottom:.2rem;">${boss.name}</div>
+        <div style="font-family:var(--fb);font-size:.75rem;color:var(--t3);margin-bottom:.85rem;font-style:italic;">${boss.tagline}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;">
+          <span class="lbl">Progress</span>
+          <span style="font-family:var(--fn);font-weight:700;font-size:.85rem;color:var(--a);">${bossP.toLocaleString()} / ${bossN.toLocaleString()}</span>
+        </div>
+        <div style="height:6px;background:var(--ppl);border-radius:999px;overflow:hidden;margin-bottom:1rem;">
+          <div style="height:100%;width:${Math.min((bossP/bossN)*100,100)}%;background:linear-gradient(90deg,var(--a),#a855f7);border-radius:999px;transition:width .6s ease;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.25rem;">
+          ${BOSSES.map(b=>{
+            const done=ST.totalNos>=b.target,cur=boss.id===b.id;
+            return `<div style="display:flex;align-items:center;gap:.5rem;opacity:${done?.45:cur?1:.3};">
+              <div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:${done?"var(--grn)":cur?"var(--a)":"var(--t4)"};"></div>
+              <span style="font-family:var(--fb);font-size:.72rem;color:${cur?"var(--a)":done?"var(--t4)":"var(--t3)"};flex:1;">${b.name}</span>
+              <span style="font-family:var(--fn);font-size:.68rem;color:var(--t4);">${b.target.toLocaleString()}</span>
+              ${done?`<span style="font-size:.6rem;color:var(--grn);">✓</span>`:""}
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements row -->
+    <div class="card" style="padding:1.25rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div class="lbl">Achievements</div>
+        <div style="font-family:var(--fb);font-size:.72rem;color:var(--t3);">${ST.unlockedAchs.length}/${ACHS.length}</div>
+      </div>
+      <div style="display:flex;gap:.75rem;overflow-x:auto;padding-bottom:.25rem;">
+        ${ACHS.map(a=>{
+          const done=ST.unlockedAchs.includes(a.id);
+          return `<div title="${a.name}: ${a.desc}" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;flex-shrink:0;width:64px;cursor:default;">
+            <div style="width:46px;height:46px;border-radius:50%;background:${done?"var(--al)":"var(--bd2)"};border:${done?"2px solid var(--abd)":"2px solid var(--bd)"};display:flex;align-items:center;justify-content:center;font-size:1.3rem;filter:${done?"none":"grayscale(1) opacity(0.35)"};transition:all .25s;">
+              ${done?a.icon:"?"}
+            </div>
+            <span style="font-family:var(--fb);font-size:.55rem;color:${done?"var(--a)":"var(--t4)"};font-weight:600;text-align:center;line-height:1.2;">
+              ${done?a.name:"Locked"}
+            </span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- Log Events -->
+    <div class="card" style="padding:1.25rem;">
+      <div class="lbl" style="margin-bottom:1rem;">Log Events</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;">
+        ${[
+          {type:"no",icon:"📞",label:"Log No",xp:1,c:"var(--red)",bg:"var(--rdl)"},
+          {type:"dm",icon:"👔",label:"Decision Maker",xp:5,c:"var(--prp)",bg:"var(--ppl)"},
+          {type:"convo",icon:"💬",label:"Conversation",xp:10,c:"var(--blu)",bg:"var(--bll)"},
+          {type:"meeting",icon:"📅",label:"Meeting Booked",xp:50,c:"var(--grn)",bg:"var(--gnl)"},
+          {type:"proposal",icon:"📄",label:"Proposal Sent",xp:100,c:"var(--org)",bg:"var(--orl)"},
+          {type:"client",icon:"🏆",label:"Client Closed",xp:500,c:"var(--gld)",bg:"var(--gdl)"},
+        ].map(({type,icon,label,xp,c,bg})=>`
+          <button onclick="${type==="no"?"logNo()":"logEvent('"+type+"')"}"
+            style="display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.8rem .5rem;background:${bg};border:1px solid transparent;border-radius:10px;cursor:pointer;transition:all .12s;"
+            onpointerdown="this.style.transform='scale(0.95)'"
+            onpointerup="this.style.transform='scale(1)'"
+            onpointerleave="this.style.transform='scale(1)'">
+            <span style="font-size:1.3rem;">${icon}</span>
+            <span style="font-family:var(--fb);font-size:.62rem;font-weight:700;color:${c};text-align:center;line-height:1.2;">${label}</span>
+            <span style="font-family:var(--fb);font-size:.58rem;color:${c};opacity:.75;">+${xp} XP</span>
+          </button>`).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// INLINE CALENDAR VIEW (inside app)
+// ═══════════════════════════════════════════════
+let appCalViewDate = new Date();
+
+function renderInlineCalendar(){
+  const year=appCalViewDate.getFullYear();
+  const month=appCalViewDate.getMonth();
+  const monthLabel=new Date(year,month,1).toLocaleString("en-GB",{month:"long",year:"numeric"});
+  const dows=["M","T","W","T","F","S","S"];
+  const firstDay=new Date(year,month,1);
+  let startDow=(firstDay.getDay()+6)%7;
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const todayStr=TODAY();
+
+  // Build day cells HTML
+  let cells=dows.map(d=>`<div class="cal-dow">${d}</div>`).join("");
+  for(let i=0;i<startDow;i++) cells+=`<div class="cal-day empty"></div>`;
+  let totalCallsThisMonth=0;
+  let daysCalledThisMonth=0;
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isToday=dateStr===todayStr;
+    const isFuture=dateStr>todayStr;
+    const calls=ST.dailyCalls?.[dateStr]||0;
+    const callCount=(dateStr===todayStr)?Math.max(calls,ST.nosToday||0):calls;
+    if(callCount>0){totalCallsThisMonth+=callCount;daysCalledThisMonth++;}
+    let cls="cal-day";
+    if(isFuture) cls+=" future";
+    else if(callCount>=DAILY) cls+=" full-day";
+    else if(callCount>0) cls+=" has-calls";
+    else cls+=" no-calls";
+    if(isToday) cls+=" today-marker";
+    const callLabel=callCount>0?`<div class="d-calls">${callCount}</div>`:"";
+    cells+=`<div class="${cls}" title="${dateStr}: ${callCount} calls"><div class="d-num">${d}</div>${callLabel}</div>`;
+  }
+
+  // Compute streak info
+  const streak=ST.streak;
+  const streakMsg=getStreakMsg(streak);
+
+  return `<div style="display:flex;flex-direction:column;gap:1.25rem;animation:fadeIn .4s ease;max-width:500px;margin:0 auto;">
+    <div style="font-family:var(--fn);font-weight:800;font-size:1.5rem;">Call Calendar</div>
+
+    <!-- Streak card -->
+    <div style="background:${streak>0?"linear-gradient(135deg,#f97316,#ef4444)":"linear-gradient(135deg,var(--a),#6d28d9)"};border-radius:14px;padding:1.25rem 1.4rem;display:flex;align-items:center;justify-content:space-between;color:#fff;box-shadow:0 4px 20px ${streak>0?"rgba(239,68,68,.3)":"rgba(79,70,229,.3)"};">
+      <div>
+        <div style="font-family:var(--fn);font-weight:900;font-size:2.8rem;line-height:1;">${streak}</div>
+        <div style="font-family:var(--fb);font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-top:.1rem;">Day Streak</div>
+      </div>
+      <div style="font-family:var(--fb);font-size:.82rem;font-weight:600;max-width:200px;line-height:1.45;opacity:.95;text-align:right;">${streakMsg}</div>
+    </div>
+
+    <!-- Month stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+      <div class="card" style="padding:1rem;">
+        <div class="lbl" style="margin-bottom:.35rem;">This Month</div>
+        <div style="font-family:var(--fn);font-weight:800;font-size:1.8rem;color:var(--a);line-height:1;">${totalCallsThisMonth.toLocaleString()}</div>
+        <div style="font-family:var(--fb);font-size:.72rem;color:var(--t3);margin-top:.2rem;">calls logged</div>
+      </div>
+      <div class="card" style="padding:1rem;">
+        <div class="lbl" style="margin-bottom:.35rem;">Days Active</div>
+        <div style="font-family:var(--fn);font-weight:800;font-size:1.8rem;color:var(--grn);line-height:1;">${daysCalledThisMonth}</div>
+        <div style="font-family:var(--fb);font-size:.72rem;color:var(--t3);margin-top:.2rem;">of ${daysInMonth} days</div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:.4rem;"><div style="width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,var(--a),var(--am));"></div><span style="font-family:var(--fb);font-size:.72rem;color:var(--t3);">100+ calls</span></div>
+      <div style="display:flex;align-items:center;gap:.4rem;"><div style="width:14px;height:14px;border-radius:4px;background:var(--al);border:1px solid var(--abd);"></div><span style="font-family:var(--fb);font-size:.72rem;color:var(--t3);">Some calls</span></div>
+      <div style="display:flex;align-items:center;gap:.4rem;"><div style="width:14px;height:14px;border-radius:4px;background:var(--bd2);border:1px solid var(--bd);"></div><span style="font-family:var(--fb);font-size:.72rem;color:var(--t3);">No calls</span></div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="card" style="padding:1.25rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div style="font-family:var(--fn);font-weight:800;font-size:1.1rem;">${monthLabel}</div>
+        <div style="display:flex;gap:.4rem;">
+          <button onclick="appCalPrev()" style="width:32px;height:32px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;font-size:.9rem;color:var(--t2);transition:all .12s;">‹</button>
+          <button onclick="appCalNext()" style="width:32px;height:32px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;font-size:.9rem;color:var(--t2);transition:all .12s;">›</button>
+        </div>
+      </div>
+      <div class="cal-grid">${cells}</div>
+    </div>
+  </div>`;
+}
+
+function appCalPrev(){appCalViewDate=new Date(appCalViewDate.getFullYear(),appCalViewDate.getMonth()-1,1);renderApp();}
+function appCalNext(){appCalViewDate=new Date(appCalViewDate.getFullYear(),appCalViewDate.getMonth()+1,1);renderApp();}
+
+// ═══════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════
+function renderStats(){
+  const mrRate=ST.totalNos>0&&ST.meetings>0?Math.round(ST.totalNos/ST.meetings):null;
+  const propRate=ST.meetings>0&&ST.proposals>0?+(ST.meetings/ST.proposals).toFixed(1):null;
+  const cRate=ST.proposals>0&&ST.clients>0?+(ST.proposals/ST.clients).toFixed(1):null;
+  const npc=ST.clients>0?Math.round(ST.totalNos/ST.clients):null;
+  const predict=npc?Math.max(npc-(ST.totalNos%npc||npc),0):null;
+
+  return `<div style="display:flex;flex-direction:column;gap:1.25rem;animation:fadeIn .4s ease;">
+    <div style="font-family:var(--fn);font-weight:800;font-size:1.5rem;">Stats & Probability</div>
+    <div class="card" style="padding:1.25rem;">
+      <div class="lbl" style="margin-bottom:1rem;">All-Time Numbers</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;">
+        ${[
+          ["Total NOs",ST.totalNos.toLocaleString(),"#4f46e5"],
+          ["Meetings",ST.meetings,"#059669"],
+          ["Proposals",ST.proposals,"#ea580c"],
+          ["Clients Won",ST.clients,"#d97706"],
+          ["Revenue","£"+ST.revenue.toLocaleString(),"#7c3aed"],
+          ["Total XP",ST.xp.toLocaleString(),"#4f46e5"],
+          ["Best Streak",ST.bestStreak+"d","#dc2626"],
+          ["Current Streak",ST.streak+"d","#059669"],
+        ].map(([k,v,c])=>`
+          <div style="background:var(--bg);border-radius:10px;padding:1rem;border:1px solid var(--bd);">
+            <div class="lbl" style="margin-bottom:.35rem;">${k}</div>
+            <div style="font-family:var(--fn);font-weight:800;font-size:1.5rem;color:${c};">${v}</div>
+          </div>`).join("")}
+      </div>
+    </div>
+    <div class="card" style="padding:1.25rem;">
+      <div class="lbl" style="margin-bottom:1rem;">Conversion Rates</div>
+      ${mrRate||propRate||cRate?`
+        <div style="display:flex;flex-direction:column;gap:.85rem;">
+          ${mrRate?`<div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem;background:var(--gnl);border-radius:10px;border:1px solid #bbf7d0;">
+            <div>
+              <div style="font-family:var(--fb);font-weight:700;font-size:.82rem;color:#065f46;">NO → Meeting Rate</div>
+              <div style="font-family:var(--fb);font-size:.72rem;color:#047857;margin-top:.2rem;">Average NOs per meeting</div>
+            </div>
+            <div style="font-family:var(--fn);font-weight:900;font-size:1.5rem;color:#065f46;">1:${mrRate}</div>
+          </div>`:""}
+          ${propRate?`<div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem;background:var(--orl);border-radius:10px;border:1px solid #fed7aa;">
+            <div>
+              <div style="font-family:var(--fb);font-weight:700;font-size:.82rem;color:#9a3412;">Meeting → Proposal Rate</div>
+              <div style="font-family:var(--fb);font-size:.72rem;color:#c2410c;margin-top:.2rem;">Meetings per proposal</div>
+            </div>
+            <div style="font-family:var(--fn);font-weight:900;font-size:1.5rem;color:#9a3412;">1:${propRate}</div>
+          </div>`:""}
+          ${cRate?`<div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem;background:var(--al);border-radius:10px;border:1px solid var(--abd);">
+            <div>
+              <div style="font-family:var(--fb);font-weight:700;font-size:.82rem;color:#3730a3;">Proposal → Close Rate</div>
+              <div style="font-family:var(--fb);font-size:.72rem;color:#4338ca;margin-top:.2rem;">Proposals per client</div>
+            </div>
+            <div style="font-family:var(--fn);font-weight:900;font-size:1.5rem;color:#3730a3;">1:${cRate}</div>
+          </div>`:""}
+          ${npc?`<div style="background:var(--txt);border-radius:10px;padding:.85rem 1rem;">
+            <div style="font-family:var(--fb);font-size:.8rem;color:rgba(255,255,255,.7);margin-bottom:.3rem;">Average NOs per client at current rates:</div>
+            <div style="font-family:var(--fn);font-weight:900;font-size:1.5rem;color:white;margin-bottom:.4rem;">~${npc} NOs per client</div>
+            ${predict!==null?`<div style="font-family:var(--fb);font-size:.78rem;color:rgba(255,255,255,.75);">Estimated ${predict} more NOs for your next client.</div>`:""}
+          </div>`:""}
+        </div>
+      `:`<div style="text-align:center;padding:1.5rem;color:var(--t4);font-family:var(--fb);font-size:.82rem;">Log meetings, proposals, and clients to see your conversion rates.</div>`}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// ACHIEVEMENTS
+// ═══════════════════════════════════════════════
+function renderAchievements(){
+  const done=ACHS.filter(a=>ST.unlockedAchs.includes(a.id));
+  const locked=ACHS.filter(a=>!ST.unlockedAchs.includes(a.id));
+  return `<div style="display:flex;flex-direction:column;gap:1.25rem;animation:fadeIn .4s ease;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:var(--fn);font-weight:800;font-size:1.5rem;">Achievements</div>
+      <div style="font-family:var(--fb);font-size:.82rem;color:var(--t3);">${done.length} / ${ACHS.length} unlocked</div>
+    </div>
+    ${done.length>0?`
+    <div class="card" style="padding:1.25rem;">
+      <div class="lbl" style="margin-bottom:1rem;">Unlocked</div>
+      <div style="display:flex;flex-direction:column;gap:.6rem;">
+        ${done.map(a=>`
+          <div style="display:flex;align-items:center;gap:.85rem;padding:.85rem;background:var(--al);border:1px solid var(--abd);border-radius:12px;animation:sUp .3s ease;">
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--card);border:2px solid var(--abd);display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0;">${a.icon}</div>
+            <div>
+              <div style="font-family:var(--fb);font-weight:700;font-size:.9rem;color:var(--a);">${a.name}</div>
+              <div style="font-family:var(--fb);font-size:.75rem;color:var(--t3);">${a.desc}</div>
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>`:""}
+    <div class="card" style="padding:1.25rem;opacity:.7;">
+      <div class="lbl" style="margin-bottom:1rem;">Locked</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;">
+        ${locked.map(a=>`
+          <div style="display:flex;align-items:center;gap:.85rem;padding:.75rem;background:var(--bg);border:1px solid var(--bd);border-radius:12px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--bd2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;filter:grayscale(1) opacity(.4);">?</div>
+            <div>
+              <div style="font-family:var(--fb);font-weight:600;font-size:.85rem;color:var(--t3);">???</div>
+              <div style="font-family:var(--fb);font-size:.72rem;color:var(--t4);">Keep going</div>
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// JOURNAL
+// ═══════════════════════════════════════════════
+function renderJournal(){
+  const today=TODAY();
+  const jnl=ST.journals?.[today]??{worked:"",objection:"",learned:"",improve:""};
+  const recent=Object.entries(ST.journals||{}).sort(([a],[b])=>b.localeCompare(a)).slice(0,7);
+
+  return `<div style="display:flex;flex-direction:column;gap:1.25rem;animation:fadeIn .4s ease;">
+    <div style="font-family:var(--fn);font-weight:800;font-size:1.5rem;">Daily Journal</div>
+    <div class="card" style="padding:1.5rem;">
+      <div class="lbl" style="margin-bottom:1.25rem;">Today · ${today}</div>
+      ${[
+        {k:"worked",label:"What worked today?",ph:"What actually moved the needle..."},
+        {k:"objection",label:"What objection came up most?",ph:"What did they push back with..."},
+        {k:"learned",label:"What did I learn?",ph:"What insight do you have now..."},
+        {k:"improve",label:"What will I improve tomorrow?",ph:"One specific, actionable thing..."},
+      ].map(({k,label,ph})=>`
+        <div style="margin-bottom:1.1rem;">
+          <div style="font-family:var(--fb);font-weight:600;font-size:.82rem;color:var(--t2);margin-bottom:.4rem;">${label}</div>
+          <textarea data-jkey="${k}" placeholder="${ph}" rows="3"
+            style="width:100%;padding:.65rem .75rem;background:var(--bg);border:1px solid var(--bd);border-radius:10px;font-size:.82rem;resize:none;line-height:1.55;color:var(--txt);"
+          >${escHtml(jnl[k]||"")}</textarea>
+        </div>`).join("")}
+    </div>
+    ${recent.length>0?`
+    <div class="card" style="padding:1.25rem;">
+      <div class="lbl" style="margin-bottom:1rem;">Recent Entries</div>
+      ${recent.map(([date,entry])=>`
+        <div style="border-bottom:1px solid var(--bd2);padding-bottom:.85rem;margin-bottom:.85rem;">
+          <div style="font-family:var(--fb);font-weight:600;font-size:.8rem;color:var(--a);margin-bottom:.4rem;">${date}</div>
+          ${entry.worked?`<div style="font-family:var(--fb);font-size:.78rem;color:var(--t2);margin-bottom:.2rem;"><strong>Worked:</strong> ${escHtml(entry.worked)}</div>`:""}
+          ${entry.improve?`<div style="font-family:var(--fb);font-size:.78rem;color:var(--t2);"><strong>Tomorrow:</strong> ${escHtml(entry.improve)}</div>`:""}
+        </div>`).join("")}
+    </div>`:""}
+  </div>`;
+}
+
+function bindJournalEvents(){
+  document.querySelectorAll("[data-jkey]").forEach(ta=>{
+    ta.addEventListener("input",function(){
+      const today=TODAY();
+      const k=this.dataset.jkey;
+      if(!ST.journals) ST.journals={};
+      if(!ST.journals[today]) ST.journals[today]={worked:"",objection:"",learned:"",improve:""};
+      ST.journals[today][k]=this.value;
+      save();
+    });
+  });
+}
+
+function bindRevEvent(){
+  const btn=document.getElementById("add-rev-btn");
+  if(btn){
+    btn.addEventListener("click",()=>{
+      const inp=document.getElementById("rev-input");
+      const n=parseFloat(inp.value);
+      if(!isNaN(n)&&n>0){addRev(n);inp.value="";}
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════
+// RIGHT PANEL
+// ═══════════════════════════════════════════════
+function updateRightPanel(){
+  const rp=document.getElementById("right-panel");
+  if(!rp||currentTab!=="dashboard") return;
+  const nosToday=ST.nosToday||0;
+  const remaining=Math.max(TOTAL-ST.totalNos,0);
+  const mrRate=ST.totalNos>0&&ST.meetings>0?Math.round(ST.totalNos/ST.meetings):null;
+  const npc=ST.clients>0?Math.round(ST.totalNos/ST.clients):null;
+  const predict=npc?Math.max(npc-(ST.totalNos%npc||npc),0):null;
+  const today=TODAY();
+  const jnl=ST.journals?.[today]??{worked:"",objection:"",improve:""};
+
+  rp.innerHTML=`
+    <!-- Streak -->
+    <div class="card" style="padding:1.1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="lbl" style="margin-bottom:.35rem;">Current Streak</div>
+          <div style="display:flex;align-items:baseline;gap:.3rem;">
+            <span style="font-size:1.3rem;">🔥</span>
+            <span style="font-family:var(--fn);font-weight:900;font-size:2rem;color:var(--txt);line-height:1;">${ST.streak}</span>
+            <span style="font-family:var(--fb);font-size:.8rem;color:var(--t3);">days</span>
+          </div>
+          <div style="font-family:var(--fb);font-size:.72rem;color:var(--t4);margin-top:.2rem;">Best: ${ST.bestStreak} Days</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="lbl" style="margin-bottom:.25rem;">Total XP</div>
+          <div style="font-family:var(--fn);font-weight:800;font-size:1.1rem;color:var(--a);">${ST.xp.toLocaleString()}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Mission -->
+    <div class="card" style="padding:1.1rem;">
+      <div class="lbl" style="margin-bottom:.85rem;">Today's Mission</div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        ${progressRingHTML(nosToday,100,72,6)}
+        <div>
+          <div style="font-family:var(--fn);font-weight:900;font-size:1.6rem;color:var(--a);line-height:1;">${nosToday} <span style="font-size:1rem;color:var(--t4);font-weight:600;">/ 100</span></div>
+          <div style="font-family:var(--fb);font-size:.75rem;color:var(--t3);margin-top:.25rem;">NOs Today</div>
+        </div>
+      </div>
+      <div style="margin-top:.85rem;font-family:var(--fb);font-size:.75rem;color:var(--a);text-align:center;font-weight:600;">
+        ${nosToday>=100?"✅ Daily target hit!":`${100-nosToday} more to hit today's target.`}
+      </div>
+    </div>
+
+    <!-- Mission Status -->
+    <div class="card" style="padding:1.1rem;">
+      <div class="lbl" style="margin-bottom:.85rem;">Mission Status</div>
+      ${[
+        ["NOs Collected",ST.totalNos.toLocaleString(),"📞"],
+        ["NOs Remaining",remaining.toLocaleString(),"🎯"],
+        ["Meetings",ST.meetings,"🤝"],
+        ["Proposals",ST.proposals,"📄"],
+        ["Clients Won",ST.clients,"💰"],
+        ["Revenue","£"+(ST.revenue||0).toLocaleString(),"💷"],
+      ].map(([label,val,ic])=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.38rem 0;border-bottom:1px solid var(--bd2);">
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <span style="font-size:.85rem;">${ic}</span>
+            <span style="font-family:var(--fb);font-size:.78rem;color:var(--t2);">${label}</span>
+          </div>
+          <span style="font-family:var(--fn);font-weight:700;font-size:.85rem;color:var(--txt);">${val}</span>
+        </div>`).join("")}
+      ${predict?`<div style="margin-top:.75rem;padding:.65rem;background:var(--al);border-radius:8px;border:1px solid var(--abd);">
+        <div style="font-family:var(--fb);font-size:.72rem;color:var(--a);line-height:1.5;">At current rates, you need <strong>~${predict} more NOs</strong> for another client.</div>
+      </div>`:""}
+    </div>
+
+    <!-- Revenue -->
+    <div class="card" style="padding:1.1rem;">
+      <div class="lbl" style="margin-bottom:.75rem;">Log Revenue</div>
+      <div style="display:flex;gap:.5rem;">
+        <input id="rev-input" type="number" placeholder="£ Amount" style="flex:1;padding:.55rem .7rem;background:var(--bg);border:1px solid var(--bd);border-radius:8px;font-size:.82rem;"/>
+        <button id="add-rev-btn" class="btn btn-a" style="padding:.55rem .9rem;font-size:.78rem;">Add</button>
+      </div>
+    </div>
+
+    <!-- Journal -->
+    <div class="card" style="padding:1.1rem;">
+      <div class="lbl" style="margin-bottom:.85rem;">Daily Journal</div>
+      ${[
+        {k:"worked",label:"What worked today?"},
+        {k:"objection",label:"Biggest objection?"},
+        {k:"improve",label:"What will I improve?"},
+      ].map(({k,label})=>`
+        <div style="margin-bottom:.75rem;">
+          <div style="font-family:var(--fb);font-size:.72rem;font-weight:600;color:var(--t2);margin-bottom:.3rem;">${label}</div>
+          <textarea data-jkey="${k}" placeholder="Write here..." rows="2"
+            style="width:100%;padding:.5rem .65rem;background:var(--bg);border:1px solid var(--bd);border-radius:8px;font-size:.78rem;resize:none;line-height:1.5;color:var(--txt);"
+          >${escHtml(jnl[k]||"")}</textarea>
+        </div>`).join("")}
+    </div>
+  `;
+  bindRevEvent();
+  bindJournalEvents();
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function progressRingHTML(value,max,size,stroke){
+  const r=(size-stroke*2)/2;
+  const circ=2*Math.PI*r;
+  const offset=circ*(1-Math.min(value/max,1));
+  return `<svg width="${size}" height="${size}" style="transform:rotate(-90deg);flex-shrink:0;">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--al)" stroke-width="${stroke}"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--a)" stroke-width="${stroke}"
+      stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"
+      style="transition:stroke-dashoffset .5s ease;"/>
+  </svg>`;
+}
+
+function escHtml(s){
+  if(!s) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+renderCalScreen();
+</script>
+</body>
+</html>

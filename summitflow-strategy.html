@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SummitFlow — Business Strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --a:#4f46e5;--ah:#4338ca;--al:#eef2ff;--am:#818cf8;--abd:#c7d2fe;
+  --txt:#0f172a;--t2:#374151;--t3:#6b7280;--t4:#9ca3af;
+  --bg:#f1f5f9;--card:#ffffff;--bd:#e2e8f0;--bd2:#f1f5f9;
+  --grn:#059669;--gnl:#ecfdf5;--red:#dc2626;--rdl:#fef2f2;
+  --gld:#d97706;--gdl:#fef3c7;--blu:#2563eb;--bll:#eff6ff;
+  --sh:0 1px 3px rgba(15,23,42,.07),0 1px 2px rgba(15,23,42,.05);
+  --sh2:0 4px 6px -1px rgba(15,23,42,.07),0 2px 4px rgba(15,23,42,.05);
+  --fn:'Outfit',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);line-height:1.65;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+html{scroll-behavior:smooth;}
+nav{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);z-index:100;padding:.85rem 2rem;}
+.nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;}
+.logo-icon{width:30px;height:30px;background:var(--a);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--fn);font-weight:900;font-size:.95rem;}
+.logo-text{font-family:var(--fn);font-weight:800;font-size:1rem;color:var(--txt);}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center;}
+.nav-links a{color:var(--t3);text-decoration:none;font-size:.78rem;font-weight:500;transition:color .15s;}
+.nav-links a:hover{color:var(--txt);}
+.nav-links .back{color:var(--a);font-weight:700;background:var(--al);padding:.35rem .75rem;border-radius:7px;}
+@media(max-width:768px){.nav-links{display:none;}}
+.mob-back{display:none;position:fixed;bottom:1.5rem;right:1.5rem;background:var(--a);color:#fff;padding:.7rem 1.1rem;border-radius:100px;text-decoration:none;font-size:.8rem;font-weight:700;box-shadow:0 4px 14px rgba(79,70,229,.35);z-index:99;}
+@media(max-width:768px){.mob-back{display:flex;}}
+
+section{padding:4rem 2rem;max-width:900px;margin:0 auto;}
+.hero{padding:6.5rem 2rem 3.5rem;max-width:900px;margin:0 auto;text-align:center;}
+.hero-tag{display:inline-block;padding:.4rem .9rem;background:var(--al);border:1px solid var(--abd);color:var(--a);font-size:.68rem;font-weight:700;border-radius:100px;margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.08em;}
+.hero h1{font-family:var(--fn);font-weight:900;font-size:clamp(2rem,4.5vw,2.75rem);line-height:1.15;margin-bottom:1rem;letter-spacing:-.03em;}
+.hero p{font-size:1rem;color:var(--t3);max-width:580px;margin:0 auto 2.5rem;}
+.hero-stats{display:flex;justify-content:center;gap:3.5rem;padding-top:2.5rem;border-top:1px solid var(--bd);flex-wrap:wrap;gap:2rem;}
+.hs{text-align:center;}
+.hs-val{font-family:var(--fn);font-weight:900;font-size:2.2rem;color:var(--a);line-height:1;}
+.hs-lbl{font-size:.72rem;color:var(--t3);margin-top:.25rem;}
+
+.sec-num{font-size:.65rem;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.6rem;}
+section h2{font-family:var(--fn);font-weight:800;font-size:clamp(1.4rem,3vw,1.85rem);margin-bottom:.75rem;letter-spacing:-.02em;}
+.intro{font-size:.95rem;color:var(--t3);max-width:680px;margin-bottom:2rem;}
+.divider{height:1px;background:var(--bd);margin:0 2rem;}
+
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:1.6rem;box-shadow:var(--sh);}
+.card-icon{width:40px;height:40px;background:var(--al);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:.85rem;}
+.card h3{font-family:var(--fn);font-weight:700;font-size:1rem;color:var(--txt);margin-bottom:.5rem;}
+.card p{font-size:.875rem;color:var(--t3);line-height:1.65;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
+@media(max-width:768px){.g2,.g3{grid-template-columns:1fr;}}
+
+.hl{background:linear-gradient(135deg,var(--al) 0%,var(--card) 100%);border:1px solid var(--abd);border-radius:14px;padding:2rem;margin:1.5rem 0;}
+.hl h3{font-family:var(--fn);font-weight:800;font-size:1.1rem;margin-bottom:1rem;}
+
+.offer-box{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);border-radius:14px;padding:2rem;margin:1.5rem 0;border-left:4px solid var(--am);}
+.offer-box p{font-family:var(--fn);font-weight:700;font-size:1.1rem;color:#e2e8f0;line-height:1.6;font-style:italic;}
+.offer-box cite{display:block;font-family:var(--fb);font-size:.78rem;color:var(--am);margin-top:.75rem;font-style:normal;}
+
+ul.slist{list-style:none;}
+ul.slist li{position:relative;padding-left:1.25rem;margin-bottom:.6rem;color:var(--t2);font-size:.875rem;}
+ul.slist li::before{content:"";position:absolute;left:0;top:.5rem;width:5px;height:5px;background:var(--a);border-radius:50%;}
+ul.slist li strong{color:var(--txt);}
+
+.badge{display:inline-block;padding:.22rem .6rem;font-size:.6rem;font-weight:700;border-radius:100px;text-transform:uppercase;letter-spacing:.05em;margin-left:.4rem;}
+.badge.grn{background:var(--grn);color:#fff;}
+.badge.ind{background:var(--a);color:#fff;}
+.badge.gld{background:var(--gld);color:#fff;}
+
+.alert{padding:1rem 1.3rem;border-radius:10px;margin:1.25rem 0;display:flex;align-items:flex-start;gap:.75rem;font-size:.875rem;}
+.alert-i{font-size:1.1rem;flex-shrink:0;}
+.alert.info{background:var(--bll);border:1px solid #93c5fd;}
+.alert.success{background:var(--gnl);border:1px solid #6ee7b7;}
+
+.quote{font-family:var(--fn);font-size:1.05rem;font-weight:600;line-height:1.55;color:var(--txt);padding:1.4rem 1.65rem;background:var(--card);border-left:4px solid var(--a);border-radius:0 12px 12px 0;margin:1.5rem 0;box-shadow:var(--sh);}
+.quote cite{display:block;font-family:var(--fb);font-size:.78rem;color:var(--t3);margin-top:.6rem;font-style:normal;font-weight:400;}
+
+/* timeline */
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:"";position:absolute;left:0;top:.5rem;bottom:.5rem;width:2px;background:var(--bd);}
+.tl-item{position:relative;margin-bottom:2rem;}
+.tl-item::before{content:"";position:absolute;left:-2rem;top:.3rem;width:10px;height:10px;background:var(--card);border:2px solid var(--bd);border-radius:50%;}
+.tl-item.active::before{background:var(--a);border-color:var(--a);}
+.tl-item.done::before{background:var(--grn);border-color:var(--grn);}
+.tl-phase{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:.25rem;display:flex;align-items:center;gap:.5rem;}
+.tl-item.active .tl-phase{color:var(--a);}
+.tl-item.done .tl-phase{color:var(--grn);}
+.tl-title{font-family:var(--fn);font-weight:700;font-size:1rem;color:var(--txt);margin-bottom:.4rem;}
+.tl-desc{font-size:.875rem;color:var(--t3);line-height:1.65;}
+
+/* delivery stack */
+.stack-flow{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.5rem 0;}
+.stack-step{flex:1;min-width:130px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:1.1rem;text-align:center;box-shadow:var(--sh);}
+.stack-icon{font-size:1.4rem;margin-bottom:.5rem;}
+.stack-label{font-family:var(--fn);font-weight:700;font-size:.82rem;color:var(--txt);}
+.stack-sub{font-size:.68rem;color:var(--t3);margin-top:.2rem;}
+.stack-arr{color:var(--a);font-size:1.25rem;font-weight:700;flex-shrink:0;}
+
+/* metrics funnel */
+.funnel{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:1.5rem 0;}
+.funnel-item{text-align:center;flex:1;min-width:100px;}
+.funnel-val{font-family:var(--fn);font-weight:900;font-size:1.6rem;color:var(--a);}
+.funnel-lbl{font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;}
+.funnel-arr{color:var(--t4);font-size:1.1rem;}
+
+footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--bd);background:var(--card);}
+footer p{color:var(--t3);font-size:.82rem;}
+footer strong{color:var(--txt);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">SummitFlow</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="back">← Dashboard</a></li>
+      <li><a href="#icp">ICP</a></li>
+      <li><a href="#messaging">Messaging</a></li>
+      <li><a href="#outreach">Outreach</a></li>
+      <li><a href="#delivery">Delivery</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+    </ul>
+  </div>
+</nav>
+<a href="index.html" class="mob-back">← Dashboard</a>
+
+<header class="hero">
+  <span class="hero-tag">AI Appointment-Setting Agency · UK</span>
+  <h1>Strategic playbook for landing MCS heat pump installers on retainer</h1>
+  <p>The complete SummitFlow blueprint — ICP, messaging, outreach, delivery stack, and the 180-day roadmap to £10k MRR.</p>
+  <div class="hero-stats">
+    <div class="hs"><div class="hs-val">4,000+</div><div class="hs-lbl">MCS Installers UK</div></div>
+    <div class="hs"><div class="hs-val">£7,500</div><div class="hs-lbl">BUS Grant / Install</div></div>
+    <div class="hs"><div class="hs-val">£10k+</div><div class="hs-lbl">Avg Job Value</div></div>
+  </div>
+</header>
+
+<div class="divider"></div>
+
+<!-- 01 ICP -->
+<section id="icp">
+  <div class="sec-num">01 — Ideal Client Profile</div>
+  <h2>MCS-certified heat pump installers ready to scale</h2>
+  <p class="intro">Targeting established installation businesses with the capability to convert surveys but without the systems to generate a consistent pipeline.</p>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h3>Target Niche</h3>
+      <p>MCS-certified heat pump installers across the UK. Companies with trained engineers doing air source and ground source heat pump installations. Eligible to complete Boiler Upgrade Scheme installations (£7,500 government grant).</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Company Profile</h3>
+      <p>Owner-operated businesses with 2–15 engineers. Revenue of £200k–£2M annually. Owner is accessible as the decision-maker and actively involved in business development. Likely trades under their own brand, not a franchise.</p>
+    </div>
+  </div>
+
+  <div class="hl">
+    <h3>Core Pain Points</h3>
+    <ul class="slist">
+      <li><strong>Inconsistent survey pipeline</strong> — feast or famine, especially in warmer months when installs should peak</li>
+      <li><strong>Reliance on manufacturer leads</strong> — Vaillant, Worcester Bosch, Mitsubishi leads are inconsistent and shared with competitors</li>
+      <li><strong>Word-of-mouth dependency</strong> — referrals dry up. No predictable lead generation system in place</li>
+      <li><strong>Engineers sitting idle</strong> — expensive trained workforce with no enough surveys to fill the week</li>
+      <li><strong>Missing BUS grant demand</strong> — homeowners searching for MCS installers to get the £7,500 grant can't find them easily</li>
+      <li><strong>No time for marketing</strong> — owner is on-site or managing jobs, not generating new business</li>
+      <li><strong>Survey no-shows</strong> — wasting engineer time on unqualified or uncommitted homeowners</li>
+    </ul>
+  </div>
+
+  <div class="g3">
+    <div class="card">
+      <h3>Job Value</h3>
+      <p>£8,000–£18,000 per installation (with BUS grant reducing homeowner cost to £3,500–£10,500). A single install covers months of SummitFlow retainer.</p>
+    </div>
+    <div class="card">
+      <h3>Awareness Level</h3>
+      <p>Level 2–3: Problem aware and solution aware. Know they need more surveys. Most have tried marketing or manufacturer leads. Few aware of AI appointment setting.</p>
+    </div>
+    <div class="card">
+      <h3>Easy to Reach</h3>
+      <p>MCS Certificate database (public). Companies House. Google Maps. LinkedIn. Decision-maker typically answers the office phone directly.</p>
+    </div>
+  </div>
+
+  <div class="alert info">
+    <span class="alert-i">💡</span>
+    <div><p><strong>Why MCS is the perfect niche:</strong> The MCS database is public and gives you a verified, qualified list of every eligible installer in the UK. You're not guessing who to call — you know exactly who can deliver the service and who qualifies to do BUS grant work.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 02 MESSAGING -->
+<section id="messaging">
+  <div class="sec-num">02 — Sales Messaging</div>
+  <h2>Making SummitFlow the obvious choice</h2>
+  <p class="intro">Four ingredients: niche-specific value, measurable results, a clear timeframe, and a risk reversal that removes all hesitation.</p>
+
+  <div class="offer-box">
+    <p>"We help MCS-certified heat pump installers across the UK get 8–12 guaranteed qualified survey appointments booked directly into their calendar each month — on a performance-backed retainer."</p>
+    <cite>The SummitFlow Core Offer</cite>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>Niche-Specific Value</h3>
+      <p>"We help heat pump installers stop losing BUS grant customers to competitors and keep their survey calendars full — without relying on manufacturer leads or word-of-mouth."</p>
+      <p style="font-size:.8rem;color:var(--t4);margin-top:.65rem;">Speaks to the emotional pain. "MCS-certified" creates instant recognition — they understand exactly who you're talking about.</p>
+    </div>
+    <div class="card">
+      <h3>Specific Result</h3>
+      <p>"8–12 guaranteed qualified survey appointments booked directly into your calendar each month."</p>
+      <p style="font-size:.8rem;color:var(--t4);margin-top:.65rem;">Specific number. Qualified (not tyre-kickers). Booked directly via AppointWise AI. The specificity builds credibility.</p>
+    </div>
+    <div class="card">
+      <h3>Time Frame</h3>
+      <p>"First surveys in your calendar within 2 weeks of going live."</p>
+      <p style="font-size:.8rem;color:var(--t4);margin-top:.65rem;">Fast enough to create urgency. Realistic for lead outreach + AI qualification. Creates accountability from day one.</p>
+    </div>
+    <div class="card">
+      <h3>Risk Reversal</h3>
+      <p>"Performance-backed retainer — we guarantee a minimum number of surveys per month. Short on the guarantee, we work for free until we deliver it."</p>
+      <p style="font-size:.8rem;color:var(--t4);margin-top:.65rem;">Removes all risk. Aligns incentives completely — SummitFlow only wins when the client wins.</p>
+    </div>
+  </div>
+
+  <div class="alert success">
+    <span class="alert-i">⚡</span>
+    <div><p><strong>The BUS Grant Angle:</strong> The Boiler Upgrade Scheme gives homeowners £7,500 off a heat pump installation. There are homeowners actively searching for MCS-certified installers RIGHT NOW to access this grant. They have strong intent and a financial incentive to convert. This is the highest-quality lead in the heat pump market.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 03 OUTREACH -->
+<section id="outreach">
+  <div class="sec-num">03 — Outreach Strategy</div>
+  <h2>Cold calling MCS installers with proven hooks</h2>
+  <p class="intro">Cold calling is the highest-converting outreach method for this market. The decision-makers answer their phones. Competition is low. Volume wins.</p>
+
+  <div class="hl">
+    <h3>The Three Attention Hooks</h3>
+    <div style="margin-top:1.25rem;">
+      <div style="margin-bottom:1.4rem;">
+        <span class="badge ind">Highest Converting</span>
+        <h3 style="margin-top:.5rem;font-family:var(--fn);font-weight:700;">Hook 1: Competitor Comparison</h3>
+        <p style="font-size:.875rem;color:var(--t2);margin-top:.3rem;">"Have you seen what some of the bigger installation companies are doing to guarantee their survey pipeline throughout the year?"</p>
+        <p style="font-size:.8rem;color:var(--t3);margin-top:.4rem;">Triggers competitive instinct. Business owners hate competitors doing better. Per Jordan: "They hate being competed."</p>
+      </div>
+      <div style="margin-bottom:1.4rem;">
+        <span class="badge gld">Strong</span>
+        <h3 style="margin-top:.5rem;font-family:var(--fn);font-weight:700;">Hook 2: BUS Grant Demand</h3>
+        <p style="font-size:.875rem;color:var(--t2);margin-top:.3rem;">"Are you making the most of the Boiler Upgrade Scheme demand? There are homeowners in your area qualifying for the £7,500 grant right now and actively searching for MCS installers."</p>
+        <p style="font-size:.8rem;color:var(--t3);margin-top:.4rem;">Creates immediate relevance. Positions you as informed about their market. FOMO on real demand.</p>
+      </div>
+      <div>
+        <span class="badge grn">Good</span>
+        <h3 style="margin-top:.5rem;font-family:var(--fn);font-weight:700;">Hook 3: Capacity Question</h3>
+        <p style="font-size:.875rem;color:var(--t2);margin-top:.3rem;">"Could you handle an extra 8–10 qualified heat pump surveys booked into your calendar next month?"</p>
+        <p style="font-size:.8rem;color:var(--t3);margin-top:.4rem;">"Could you handle" feeds ego — of course they can. Opens desire-based conversation immediately.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="funnel">
+    <div class="funnel-item"><div class="funnel-val">100</div><div class="funnel-lbl">Dials/Day</div></div>
+    <span class="funnel-arr">→</span>
+    <div class="funnel-item"><div class="funnel-val">25–30</div><div class="funnel-lbl">Conversations</div></div>
+    <span class="funnel-arr">→</span>
+    <div class="funnel-item"><div class="funnel-val">4–5</div><div class="funnel-lbl">Meetings/Week</div></div>
+    <span class="funnel-arr">→</span>
+    <div class="funnel-item"><div class="funnel-val">1–2</div><div class="funnel-lbl">Clients/Month</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 04 PRICING -->
+<section id="pricing">
+  <div class="sec-num">04 — Pricing & Packaging</div>
+  <h2>Performance-backed retainer model</h2>
+  <p class="intro">A fixed monthly retainer with a guaranteed minimum delivery. Simple. Removes risk. Aligns incentives.</p>
+
+  <div class="g2">
+    <div class="card" style="border:2px solid var(--abd);">
+      <div style="background:var(--al);border-radius:8px;padding:.85rem;margin-bottom:1.1rem;text-align:center;">
+        <div style="font-family:var(--fn);font-weight:900;font-size:2rem;color:var(--a);">£1,500</div>
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--am);">Per Month · Starter</div>
+      </div>
+      <ul class="slist">
+        <li>8 guaranteed qualified survey appointments/month</li>
+        <li>AI qualification + calendar booking (AppointWise)</li>
+        <li>GoHighLevel CRM pipeline management</li>
+        <li>Weekly performance report</li>
+        <li>Shortfall guarantee — we work free until delivered</li>
+      </ul>
+    </div>
+    <div class="card" style="border:2px solid var(--a);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:.75rem;right:.75rem;background:var(--a);color:#fff;font-size:.6rem;font-weight:700;padding:.2rem .55rem;border-radius:100px;text-transform:uppercase;letter-spacing:.05em;">Recommended</div>
+      <div style="background:linear-gradient(135deg,var(--al),var(--card));border-radius:8px;padding:.85rem;margin-bottom:1.1rem;text-align:center;">
+        <div style="font-family:var(--fn);font-weight:900;font-size:2rem;color:var(--a);">£2,500</div>
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--am);">Per Month · Growth</div>
+      </div>
+      <ul class="slist">
+        <li>15 guaranteed qualified survey appointments/month</li>
+        <li>Priority lead targeting + BUS grant homeowners</li>
+        <li>Full AI qualification pipeline</li>
+        <li>CRM + automated follow-up sequences</li>
+        <li>Bi-weekly strategy calls</li>
+        <li>Shortfall guarantee applies</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert info">
+    <span class="alert-i">💡</span>
+    <div><p><strong>ROI argument for the close:</strong> At £10k average installation value and 30% survey-to-install conversion rate, 8 qualified surveys = 2–3 installs = £20–30k revenue. The £1,500 retainer pays for itself many times over from a single installation.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 05 DELIVERY -->
+<section id="delivery">
+  <div class="sec-num">05 — Delivery Stack</div>
+  <h2>The automated lead pipeline</h2>
+  <p class="intro">From homeowner interest to qualified survey in the installer's calendar — fully automated.</p>
+
+  <div class="stack-flow">
+    <div class="stack-step"><div class="stack-icon">🎯</div><div class="stack-label">Lead Generation</div><div class="stack-sub">Targeted outreach + Meta Ads targeting BUS grant homeowners</div></div>
+    <span class="stack-arr">→</span>
+    <div class="stack-step"><div class="stack-icon">🤖</div><div class="stack-label">AI Qualification</div><div class="stack-sub">AppointWise qualifies leads 24/7 via SMS/WhatsApp</div></div>
+    <span class="stack-arr">→</span>
+    <div class="stack-step"><div class="stack-icon">📊</div><div class="stack-label">CRM Pipeline</div><div class="stack-sub">GoHighLevel manages leads, follow-ups, and reminders</div></div>
+    <span class="stack-arr">→</span>
+    <div class="stack-step"><div class="stack-icon">📅</div><div class="stack-label">Calendar Booking</div><div class="stack-sub">Qualified surveys booked directly into the installer's calendar</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <h3>Lead Generation</h3>
+      <p>Meta/Facebook Ads + targeted outreach to homeowners actively researching heat pump installations and Boiler Upgrade Scheme grants. High-intent traffic only.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <h3>AI Appointment Setting</h3>
+      <p>AppointWise — 24/7 automated lead qualification, objection handling, and direct calendar booking. Responds within 60 seconds. Qualifies for BUS grant eligibility, property type, and survey readiness.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>CRM System</h3>
+      <p>Go High Level — pipeline management, automated follow-up sequences, lead scoring, SMS/WhatsApp/email flows. Single source of truth for every lead.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📅</div>
+      <h3>Calendar Integration</h3>
+      <p>Surveys booked directly into the installer's Google Calendar. No friction. No manual work from the client. Show rate optimised via automated confirmations.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 06 ROADMAP -->
+<section id="roadmap">
+  <div class="sec-num">06 — 180-Day Roadmap</div>
+  <h2>The path to 10 clients</h2>
+  <p class="intro">Phase-by-phase execution. Currently in Phase 2 — the only metric that matters is calls made and meetings booked.</p>
+
+  <div class="timeline">
+    <div class="tl-item done">
+      <div class="tl-phase">Phase 1 — Weeks 0–2 <span class="badge grn">Complete</span></div>
+      <div class="tl-title">Foundations</div>
+      <div class="tl-desc">MCS heat pump installer niche selected and validated. Performance-backed retainer offer built. Sales messaging written with BUS grant hooks. Delivery stack configured: GoHighLevel + AppointWise. MCS database secured as lead source.</div>
+    </div>
+
+    <div class="tl-item active">
+      <div class="tl-phase">Phase 2 — Days 14–90 <span class="badge ind">Current</span></div>
+      <div class="tl-title">First Clients</div>
+      <div class="tl-desc">100 cold calls per day from the MCS database. Target 4–5 meetings per week. Close first 3–5 clients. Prove the model delivers surveys. Learn which sub-niches and regions convert fastest.</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Phase 3 — Days 90–150</div>
+      <div class="tl-title">Scale Base</div>
+      <div class="tl-desc">Refine offer based on delivery data. Add 5+ more clients. Tighten qualification criteria. Begin building case studies. Automate reporting so it doesn't eat time. Start thinking about first hire.</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Phase 4 — Days 150–180</div>
+      <div class="tl-title">Sprint to 10</div>
+      <div class="tl-desc">Review which messaging and regions drove the most closes. Double down on what works. Only take aligned clients. Use case studies for cold outreach and paid ads. Target £10k MRR before end of Q1 2027.</div>
+    </div>
+  </div>
+
+  <div class="hl" style="margin-top:2.5rem;">
+    <h3>30-Day Phase 2 Execution Plan</h3>
+    <ul class="slist">
+      <li>Execute 2,000+ cold calls (100/day × 20 working days)</li>
+      <li>Book 16–20 meetings (4–5/week at ~4% meeting rate)</li>
+      <li>Close 2–3 clients (30% close rate on attended meetings)</li>
+      <li>Test all three BUS grant + competitor hooks to find highest converter</li>
+      <li>Track metrics by region — which areas have the most MCS installers with capacity?</li>
+      <li>Document every objection — build the counter by call 50</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <div class="sec-num">07 — Key Principles</div>
+  <h2>The mindset that makes it work</h2>
+
+  <div class="g2">
+    <div class="card"><h3>On Fear</h3><p>"It is completely normal to be riddled with fear when it comes to cold calling. We are dedicating time in our day to be told no again and again. Everything you want to achieve is on the other side of that fear barrier." — Jordan Platten</p></div>
+    <div class="card"><h3>On Volume</h3><p>100 calls/day is not optional. At 4% meeting rate you need 25 conversations. 25 conversations require 80–100 dials. The maths only works if you show up every day. Volume solves everything.</p></div>
+    <div class="card"><h3>On Imposter Syndrome</h3><p>"You are not going to break through imposter syndrome until you sign up your first couple of clients, deliver great results, and they tell you they're happy. Imposter syndrome indicates growth, not evidence to stop." — Jordan Platten</p></div>
+    <div class="card"><h3>On the Runway</h3><p>Runway ends August 19. That's roughly 10 weeks. One client = the runway extended. Three clients = sustainable. The only thing that closes clients is calls made. Everything else is noise.</p></div>
+  </div>
+
+  <div class="quote" style="margin-top:2rem;">
+    "Cold calling is without a doubt the most effective outreach strategy for securing meetings. Bar none. The reason why is because the competition is so low."
+    <cite>— Jordan Platten</cite>
+  </div>
+</section>
+
+<footer>
+  <p><strong>SummitFlow</strong> — Guaranteed Survey Appointments for MCS Heat Pump Installers</p>
+  <p style="margin-top:.5rem;">Built on Jordan Platten's frameworks. Refined for the UK heat pump market.</p>
+  <p style="margin-top:1.25rem;font-size:.78rem;">Make Mum proud by November 30th.</p>
+</footer>
+
+</body>
+</html>

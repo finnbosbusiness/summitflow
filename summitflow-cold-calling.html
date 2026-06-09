@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SummitFlow — Cold Calling Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --a:#4f46e5;--ah:#4338ca;--al:#eef2ff;--am:#818cf8;--abd:#c7d2fe;
+  --txt:#0f172a;--t2:#374151;--t3:#6b7280;--t4:#9ca3af;
+  --bg:#f1f5f9;--card:#ffffff;--bd:#e2e8f0;--bd2:#f1f5f9;
+  --grn:#059669;--gnl:#ecfdf5;--red:#dc2626;--rdl:#fef2f2;
+  --org:#ea580c;--orl:#fff7ed;--gld:#d97706;--gdl:#fef3c7;
+  --blu:#2563eb;--bll:#eff6ff;--prp:#7c3aed;--ppl:#f5f3ff;
+  --sh:0 1px 3px rgba(15,23,42,.07),0 1px 2px rgba(15,23,42,.05);
+  --sh2:0 4px 6px -1px rgba(15,23,42,.07),0 2px 4px rgba(15,23,42,.05);
+  --sh3:0 10px 15px -3px rgba(15,23,42,.08),0 4px 6px rgba(15,23,42,.04);
+  --fn:'Outfit',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;--fm:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);line-height:1.65;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+html{scroll-behavior:smooth;}
+nav{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);z-index:100;padding:.85rem 2rem;}
+.nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;}
+.logo-icon{width:30px;height:30px;background:var(--a);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--fn);font-weight:900;font-size:.95rem;}
+.logo-text{font-family:var(--fn);font-weight:800;font-size:1rem;color:var(--txt);}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center;}
+.nav-links a{color:var(--t3);text-decoration:none;font-size:.78rem;font-weight:500;transition:color .15s;}
+.nav-links a:hover{color:var(--txt);}
+.nav-links .back{color:var(--a);font-weight:700;background:var(--al);padding:.35rem .75rem;border-radius:7px;}
+@media(max-width:768px){.nav-links{display:none;}}
+.mob-back{display:none;position:fixed;bottom:1.5rem;right:1.5rem;background:var(--a);color:#fff;padding:.7rem 1.1rem;border-radius:100px;text-decoration:none;font-size:.8rem;font-weight:700;box-shadow:0 4px 14px rgba(79,70,229,.35);z-index:99;}
+@media(max-width:768px){.mob-back{display:flex;}}
+
+section{padding:4rem 2rem;max-width:900px;margin:0 auto;}
+.hero{padding:6.5rem 2rem 3.5rem;max-width:900px;margin:0 auto;text-align:center;}
+.hero-tag{display:inline-block;padding:.4rem .9rem;background:var(--al);border:1px solid var(--abd);color:var(--a);font-size:.68rem;font-weight:700;border-radius:100px;margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.08em;}
+.hero h1{font-family:var(--fn);font-weight:900;font-size:clamp(2rem,4.5vw,2.75rem);line-height:1.15;margin-bottom:1rem;letter-spacing:-.03em;}
+.hero p{font-size:1rem;color:var(--t3);max-width:580px;margin:0 auto 2rem;}
+.kpi-row{display:inline-flex;align-items:center;gap:2rem;padding:1.1rem 1.8rem;background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:var(--sh);}
+.kpi{text-align:center;}
+.kpi-val{font-family:var(--fn);font-weight:900;font-size:1.6rem;color:var(--a);line-height:1;}
+.kpi-lbl{font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-top:.2rem;}
+.kpi-div{width:1px;height:34px;background:var(--bd);}
+
+.sec-num{font-size:.65rem;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.6rem;}
+section h2{font-family:var(--fn);font-weight:800;font-size:clamp(1.4rem,3vw,1.85rem);margin-bottom:.75rem;letter-spacing:-.02em;}
+.intro{font-size:.95rem;color:var(--t3);max-width:680px;margin-bottom:2rem;}
+.divider{height:1px;background:var(--bd);margin:0 2rem;}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:1.6rem;box-shadow:var(--sh);}
+.card-icon{width:40px;height:40px;background:var(--al);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:.85rem;}
+.card h3{font-family:var(--fn);font-weight:700;font-size:1rem;color:var(--txt);margin-bottom:.5rem;}
+.card p{font-size:.875rem;color:var(--t3);line-height:1.65;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* highlight */
+.hl{background:linear-gradient(135deg,var(--al) 0%,var(--card) 100%);border:1px solid var(--abd);border-radius:14px;padding:2rem;margin:1.5rem 0;}
+.hl h3{font-family:var(--fn);font-weight:800;font-size:1.1rem;margin-bottom:1rem;}
+
+/* script box */
+.script{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:1.75rem 2rem;margin:1.25rem 0;font-size:.87rem;line-height:2;}
+.sc-lbl{color:var(--am);font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.25rem;}
+.sc-line{color:#e2e8f0;display:block;margin-bottom:1rem;font-family:var(--fm);}
+.sc-line:last-child{margin-bottom:0;}
+.sc-note{color:#6b7280;font-style:italic;font-size:.78rem;display:block;margin-top:.15rem;margin-bottom:.85rem;font-family:var(--fb);}
+.sc-pause{color:var(--am);font-weight:700;}
+.sc-sec{margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1px solid #1e293b;}
+.sc-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.sc-sec-title{color:var(--am);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem;}
+.sc-sec-title::before{content:"";width:7px;height:7px;background:var(--am);border-radius:50%;flex-shrink:0;}
+
+/* objection cards */
+.obj{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:1.4rem;margin-bottom:1rem;box-shadow:var(--sh);}
+.obj-trigger{font-weight:700;color:var(--red);font-size:.9rem;margin-bottom:.65rem;}
+.obj-response{background:var(--gnl);border-left:3px solid var(--grn);padding:.9rem 1.1rem;border-radius:0 8px 8px 0;margin-top:.6rem;}
+.obj-response p{color:var(--txt);font-size:.875rem;line-height:1.7;}
+.obj-note{font-size:.78rem;color:var(--t3);margin-top:.6rem;font-style:italic;}
+
+/* alert */
+.alert{padding:1rem 1.3rem;border-radius:10px;margin:1.25rem 0;display:flex;align-items:flex-start;gap:.75rem;font-size:.875rem;}
+.alert-i{font-size:1.1rem;flex-shrink:0;}
+.alert.warn{background:var(--gdl);border:1px solid #fcd34d;}
+.alert.success{background:var(--gnl);border:1px solid #6ee7b7;}
+.alert.danger{background:var(--rdl);border:1px solid #fca5a5;}
+
+/* quote */
+.quote{font-family:var(--fn);font-size:1.1rem;font-weight:600;line-height:1.55;color:var(--txt);padding:1.4rem 1.65rem;background:var(--card);border-left:4px solid var(--a);border-radius:0 12px 12px 0;margin:1.5rem 0;box-shadow:var(--sh);}
+.quote cite{display:block;font-family:var(--fb);font-size:.78rem;color:var(--t3);margin-top:.6rem;font-style:normal;font-weight:400;}
+
+/* do/dont */
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin:1.5rem 0;}
+@media(max-width:768px){.do-dont{grid-template-columns:1fr;}}
+.do-box{background:var(--gnl);border:1px solid #a7f3d0;border-radius:12px;padding:1.5rem;}
+.dont-box{background:var(--rdl);border:1px solid #fecaca;border-radius:12px;padding:1.5rem;}
+.do-box h4{color:var(--grn);font-size:.78rem;font-weight:700;margin-bottom:.85rem;text-transform:uppercase;letter-spacing:.05em;}
+.dont-box h4{color:var(--red);font-size:.78rem;font-weight:700;margin-bottom:.85rem;text-transform:uppercase;letter-spacing:.05em;}
+ul.slist{list-style:none;}
+ul.slist li{position:relative;padding-left:1.25rem;margin-bottom:.55rem;color:var(--t2);font-size:.875rem;}
+ul.slist li::before{content:"";position:absolute;left:0;top:.5rem;width:5px;height:5px;background:var(--a);border-radius:50%;}
+ul.slist li strong{color:var(--txt);}
+
+/* checklist */
+ul.chk{list-style:none;}
+ul.chk li{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem 0;border-bottom:1px solid var(--bd2);font-size:.875rem;color:var(--t2);}
+ul.chk li:last-child{border-bottom:none;}
+ul.chk li::before{content:"☐";color:var(--a);font-size:1rem;flex-shrink:0;line-height:1.4;}
+
+/* metric boxes */
+.mbox{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:1.1rem;text-align:center;box-shadow:var(--sh);}
+.mbox-val{font-family:var(--fn);font-weight:900;font-size:1.75rem;color:var(--txt);}
+.mbox-lbl{font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-top:.25rem;}
+
+/* flow */
+.flow{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:1.3rem;margin:1.5rem 0;box-shadow:var(--sh);}
+.f-step{text-align:center;flex:1;min-width:75px;}
+.f-icon{width:38px;height:38px;background:var(--al);border:1px solid var(--abd);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin:0 auto .4rem;}
+.f-label{font-family:var(--fn);font-size:.75rem;font-weight:700;color:var(--txt);}
+.f-sub{font-size:.62rem;color:var(--t3);}
+.f-arr{color:var(--t4);font-size:1rem;}
+
+/* character cards */
+.char-card{background:var(--card);border:2px solid var(--bd);border-radius:14px;padding:1.75rem;position:relative;overflow:hidden;box-shadow:var(--sh);}
+.char-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;}
+.char-card.friend::before{background:var(--blu);}
+.char-card.expert::before{background:var(--a);}
+.char-name{font-family:var(--fn);font-weight:800;font-size:1.15rem;margin-bottom:.2rem;}
+.char-role{font-size:.68rem;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.85rem;}
+.char-traits{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.85rem;}
+.trait{padding:.3rem .65rem;background:var(--bg);border-radius:100px;font-size:.72rem;font-weight:500;color:var(--t2);}
+
+/* tonality */
+.ton-bar{display:flex;align-items:center;gap:.85rem;margin-bottom:1.1rem;}
+.ton-label{width:65px;font-size:.78rem;font-weight:600;color:var(--t2);}
+.ton-track{flex:1;height:7px;background:linear-gradient(90deg,var(--bll),var(--al));border-radius:100px;position:relative;}
+.ton-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:var(--a);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.15);}
+
+footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--bd);background:var(--card);}
+footer p{color:var(--t3);font-size:.82rem;}
+footer strong{color:var(--txt);}
+.badge{display:inline-block;padding:.22rem .6rem;font-size:.6rem;font-weight:700;border-radius:100px;text-transform:uppercase;letter-spacing:.05em;}
+.badge.grn{background:var(--grn);color:#fff;}
+.badge.ind{background:var(--a);color:#fff;}
+.badge.gld{background:var(--gld);color:#fff;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">SummitFlow</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="back">← Dashboard</a></li>
+      <li><a href="#mindset">Mindset</a></li>
+      <li><a href="#script">Script</a></li>
+      <li><a href="#objections">Objections</a></li>
+      <li><a href="#tracking">Tracking</a></li>
+    </ul>
+  </div>
+</nav>
+<a href="index.html" class="mob-back">← Dashboard</a>
+
+<header class="hero">
+  <span class="hero-tag">MCS Heat Pump Installer Outreach · UK</span>
+  <h1>The cold calling system for booking survey appointments with heat pump installers</h1>
+  <p>Jordan Platten's frameworks applied specifically to MCS installers. Memorise it. Execute it. 100 calls a day, every day.</p>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">100</div><div class="kpi-lbl">Calls/Day</div></div>
+    <div class="kpi-div"></div>
+    <div class="kpi"><div class="kpi-val">4–5%</div><div class="kpi-lbl">Meeting Rate</div></div>
+    <div class="kpi-div"></div>
+    <div class="kpi"><div class="kpi-val">30%</div><div class="kpi-lbl">Close Rate</div></div>
+  </div>
+</header>
+
+<div class="divider"></div>
+
+<!-- 01 MINDSET -->
+<section id="mindset">
+  <div class="sec-num">01 — Mindset Foundation</div>
+  <h2>Fear is an illusion. Push through it.</h2>
+  <p class="intro">You're cold calling heat pump business owners all day. They'll say no. They'll be abrupt. Some will hang up. None of that means anything. Volume is the only variable you control.</p>
+
+  <div class="quote">
+    "It is completely normal to be riddled with fear when it comes to cold calling. Human beings really don't like being told no. But this is precisely why cold calls are exceptional for new entrepreneurs — they will build the resilience you need to be successful long term."
+    <cite>— Jordan Platten</cite>
+  </div>
+
+  <div class="g3">
+    <div class="card"><h3>Acknowledge the Fear</h3><p>It's okay to be afraid. Accept it as part of the process. Then dial anyway. The call is neutral — it's the story you tell yourself that makes it feel dangerous.</p></div>
+    <div class="card"><h3>It's a Numbers Game</h3><p>At 4–5% meeting rate, you need 20–25 conversations for one meeting. You get 100 dials in, you're statistically getting 4–5 conversations with decision makers. That's 1 meeting per day at minimum.</p></div>
+    <div class="card"><h3>They Need You</h3><p>MCS installers want more survey appointments. You're not interrupting them — you're offering them a system that fills their calendar. Approach it with that conviction.</p></div>
+  </div>
+
+  <div class="alert warn">
+    <span class="alert-i">⚡</span>
+    <div><p><strong>The truth:</strong> You won't break imposter syndrome until you sign your first clients and deliver results. Imposter syndrome is a sign of growth. Keep going. The first client is on the other side of this.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 02 ENVIRONMENT -->
+<section id="environment">
+  <div class="sec-num">02 — Environment Setup</div>
+  <h2>Create the perfect calling environment</h2>
+  <p class="intro">None of the tactics matter if your environment handicaps you. Body follows breath. Voice follows body. Get this right first.</p>
+
+  <div class="g2">
+    <div class="card"><div class="card-icon">🎧</div><h3>Use Handsfree</h3><p>AirPods, earphones, or headphones. Holding a phone closes you off. Handsfree = freedom of expression = conviction in your voice.</p></div>
+    <div class="card"><div class="card-icon">🧍</div><h3>Stand Up & Pace</h3><p>Never sit hunched. Standing opens your diaphragm, improves airflow, creates a stronger voice. Your energy is completely different standing.</p></div>
+    <div class="card"><div class="card-icon">🤫</div><h3>Eliminate Distractions</h3><p>Quiet room. No other tabs open. No music. No one else in the room who might judge you. Perceived judgment kills conviction.</p></div>
+    <div class="card"><div class="card-icon">😊</div><h3>Smile While You Dial</h3><p>They can't see it but they can hear it. Smiling adds warmth and upward warmth to your voice. It changes the energy of the call.</p></div>
+  </div>
+
+  <div class="hl">
+    <h3>Pre-Call Checklist</h3>
+    <ul class="chk">
+      <li>Quiet room — door closed, no distractions</li>
+      <li>Handsfree connected and working</li>
+      <li>Standing position, space to pace</li>
+      <li>Only MCS lead list open on screen</li>
+      <li>Script nearby but not staring at it</li>
+      <li>Deep breath in, long breath out, "I've got this"</li>
+      <li>Smile on your face before the first dial</li>
+    </ul>
+  </div>
+
+  <div class="alert success">
+    <span class="alert-i">💡</span>
+    <div><p><strong>Habit Stack:</strong> Attach cold calling to your morning routine. Coffee down → stand up → first batch of dials. Automatic within 2 weeks. 8am sharp.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 03 TWO CHARACTERS -->
+<section id="characters">
+  <div class="sec-num">03 — The Two Characters</div>
+  <h2>You play two roles on every call</h2>
+  <p class="intro">You cannot speak to a receptionist the same way you speak to the business owner. Your tone shifts. Your character shifts.</p>
+
+  <div class="g2">
+    <div class="char-card friend">
+      <div class="char-name">The Old Friend</div>
+      <div class="char-role">For Gatekeepers</div>
+      <p>You're calling like you already know the owner. Confident, casual, warm. You don't explain. You assume familiarity.</p>
+      <p style="margin-top:.85rem;font-size:.875rem;"><strong>Mindset:</strong> "Imagine calling a mate's business and the admin picks up. How would you speak to them?"</p>
+      <div class="char-traits"><span class="trait">Casual</span><span class="trait">Familiar</span><span class="trait">Brief</span><span class="trait">Directive</span></div>
+    </div>
+    <div class="char-card expert">
+      <div class="char-name">The Trusted Expert</div>
+      <div class="char-role">For Decision Makers</div>
+      <p>You have inside knowledge and genuinely want to help them grow. Calm authority. Clear. Composed. No fluff.</p>
+      <p style="margin-top:.85rem;font-size:.875rem;"><strong>Mindset:</strong> "You are equal to them — not below, not above. You have something they actually need."</p>
+      <div class="char-traits"><span class="trait">Authoritative</span><span class="trait">Composed</span><span class="trait">Convicted</span><span class="trait">Peer-Level</span></div>
+    </div>
+  </div>
+
+  <div class="do-dont">
+    <div class="dont-box">
+      <h4>❌ Never Say to Gatekeepers</h4>
+      <ul class="slist">
+        <li>"Hi, can I speak to the owner please?"</li>
+        <li>Your company name unless asked</li>
+        <li>Anything about marketing or lead generation</li>
+        <li>Any full explanation of why you're calling</li>
+      </ul>
+    </div>
+    <div class="do-box">
+      <h4>✅ What Actually Works</h4>
+      <ul class="slist">
+        <li>"Hey, is [Name] about?"</li>
+        <li>"[Name] will know what it's regarding"</li>
+        <li>"It's a bit complex to explain right now, could you pop me through?"</li>
+        <li>Be beautifully vague. Never reveal your cards.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 04 TONALITY -->
+<section id="tonality">
+  <div class="sec-num">04 — Tonality Mastery</div>
+  <h2>70% of your first impression is tone</h2>
+  <p class="intro">It's not the words you say — it's how you say them. Your voice is the lens through which they judge your intentions, energy, and worth.</p>
+
+  <div class="hl">
+    <h3>The Five Voice Controls</h3>
+    <div style="margin-top:1.25rem;">
+      <p style="font-size:.78rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem;">1. Pitch — Communicates Emotion</p>
+      <div class="ton-bar"><span class="ton-label">Higher</span><div class="ton-track"><div class="ton-marker" style="left:30%;"></div></div><span class="ton-label">Lower</span></div>
+      <p style="font-size:.85rem;color:var(--t3);margin-bottom:1.1rem;">Higher pitch = excitement, urgency. Lower pitch = confidence, calm, control. <strong>Use lower for statements of certainty.</strong></p>
+
+      <p style="font-size:.78rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem;">2. Pace — Shows Control</p>
+      <div class="ton-bar"><span class="ton-label">Fast</span><div class="ton-track"><div class="ton-marker" style="left:70%;"></div></div><span class="ton-label">Slow</span></div>
+      <p style="font-size:.85rem;color:var(--t3);margin-bottom:1.1rem;">Fast = nervous, trying to get through before they hang up. Slow = confident, comfortable. <strong>Slow down. Always.</strong></p>
+
+      <p style="font-size:.78rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;">3. Inflection — Controls Certainty</p>
+      <p style="font-size:.85rem;color:var(--t3);margin-bottom:.5rem;"><strong>Downward inflection</strong> = conviction, certainty. <strong>Upward inflection</strong> = doubt, seeking approval. End your statements like you mean them.</p>
+      <div class="script" style="margin-top:.5rem;padding:1.1rem 1.4rem;">
+        <span class="sc-line">"It's Finn from SummitFlow↓" — Authority, confidence</span>
+        <span class="sc-line">"It's Finn from SummitFlow↑?" — Uncertain, seeking validation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 05 THE SCRIPT -->
+<section id="script">
+  <div class="sec-num">05 — The Complete Script</div>
+  <h2>Memorise this word for word</h2>
+  <p class="intro">Built specifically for MCS-certified heat pump installers. Learn the structure, then make it your own. Scripts are training wheels — tear them off as soon as you can.</p>
+
+  <div class="flow">
+    <div class="f-step"><div class="f-icon">🚪</div><div class="f-label">Gatekeeper</div><div class="f-sub">Old Friend</div></div>
+    <span class="f-arr">→</span>
+    <div class="f-step"><div class="f-icon">✓</div><div class="f-label">Validate</div><div class="f-sub">Right person</div></div>
+    <span class="f-arr">→</span>
+    <div class="f-step"><div class="f-icon">😌</div><div class="f-label">Diffuse</div><div class="f-sub">Respect time</div></div>
+    <span class="f-arr">→</span>
+    <div class="f-step"><div class="f-icon">🎯</div><div class="f-label">Hook</div><div class="f-sub">Attention</div></div>
+    <span class="f-arr">→</span>
+    <div class="f-step"><div class="f-icon">💎</div><div class="f-label">Pitch</div><div class="f-sub">Value</div></div>
+    <span class="f-arr">→</span>
+    <div class="f-step"><div class="f-icon">📅</div><div class="f-label">Book</div><div class="f-sub">Meeting</div></div>
+  </div>
+
+  <div class="script">
+    <h3 style="color:#fff;font-family:var(--fn);font-weight:800;font-size:1.1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #1e293b;">⚡ SummitFlow Call Script — MCS Heat Pump Installers</h3>
+
+    <div class="sc-sec">
+      <div class="sc-sec-title">Stage 1: Gatekeeper (Old Friend Character)</div>
+      <span class="sc-line">"Hey, is [Owner Name] about?"</span>
+      <span class="sc-note">Casual, downward inflection. Like calling a friend. Never say "please" or "the owner."</span>
+      <span class="sc-line">[If pressed: "What's this regarding?"]</span>
+      <span class="sc-line">"Just tell them it's Finn calling — they'll know what it's about."</span>
+      <span class="sc-note">Confident, familiar. Never reveal you're selling.</span>
+      <span class="sc-line">[If pushed harder:]</span>
+      <span class="sc-line">"It's a bit complex to explain right now, could you pop me through?"</span>
+    </div>
+
+    <div class="sc-sec">
+      <div class="sc-sec-title">Stage 2: Validate Decision Maker</div>
+      <span class="sc-line">"Am I speaking to [Name]?"</span>
+      <span class="sc-note">Confirm you're with the right person before proceeding. Don't waste your pitch on a junior.</span>
+    </div>
+
+    <div class="sc-sec">
+      <div class="sc-sec-title">Stage 3: Diffuse</div>
+      <span class="sc-line">"[Name], I know you're busy so I'll be really quick."</span>
+      <span class="sc-note">Downward inflection. Shows respect. Positions you as someone who values their time.</span>
+    </div>
+
+    <div class="sc-sec">
+      <div class="sc-sec-title">Stage 4: Attention Hook — Choose One</div>
+      <div style="background:#1e293b;padding:1.1rem;border-radius:8px;margin-bottom:.85rem;">
+        <span style="color:var(--am);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Option A — Competitor Hook (Highest Converting)</span>
+        <span class="sc-line" style="margin-top:.6rem;">"Have you seen what some of the bigger installation companies are doing to guarantee their survey pipeline throughout the year?"</span>
+        <span class="sc-note">Triggers competitive instinct. Installers hate competitors doing better. Pause and let them respond.</span>
+      </div>
+      <div style="background:#1e293b;padding:1.1rem;border-radius:8px;margin-bottom:.85rem;">
+        <span style="color:var(--am);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Option B — Capacity Hook</span>
+        <span class="sc-line" style="margin-top:.6rem;">"Could you handle an extra 8–10 qualified heat pump surveys booked into your calendar next month?"</span>
+        <span class="sc-note">"Could you handle" feeds into ego — of course they can. Opens desire-based conversation. Pause for response.</span>
+      </div>
+      <div style="background:#1e293b;padding:1.1rem;border-radius:8px;">
+        <span style="color:var(--am);font-size:.62nm;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Option C — BUS Grant Hook</span>
+        <span class="sc-line" style="margin-top:.6rem;">"Are you making the most of the Boiler Upgrade Scheme demand? There are homeowners in your area qualifying for the £7,500 grant right now and actively searching for MCS installers."</span>
+        <span class="sc-note">Creates immediate relevance. BUS grants mean motivated homeowners — not cold leads.</span>
+      </div>
+    </div>
+
+    <div class="sc-sec">
+      <div class="sc-sec-title">Stage 5: Elevator Pitch</div>
+      <span class="sc-line">"Perfect. So I help MCS-certified heat pump installers across the UK get guaranteed qualified survey appointments booked directly into their calendar."</span>
+      <span class="sc-pause sc-line">[PAUSE — let that land]</span>
+      <span class="sc-line">"We run targeted outreach to homeowners actively researching heat pump installations in your area — people who already qualify for the BUS grant..."</span>
+      <span class="sc-pause sc-line">[PAUSE]</span>
+      <span class="sc-line">"...then our AI qualifies them and books them straight into your survey calendar."</span>
+      <span class="sc-pause sc-line">[PAUSE]</span>
+      <span class="sc-line">"The whole thing's automated — so you get a consistent flow of qualified surveys without spending time chasing leads."</span>
+      <span class="sc-note">Slow. Micro-pauses between key points. Downward inflection on certainties. Don't rush through this.</span>
+    </div>
+
+    <div class="sc-sec">
+      <div class="sc-sec-title">Stage 6: Book the Meeting</div>
+      <span class="sc-line">"I've got some ideas I'd love to share with you — you can take them and implement yourself if you like."</span>
+      <span class="sc-line">"Are you free for 15 minutes tomorrow at [specific time]?"</span>
+      <span class="sc-note">Lead with value. Specific time only — never "sometime this week."</span>
+      <span class="sc-line">[If they agree:]</span>
+      <span class="sc-line">"Perfect. What's the best email to send the invite to? And your mobile — just in case I need to reach you?"</span>
+      <span class="sc-note">Always get both email AND mobile. Send the invite while still on the call.</span>
+    </div>
+
+    <div class="sc-sec">
+      <div class="sc-sec-title">Stage 7: Risk Reversal (Use for Hesitation)</div>
+      <span class="sc-line">"And just so you know — we guarantee a minimum number of qualified surveys per month on retainer. If we don't deliver, you don't pay."</span>
+      <span class="sc-line">"What's a completed installation worth to you? £8,000? £12,000?"</span>
+      <span class="sc-line" style="color:#9ca3af;">[Let them answer]</span>
+      <span class="sc-line">"So if we're delivering 8 qualified surveys a month, and you convert even 30% of those — that's 2–3 installations worth £15–30k. For a retainer that costs a fraction of that. Does that maths make sense?"</span>
+      <span class="sc-note">Performance-backed retainer removes risk. The ROI argument is compelling — a single install covers months of retainer.</span>
+    </div>
+  </div>
+
+  <div class="alert success">
+    <span class="alert-i">🔑</span>
+    <div><p><strong>The Golden Rule:</strong> Never sell on a cold call. Never discuss pricing. Never pitch the full service. Your only goal is to book a 15-minute meeting. Everything else happens on the Zoom.</p></div>
+  </div>
+
+  <div class="do-dont">
+    <div class="dont-box">
+      <h4>❌ Never Say These</h4>
+      <ul class="slist">
+        <li>"This is a cold call, do you want to hang up or give me 30 seconds?" — Terrible positioning</li>
+        <li>"I'm not trying to sell you anything" — Weak, self-degrading</li>
+        <li>"If you're interested..." — No conviction</li>
+        <li>"I'm not sure if this is relevant for you" — Why are you calling then?</li>
+        <li>"If you're free, maybe we could..." — Wishy-washy</li>
+      </ul>
+    </div>
+    <div class="do-box">
+      <h4>✅ Say These Instead</h4>
+      <ul class="slist">
+        <li>"I'm confident we can get you more qualified surveys" — Conviction</li>
+        <li>"What have you got to lose?" — Challenges their logic</li>
+        <li>"Are you free tomorrow at 2pm?" — Specific, assumptive</li>
+        <li>"Worst case, you take these ideas and implement yourself" — No risk frame</li>
+        <li>"I know we can make this work for you" — Certainty</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 06 OBJECTIONS -->
+<section id="objections">
+  <div class="sec-num">06 — Objection Handling</div>
+  <h2>The sale starts at the first objection</h2>
+  <p class="intro">Don't fight objections — redirect them. Agree with their concern, then offer a different perspective. Push back 2–3 times before accepting a no. Most give up at one.</p>
+
+  <div class="obj">
+    <div class="obj-trigger">"Not interested" / "We're fine for leads"</div>
+    <p style="font-size:.85rem;color:var(--t3);">The auto-reject. Don't accept it. They haven't heard the value yet.</p>
+    <div class="obj-response">
+      <p>"I completely get that. Can I ask — are you fully booked every single month, or are there quieter periods when you could do with more surveys in the calendar?"</p>
+      <p style="color:var(--t3);margin-top:.5rem;">[Let them answer — most will admit to quieter periods]</p>
+      <p>"That's exactly what we solve. We give you a consistent baseline so you're never dependent on word-of-mouth or referrals. What have you got to lose by having a 15-minute chat?"</p>
+    </div>
+  </div>
+
+  <div class="obj">
+    <div class="obj-trigger">"We already have a marketing company"</div>
+    <p style="font-size:.85rem;color:var(--t3);">Acknowledge, then differentiate hard.</p>
+    <div class="obj-response">
+      <p>"That's great — we're not doing general marketing. We specifically guarantee qualified heat pump survey appointments delivered directly into your calendar. Very different from a marketing agency running ads and hoping for the best."</p>
+      <p style="color:var(--t3);margin-top:.5rem;">"What's your current agency delivering in terms of guaranteed surveys per month?"</p>
+    </div>
+    <div class="obj-note">If they can't answer, you've made the distinction. If they can, acknowledge it and find the gap.</div>
+  </div>
+
+  <div class="obj">
+    <div class="obj-trigger">"We're busy enough / don't need more work"</div>
+    <p style="font-size:.85rem;color:var(--t3);">Probe the assumption.</p>
+    <div class="obj-response">
+      <p>"That's brilliant — are you booked solid 12 months of the year, or are there seasonal dips?"</p>
+      <p style="color:var(--t3);margin-top:.5rem;">[They'll almost always admit to seasonal slowdown]</p>
+      <p>"The quieter months are exactly when a consistent survey pipeline matters most. We help you smooth out those dips so you've always got work in the calendar. Worst case, you have too many surveys and pick the best ones."</p>
+    </div>
+  </div>
+
+  <div class="obj">
+    <div class="obj-trigger">"We tried ads before and it didn't work"</div>
+    <p style="font-size:.85rem;color:var(--t3);">Common and valid. Acknowledge, then differentiate your model.</p>
+    <div class="obj-response">
+      <p>"I hear that a lot — most agencies run generic ads that attract time-wasters. Can I ask what happened with yours?"</p>
+      <p style="color:var(--t3);margin-top:.5rem;">[Let them vent]</p>
+      <p>"The difference with what we do is we specifically target homeowners who already qualify for the BUS grant and are actively searching for MCS installers. Not cold traffic. Pre-qualified, motivated homeowners. And we only charge when the surveys land in your calendar."</p>
+    </div>
+    <div class="obj-note">The BUS grant angle is your differentiator. High-intent leads who already have the grant motivation are very different from Facebook ad leads.</div>
+  </div>
+
+  <div class="obj">
+    <div class="obj-trigger">"We get leads from [manufacturer / Vaillant / Worcester Bosch]"</div>
+    <p style="font-size:.85rem;color:var(--t3);">Position as complementary, not replacement.</p>
+    <div class="obj-response">
+      <p>"That's brilliant — manufacturer leads are great. But can I ask, are those enough to keep your engineers busy 12 months of the year? Or do you find they're inconsistent?"</p>
+      <p style="color:var(--t3);margin-top:.5rem;">[They almost always admit inconsistency]</p>
+      <p>"We don't replace your manufacturer relationship at all — we give you a predictable baseline on top of it. So you're never solely dependent on one source. Think of it as your survey pipeline insurance."</p>
+    </div>
+  </div>
+
+  <div class="obj">
+    <div class="obj-trigger">"Haven't got time right now"</div>
+    <p style="font-size:.85rem;color:var(--t3);">They're trying to end the call. Get a specific future time.</p>
+    <div class="obj-response">
+      <p>"No problem — when would be a better time to give you a ring back?"</p>
+      <p style="color:var(--t3);margin-top:.5rem;">[Get a specific day and time]</p>
+      <p><strong>Or push once:</strong> "Look, just before you go — I literally only need 20 seconds. There are homeowners in your area qualifying for the BUS grant right now who can't find an MCS installer. You're going to want to hear this."</p>
+    </div>
+    <div class="obj-note">Never leave without either a meeting booked or a specific callback time. Always get their mobile.</div>
+  </div>
+
+  <div class="obj">
+    <div class="obj-trigger">"Need to think about it" / Vague brush-off</div>
+    <div class="obj-response">
+      <p>"Absolutely, I get that. Can I ask — what specifically would you want to think about? Is it whether the BUS grant demand is real in your area, or how the survey qualification works, or something else?"</p>
+      <p style="color:var(--t3);margin-top:.5rem;">[Now you can address the real concern]</p>
+      <p>"[Name], there's literally no risk — we guarantee surveys on retainer. Every day you wait is another day of homeowners in your area signing with another installer. What would need to happen for this to be a no-brainer?"</p>
+    </div>
+  </div>
+
+  <div class="alert warn">
+    <span class="alert-i">💪</span>
+    <div><p><strong>The Push-Back Rule:</strong> Push back 2–3 times before accepting rejection. Most salespeople give up after one "no." The best approach calls with the energy that the prospect needs them more than they need the prospect — without arrogance.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 07 BOOKING -->
+<section id="booking">
+  <div class="sec-num">07 — Securing The Meeting</div>
+  <h2>Never leave without a next step</h2>
+  <p class="intro">Your only goal on every call is a meeting. Nothing else matters.</p>
+
+  <div class="hl">
+    <h3>Meeting Framework</h3>
+    <ol style="list-style:none;counter-reset:item;">
+      <li style="position:relative;padding-left:2.25rem;margin-bottom:.9rem;font-size:.875rem;color:var(--t2);counter-increment:item;">
+        <span style="position:absolute;left:0;top:0;width:22px;height:22px;background:var(--al);border:1.5px solid var(--abd);color:var(--a);font-size:.72rem;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;">1</span>
+        <strong>Lead with value:</strong> "I've got some ideas I'd love to share — you can take them and implement yourself."
+      </li>
+      <li style="position:relative;padding-left:2.25rem;margin-bottom:.9rem;font-size:.875rem;color:var(--t2);counter-increment:item;">
+        <span style="position:absolute;left:0;top:0;width:22px;height:22px;background:var(--al);border:1.5px solid var(--abd);color:var(--a);font-size:.72rem;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;">2</span>
+        <strong>Specific time:</strong> Never "sometime this week." Always "tomorrow at 2pm" or "Friday at 10am."
+      </li>
+      <li style="position:relative;padding-left:2.25rem;margin-bottom:.9rem;font-size:.875rem;color:var(--t2);counter-increment:item;">
+        <span style="position:absolute;left:0;top:0;width:22px;height:22px;background:var(--al);border:1.5px solid var(--abd);color:var(--a);font-size:.72rem;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;">3</span>
+        <strong>As soon as possible:</strong> Every extra day = lower show rate. Book within 48 hours where possible.
+      </li>
+      <li style="position:relative;padding-left:2.25rem;font-size:.875rem;color:var(--t2);">
+        <span style="position:absolute;left:0;top:0;width:22px;height:22px;background:var(--al);border:1.5px solid var(--abd);color:var(--a);font-size:.72rem;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;">4</span>
+        <strong>Get email AND mobile:</strong> Both. Send the calendar invite while still on the call.
+      </li>
+    </ol>
+  </div>
+
+  <div class="script">
+    <span class="sc-lbl">Booking Line</span>
+    <span class="sc-line">"I've got some ideas I'd love to share — you can take them and implement yourself if you like. Are you free for 15 minutes tomorrow at 10am?"</span>
+    <span class="sc-lbl">Get Details</span>
+    <span class="sc-line">"Perfect. What's the best email to send the invite? And your mobile — just in case I need to reach you?"</span>
+    <span class="sc-lbl">Confirm</span>
+    <span class="sc-line">"Great — I'm sending that now. Are you at your desk? Can you check you've received it?"</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 08 TRACKING -->
+<section id="tracking">
+  <div class="sec-num">08 — Daily Tracking</div>
+  <h2>Track everything. Improve daily.</h2>
+  <p class="intro">Sales is a numbers game. The data shows exactly where to focus. Test → Track → Tweak → Repeat.</p>
+
+  <div class="g4">
+    <div class="mbox"><div class="mbox-val">100</div><div class="mbox-lbl">Calls/Day</div></div>
+    <div class="mbox"><div class="mbox-val">4–5%</div><div class="mbox-lbl">Meeting Rate</div></div>
+    <div class="mbox"><div class="mbox-val">70%+</div><div class="mbox-lbl">Show Rate</div></div>
+    <div class="mbox"><div class="mbox-val">30%</div><div class="mbox-lbl">Close Rate</div></div>
+  </div>
+
+  <div class="hl" style="margin-top:2rem;">
+    <h3>Weekly Commitment</h3>
+    <ul class="chk">
+      <li><strong>Monday–Friday:</strong> 100 calls per day. No negotiation. 8am sharp.</li>
+      <li><strong>Morning sessions:</strong> First 2 hours are sacred. No meetings, no distractions.</li>
+      <li><strong>Friday:</strong> Review week's metrics. Where did you convert? Where did you drop off?</li>
+      <li><strong>Sunday:</strong> Prep lead list for the week. Check MCS database for new entries.</li>
+    </ul>
+  </div>
+
+  <div class="quote">
+    "With every single call you will make micro improvements. It's not about what happens in your first 10 calls — it's about what happens in your first 100, your first 1,000. The majority don't make it there. That's where they sell themselves short."
+    <cite>— Jordan Platten</cite>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 09 QUICK REFERENCE -->
+<section id="quickref">
+  <div class="sec-num">09 — Quick Reference</div>
+  <h2>Print this. Keep it visible.</h2>
+
+  <div class="script" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);">
+    <h3>⚡ The 60-Second Script Flow — Heat Pump Installers</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+      <div>
+        <div class="sc-sec-title">Gatekeeper</div>
+        <div class="sc-line" style="font-size:.83rem;">"Hey, is [Name] about?"</div>
+        <div class="sc-sec-title" style="margin-top:.9rem;">Validate</div>
+        <div class="sc-line" style="font-size:.83rem;">"Am I speaking to [Name]?"</div>
+        <div class="sc-sec-title" style="margin-top:.9rem;">Diffuse</div>
+        <div class="sc-line" style="font-size:.83rem;">"[Name], I know you're busy so I'll be really quick."</div>
+        <div class="sc-sec-title" style="margin-top:.9rem;">Hook</div>
+        <div class="sc-line" style="font-size:.83rem;">"Are you making the most of the BUS grant demand in your area?"</div>
+      </div>
+      <div>
+        <div class="sc-sec-title">Pitch</div>
+        <div class="sc-line" style="font-size:.83rem;">"I help MCS-certified heat pump installers get guaranteed qualified survey appointments booked straight into their calendar."</div>
+        <div class="sc-sec-title" style="margin-top:.9rem;">Book</div>
+        <div class="sc-line" style="font-size:.83rem;">"I've got some ideas I'd love to share. Are you free 15 minutes tomorrow at 10am?"</div>
+        <div class="sc-sec-title" style="margin-top:.9rem;">Push-Back</div>
+        <div class="sc-line" style="font-size:.83rem;">"What have you got to lose by spending 15 minutes with me?"</div>
+      </div>
+    </div>
+    <div style="margin-top:1.75rem;padding-top:1.4rem;border-top:1px solid #334155;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;font-size:.78rem;color:#94a3b8;">
+        <div>✅ Stand up & pace</div>
+        <div>✅ Smile while you dial</div>
+        <div>✅ Downward inflection</div>
+        <div>✅ Micro-pauses between points</div>
+        <div>✅ Push back 2–3 times</div>
+        <div>✅ Get email AND mobile</div>
+        <div>❌ Never reveal you're selling</div>
+        <div>❌ Never pitch pricing</div>
+        <div>❌ Never give up after one "no"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>SummitFlow</strong> — Guaranteed Survey Appointments for UK Heat Pump Installers</p>
+  <p style="margin-top:.5rem;">Built on Jordan Platten's frameworks. Executed relentlessly.</p>
+  <p style="margin-top:1.25rem;font-size:.78rem;">100 calls/day. 4–5 meetings/week. 1–2 clients/month. Make Mum proud by November 30th.</p>
+</footer>
+
+</body>
+</html>

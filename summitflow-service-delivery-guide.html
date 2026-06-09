@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SummitFlow — Service Delivery Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --a:#4f46e5;--ah:#4338ca;--al:#eef2ff;--am:#818cf8;--abd:#c7d2fe;
+  --txt:#0f172a;--t2:#374151;--t3:#6b7280;--t4:#9ca3af;
+  --bg:#f1f5f9;--card:#ffffff;--bd:#e2e8f0;--bd2:#f1f5f9;
+  --grn:#059669;--gnl:#ecfdf5;--red:#dc2626;--rdl:#fef2f2;
+  --gld:#d97706;--gdl:#fef3c7;--blu:#2563eb;--bll:#eff6ff;
+  --sh:0 1px 3px rgba(15,23,42,.07),0 1px 2px rgba(15,23,42,.05);
+  --sh2:0 4px 6px -1px rgba(15,23,42,.07),0 2px 4px rgba(15,23,42,.05);
+  --fn:'Outfit',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);line-height:1.65;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+html{scroll-behavior:smooth;}
+nav{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);z-index:100;padding:.85rem 2rem;}
+.nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;}
+.logo-icon{width:30px;height:30px;background:var(--a);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--fn);font-weight:900;font-size:.95rem;}
+.logo-text{font-family:var(--fn);font-weight:800;font-size:1rem;color:var(--txt);}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center;}
+.nav-links a{color:var(--t3);text-decoration:none;font-size:.78rem;font-weight:500;transition:color .15s;}
+.nav-links a:hover{color:var(--txt);}
+.nav-links .back{color:var(--a);font-weight:700;background:var(--al);padding:.35rem .75rem;border-radius:7px;}
+@media(max-width:768px){.nav-links{display:none;}}
+.mob-back{display:none;position:fixed;bottom:1.5rem;right:1.5rem;background:var(--a);color:#fff;padding:.7rem 1.1rem;border-radius:100px;text-decoration:none;font-size:.8rem;font-weight:700;box-shadow:0 4px 14px rgba(79,70,229,.35);z-index:99;}
+@media(max-width:768px){.mob-back{display:flex;}}
+
+section{padding:4rem 2rem;max-width:900px;margin:0 auto;}
+.hero{padding:6.5rem 2rem 3.5rem;max-width:900px;margin:0 auto;text-align:center;}
+.hero-tag{display:inline-block;padding:.4rem .9rem;background:var(--al);border:1px solid var(--abd);color:var(--a);font-size:.68rem;font-weight:700;border-radius:100px;margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.08em;}
+.hero h1{font-family:var(--fn);font-weight:900;font-size:clamp(2rem,4.5vw,2.75rem);line-height:1.15;margin-bottom:1rem;letter-spacing:-.03em;}
+.hero p{font-size:1rem;color:var(--t3);max-width:600px;margin:0 auto;}
+
+.sec-num{font-size:.65rem;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.6rem;}
+section h2{font-family:var(--fn);font-weight:800;font-size:clamp(1.4rem,3vw,1.85rem);margin-bottom:.75rem;letter-spacing:-.02em;}
+section h3{font-family:var(--fn);font-weight:700;font-size:1.05rem;margin-bottom:.65rem;color:var(--txt);}
+.intro{font-size:.95rem;color:var(--t3);max-width:680px;margin-bottom:2rem;}
+.divider{height:1px;background:var(--bd);margin:0 2rem;}
+
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:1.6rem;box-shadow:var(--sh);}
+.card.sm{padding:1.1rem;}
+.card-icon{width:40px;height:40px;background:var(--al);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:.85rem;}
+.card h3,.card h4{font-family:var(--fn);font-weight:700;font-size:.95rem;color:var(--txt);margin-bottom:.5rem;}
+.card p{font-size:.875rem;color:var(--t3);line-height:1.65;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+.hl{background:linear-gradient(135deg,var(--al) 0%,var(--card) 100%);border:1px solid var(--abd);border-radius:14px;padding:2rem;margin:1.5rem 0;}
+.hl h3{font-family:var(--fn);font-weight:800;font-size:1.1rem;margin-bottom:1rem;}
+
+.script{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:1.75rem 2rem;margin:1.25rem 0;font-size:.87rem;line-height:1.9;}
+.sc-lbl{color:var(--am);font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.2rem;margin-top:1rem;}
+.sc-lbl:first-child{margin-top:0;}
+.sc-txt{color:#e2e8f0;display:block;margin-bottom:.5rem;}
+
+ul.slist{list-style:none;}
+ul.slist li{position:relative;padding-left:1.25rem;margin-bottom:.6rem;color:var(--t2);font-size:.875rem;}
+ul.slist li::before{content:"";position:absolute;left:0;top:.5rem;width:5px;height:5px;background:var(--a);border-radius:50%;}
+ul.slist li strong{color:var(--txt);}
+
+ul.chk{list-style:none;}
+ul.chk li{position:relative;padding-left:1.6rem;margin-bottom:.55rem;font-size:.875rem;color:var(--t2);}
+ul.chk li::before{content:"☐";position:absolute;left:0;color:var(--a);font-size:1rem;}
+
+.alert{padding:1rem 1.3rem;border-radius:10px;margin:1.25rem 0;display:flex;align-items:flex-start;gap:.75rem;font-size:.875rem;}
+.alert-i{font-size:1.1rem;flex-shrink:0;}
+.alert.warn{background:var(--gdl);border:1px solid #fcd34d;}
+.alert.success{background:var(--gnl);border:1px solid #6ee7b7;}
+.alert.danger{background:var(--rdl);border:1px solid #fca5a5;}
+.alert.info{background:var(--bll);border:1px solid #93c5fd;}
+
+.important{background:linear-gradient(135deg,var(--al) 0%,var(--card) 100%);border:1px solid var(--abd);border-radius:12px;padding:1.4rem 1.6rem;margin:1.5rem 0;font-family:var(--fn);font-weight:600;font-size:1rem;color:var(--txt);font-style:italic;line-height:1.5;}
+.important small{display:block;font-family:var(--fb);font-size:.78rem;color:var(--t3);margin-top:.5rem;font-style:normal;font-weight:400;}
+
+/* pipeline visual */
+.pipeline{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:1.2rem;margin:1.5rem 0;box-shadow:var(--sh);overflow-x:auto;}
+.pipe-stage{flex:1;min-width:80px;text-align:center;padding:.65rem .5rem;border-radius:8px;background:var(--bg);}
+.pipe-stage h5{font-family:var(--fn);font-weight:700;font-size:.78rem;color:var(--txt);margin-bottom:.2rem;}
+.pipe-stage p{font-size:.65rem;color:var(--t3);}
+.pipe-arr{color:var(--a);font-size:.85rem;flex-shrink:0;}
+
+/* steps */
+.steps{border:1px solid var(--bd);border-radius:14px;overflow:hidden;background:var(--card);box-shadow:var(--sh);}
+.step{display:flex;gap:1rem;padding:1.4rem;border-bottom:1px solid var(--bd);}
+.step:last-child{border-bottom:none;}
+.step-num{width:28px;height:28px;background:var(--a);color:#fff;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--fn);font-weight:900;font-size:.82rem;flex-shrink:0;margin-top:.1rem;}
+.step-content h4{font-family:var(--fn);font-weight:700;font-size:.95rem;color:var(--txt);margin-bottom:.4rem;}
+.step-content p,.step-content ul{font-size:.875rem;color:var(--t3);line-height:1.65;}
+.step-content p+p{margin-top:.5rem;}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:.875rem;}
+.tbl th{background:var(--al);color:var(--a);font-family:var(--fn);font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;padding:.7rem .9rem;text-align:left;border:1px solid var(--abd);}
+.tbl td{padding:.7rem .9rem;border:1px solid var(--bd);color:var(--t2);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:var(--bg);}
+.tbl strong{color:var(--txt);}
+
+/* metrics */
+.mbox{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:1.1rem;text-align:center;box-shadow:var(--sh);}
+.mbox-val{font-family:var(--fn);font-weight:900;font-size:1.6rem;color:var(--txt);}
+.mbox-lbl{font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-top:.25rem;}
+
+/* code box */
+.code{background:#1e293b;color:#e2e8f0;border-radius:10px;padding:1.1rem 1.4rem;margin:.85rem 0;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;overflow-x:auto;}
+.code .cm{color:#22c55e;}
+.code .ck{color:#818cf8;}
+.code .cs{color:#fb923c;}
+.code .cv{color:#7dd3fc;}
+
+footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--bd);background:var(--card);}
+footer p{color:var(--t3);font-size:.82rem;}
+footer strong{color:var(--txt);}
+
+.badge{display:inline-block;padding:.22rem .6rem;font-size:.6rem;font-weight:700;border-radius:100px;text-transform:uppercase;letter-spacing:.05em;}
+.badge.grn{background:var(--grn);color:#fff;}
+.badge.ind{background:var(--a);color:#fff;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">SummitFlow</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="back">← Dashboard</a></li>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#traffic">Lead Gen</a></li>
+      <li><a href="#crm">CRM</a></li>
+      <li><a href="#appointwise">AppointWise</a></li>
+      <li><a href="#integration">Integration</a></li>
+      <li><a href="#metrics">Metrics</a></li>
+      <li><a href="#onboarding">Onboarding</a></li>
+    </ul>
+  </div>
+</nav>
+<a href="index.html" class="mob-back">← Dashboard</a>
+
+<header class="hero">
+  <span class="hero-tag">Service Delivery Guide</span>
+  <h1>The complete survey appointment delivery system for MCS heat pump installers</h1>
+  <p>Step-by-step operational playbook: Lead Generation → Go High Level → AppointWise → Calendar. Deliver results, retain clients, build the agency.</p>
+</header>
+
+<div class="divider"></div>
+
+<!-- 01 OVERVIEW -->
+<section id="overview">
+  <div class="sec-num">01 — Service Architecture</div>
+  <h2>The complete delivery pipeline</h2>
+  <p class="intro">Five interconnected stages. The output of each becomes the input of the next. Master them sequentially. Don't try to optimise stage 3 before stage 1 is working.</p>
+
+  <div class="pipeline">
+    <div class="pipe-stage"><h5>Stage 1</h5><p>Lead Generation</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Stage 2</h5><p>Inbound Qualification</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Stage 3</h5><p>CRM Pipeline</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Stage 4</h5><p>AI Setting</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Stage 5</h5><p>Survey Booked</p></div>
+  </div>
+
+  <div class="important">
+    "The key is in the creative and the offer. The offer has to be right — it has to resonate with the audience. The more specific we can get, the better."
+    <small>— Jordan Platten</small>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-icon">📍</div>
+      <h3>Your Stack</h3>
+      <table class="tbl" style="margin-top:.5rem;">
+        <tr><td><strong>Lead Gen</strong></td><td>Meta Ads + cold outreach targeting BUS grant homeowners</td></tr>
+        <tr><td><strong>CRM</strong></td><td>Go High Level (white-labelled)</td></tr>
+        <tr><td><strong>AI Setting</strong></td><td>AppointWise (qualifies + books)</td></tr>
+        <tr><td><strong>Booking</strong></td><td>Google Calendar (direct sync)</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h3>ICP Snapshot</h3>
+      <table class="tbl" style="margin-top:.5rem;">
+        <tr><td><strong>Target</strong></td><td>MCS-certified heat pump installers</td></tr>
+        <tr><td><strong>Size</strong></td><td>2–15 engineers, owner-operated</td></tr>
+        <tr><td><strong>Revenue</strong></td><td>£200k–£2M annually</td></tr>
+        <tr><td><strong>Job Value</strong></td><td>£8,000–£18,000 per installation</td></tr>
+        <tr><td><strong>Delivery</strong></td><td>8–15 qualified surveys/month guaranteed</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="alert success">
+    <span class="alert-i">💡</span>
+    <div><p><strong>Why heat pump installers are perfect:</strong> High job value (£8k–£18k), MCS database gives you a verified prospect list, BUS grant creates urgent homeowner demand, and installers lack the time and systems to capture it. The need is real and the ROI case writes itself.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 02 LEAD GENERATION -->
+<section id="traffic">
+  <div class="sec-num">02 — Lead Generation</div>
+  <h2>Getting BUS grant homeowners into the pipeline</h2>
+  <p class="intro">The goal is to generate inbound interest from homeowners who qualify for the Boiler Upgrade Scheme and are actively researching heat pump installation. These are motivated, pre-qualified leads — not cold traffic.</p>
+
+  <div class="hl">
+    <h3>Heat Pump Lead Gen Offers That Convert</h3>
+    <div class="g2" style="margin-top:1.25rem;">
+      <div class="card sm">
+        <h4>BUS Grant Angle (Highest Converting)</h4>
+        <ul class="slist">
+          <li>Free heat pump survey + grant eligibility check</li>
+          <li>"Find out if you qualify for £7,500 off"</li>
+          <li>No-obligation home survey</li>
+          <li>"We'll handle all the BUS grant paperwork"</li>
+        </ul>
+      </div>
+      <div class="card sm">
+        <h4>Energy Savings Angle</h4>
+        <ul class="slist">
+          <li>Free energy cost comparison: gas vs heat pump</li>
+          <li>"See how much you'd save switching"</li>
+          <li>Free home heat loss assessment</li>
+          <li>"New build? You may qualify for free installation"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem;">Meta Ads Setup — Step by Step</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Create Campaign</h4>
+        <p>Ads Manager → Create → Select <strong>Leads</strong> as objective. Choose "Manual leads campaign." Name it clearly.</p>
+        <div class="code">
+          <span class="cm">// Campaign naming convention</span><br>
+          <span class="cv">[Installer Name]</span> - <span class="cv">[Offer]</span> - <span class="cv">[Region]</span> - <span class="cv">[Date]</span><br>
+          <span class="cs">"Smith HP - Free Survey - West Yorkshire - Jun 2026"</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Campaign Budget</h4>
+        <p>Enable <strong>Campaign Budget Optimization (CBO)</strong>. Minimum £5/day per ad creative. For 3 creatives = £15/day minimum. CBO distributes spend to best-performing ads automatically.</p>
+        <div class="alert warn" style="margin-top:.75rem;"><span class="alert-i">⚠️</span><div><p><strong>Budget Rule:</strong> Never go below £5/day per creative. Meta can't optimise without sufficient data. Lower budgets = wasted money.</p></div></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Audience Targeting for Heat Pump Homeowners</h4>
+        <p>Set location to the installer's service area (typically 25–40 mile radius from base). Age 30–65+ (homeowners with property suitable for heat pumps).</p>
+        <div class="script" style="margin-top:.75rem;">
+          <span class="sc-lbl">Heat Pump Targeting Suggestions</span>
+          <span class="sc-txt">Interest: Home improvement, Energy efficiency, Renewable energy<br>
+Interest: Heating systems, Home insulation, Smart home<br>
+Behaviour: Homeowners, Likely to move, Engaged shoppers<br>
+Demographics: Higher household income (heat pumps suit larger homes)<br><br>
+<span style="color:var(--am);">Pro tip:</span> Start broad (200k+ audience) then narrow based on CPL after 7 days</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Ad Creative — Pain Points and Outcomes</h4>
+        <div class="g2" style="margin-top:.75rem;">
+          <div class="card sm" style="border-color:#a7f3d0;background:var(--gnl);">
+            <h4 style="color:var(--grn);">✓ Good Copy</h4>
+            <p>"Still relying on gas central heating? Homeowners in [area] are switching to heat pumps and getting £7,500 back from the government. Book your FREE no-obligation survey and find out if your home qualifies."</p>
+          </div>
+          <div class="card sm" style="border-color:#fecaca;background:var(--rdl);">
+            <h4 style="color:var(--red);">✗ Bad Copy</h4>
+            <p>"We install heat pumps in [area]. MCS certified. Air source and ground source. Contact us for a quote."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4>Lead Form Build</h4>
+        <p>Create form in ad setup. Select <strong>More volume</strong> form type initially. Required fields:</p>
+        <ul class="slist" style="margin-top:.65rem;">
+          <li>Full Name</li>
+          <li>Phone Number (required for AppointWise)</li>
+          <li>Email Address</li>
+        </ul>
+        <p style="margin-top:.75rem;"><strong>Qualification questions (1–2 max):</strong></p>
+        <div class="script" style="margin-top:.5rem;">
+          <span class="sc-lbl">Heat Pump Qualification Questions</span>
+          <span class="sc-txt">Q1: "Do you own your property?" → Yes / No (filter renters)<br>
+Q2: "What heating system do you currently have?" → Gas / Oil / Electric / Other<br>
+Q3: "Are you aware of the £7,500 Boiler Upgrade Scheme grant?" → Yes / No / Want to know more</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <h4>Thank You Page</h4>
+        <p>Include: "We'll contact you within 60 minutes to arrange your free survey." + installer's phone number + Google reviews link. Sets immediate expectation and builds trust.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert success">
+    <span class="alert-i">💡</span>
+    <div><p><strong>Creative Testing:</strong> Launch with 3 different ad creatives in one ad set. Test one offer with three different angles or visuals. After 7 days, kill underperformers and scale the winner. Never kill an ad before day 7 — Meta needs time to optimise.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 03 CRM -->
+<section id="crm">
+  <div class="sec-num">03 — CRM System</div>
+  <h2>Go High Level pipeline management</h2>
+  <p class="intro">All leads flow into Go High Level — your single source of truth. White-label it as your own branded platform to each installer client.</p>
+
+  <div class="hl">
+    <h3>Why GHL is Non-Negotiable</h3>
+    <div class="g2" style="margin-top:.85rem;">
+      <ul class="slist">
+        <li>All-in-one: landing pages, pipelines, automations, calendar</li>
+        <li>Native Meta Ads integration</li>
+        <li>Built-in SMS, WhatsApp, and email</li>
+        <li>AppointWise integrates directly via snapshot</li>
+      </ul>
+      <ul class="slist">
+        <li>White-label capability (your brand, not GHL)</li>
+        <li>Sub-accounts for each installer client</li>
+        <li>Automation workflows (if/then logic)</li>
+        <li>Calendar booking with Google Calendar sync</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Pipeline Setup for Heat Pump Installers</h3>
+  <p style="color:var(--t3);font-size:.875rem;margin-bottom:1rem;">Create a pipeline that mirrors the homeowner journey from lead to booked survey.</p>
+
+  <div class="pipeline">
+    <div class="pipe-stage"><h5>New Lead</h5><p>Ad enquiry</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Qualified</h5><p>AI confirmed interest</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Survey Set</h5><p>Date booked</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Survey Done</h5><p>Attended</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Install</h5><p>Converted</p></div>
+  </div>
+
+  <div class="card" style="margin-top:1.25rem;">
+    <h3>Additional Pipeline Stages</h3>
+    <ul class="slist" style="margin-top:.75rem;">
+      <li><strong>Not Qualified:</strong> Renting, wrong property type, or survey not viable</li>
+      <li><strong>No-Show:</strong> Survey booked but homeowner didn't attend</li>
+      <li><strong>Ghosting:</strong> No response after 3+ follow-ups</li>
+      <li><strong>Future Follow-Up:</strong> Interested but not ready (revisit in 3–6 months)</li>
+      <li><strong>Not Viable (Property):</strong> Home assessed — not suitable for heat pump</li>
+    </ul>
+  </div>
+
+  <div class="alert danger" style="margin-top:1.5rem;">
+    <span class="alert-i">⚠️</span>
+    <div><p><strong>Critical: One Sub-Account Per Installer Client.</strong> Never cross-pollinate data between clients. Each installer gets isolated data, automations, and AppointWise strategies. Prevents AI confusion and data leakage between competing businesses in the same region.</p></div>
+  </div>
+
+  <h3 style="margin-top:2rem;">GHL Sub-Account Setup</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content"><h4>Create Sub-Account</h4><p>Agency view → Sub-Accounts → Create new. Name it: "[Installer Company] - Heat Pumps - [Region]"</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content"><h4>Configure Business Details</h4><p>Set company name, logo, timezone (UK), phone number. This is what appears in all outgoing SMS/emails from the AI.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content"><h4>Set Up Pipeline Stages</h4><p>Pipelines → Create → Add stages in order: New Lead → Qualified → Survey Set → Survey Done → Install → Not Qualified → No-Show → Ghosting → Future Follow-Up</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content"><h4>Connect Meta Ads</h4><p>Integrations → Facebook → Connect. Select the installer's Facebook Ad Account. Map the lead form fields to GHL contact fields (Name, Phone, Email must map correctly for AppointWise to work).</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content"><h4>Set Up Calendar</h4><p>Calendars → Create → Personal Meeting → "Heat Pump Survey Bookings". Duration 60–90 minutes. Connect installer's Google Calendar for conflict checking. Set available hours to their actual availability.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 04 APPOINTWISE -->
+<section id="appointwise">
+  <div class="sec-num">04 — AppointWise Setup</div>
+  <h2>Configuring the AI appointment setter</h2>
+  <p class="intro">AppointWise is the engine that qualifies leads and books them into the installer's survey calendar automatically. Set it up correctly once — it runs 24/7 from there.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content"><h4>Create New Strategy</h4><p>AppointWise → Strategies → Create. Name it "[Installer] — Heat Pump Surveys". One strategy per installer client.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Select Channel</h4>
+        <p>For UK heat pump homeowners: <strong>SMS + WhatsApp</strong> is the highest-converting channel. WhatsApp tends to get higher response rates with homeowners over 35. Test both in separate strategies.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Select Tone</h4>
+        <p>For heat pump installers: <strong>Friendly and Casual</strong> works best. Homeowners are making a significant financial decision — they want to feel like they're talking to a helpful person, not a corporate bot.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Configure AI Adjustments</h4>
+        <table class="tbl" style="margin-top:.65rem;">
+          <tr><th>Setting</th><th>Recommendation</th><th>Reason</th></tr>
+          <tr><td><strong>Objection Handling</strong></td><td>Top Closer</td><td>Push past initial hesitation — BUS grant urgency helps</td></tr>
+          <tr><td><strong>Qualification Priority</strong></td><td>Balanced</td><td>Get answers without being aggressive</td></tr>
+          <tr><td><strong>Creativity</strong></td><td>Closer to Script</td><td>Accuracy matters — don't hallucinate grant details</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4>Generate AI Instructions</h4>
+        <div class="script" style="margin-top:.65rem;">
+          <span class="sc-lbl">Describe who the AI works for</span>
+          <span class="sc-txt">The AI works for [Company Name], an MCS-certified heat pump installation company based in [area]. We specialise in air source heat pump installations and are registered to complete Boiler Upgrade Scheme (BUS) work — homeowners get £7,500 off their installation through this government grant.</span>
+          <span class="sc-lbl">State the AI objective</span>
+          <span class="sc-txt">The goal is to qualify homeowner leads generated from Facebook/Instagram ads and book them in for a free, no-obligation heat pump survey with one of our engineers. The homeowner expressed interest in a free survey and/or the BUS grant.</span>
+          <span class="sc-lbl">Qualification criteria</span>
+          <span class="sc-txt">The homeowner must: (1) own their property, (2) have a gas or oil boiler they want to replace, (3) be willing to have a surveyor visit their home. We don't want to book surveys with renters or homeowners who are not genuinely interested in switching to a heat pump.</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <h4>Tone & Style Rules</h4>
+        <ul class="chk" style="margin-top:.65rem;">
+          <li>Use friendly, helpful language — not salesy</li>
+          <li>Reference the BUS grant (£7,500) early in conversations</li>
+          <li>Limit responses to 280 characters max</li>
+          <li>Provide concise, to-the-point answers</li>
+          <li>Never quote specific installation prices (route to survey)</li>
+          <li>If asked about grants in detail — "our engineer will go through all the options at the survey"</li>
+          <li>Avoid long paragraphs and excessive exclamation marks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem;">Initial Message Configuration</h3>
+  <p style="color:var(--t3);font-size:.875rem;margin-bottom:1rem;">The opening message must be a low-friction question to maximise response rate. High friction = low responses.</p>
+
+  <div class="script">
+    <span class="sc-lbl">Heat Pump Initial Message Template</span>
+    <span class="sc-txt">Hi {{first_name}}! 👋
+
+This is [Name] from [Company Name]. I saw you were interested in finding out about heat pump installations and the government grant — thanks for getting in touch!
+
+Quick question: Is your current heating system gas or oil? Just want to make sure you qualify for the £7,500 Boiler Upgrade Scheme before we book anything in.</span>
+  </div>
+
+  <div class="alert info">
+    <span class="alert-i">💡</span>
+    <div><p><strong>Female names convert better.</strong> Per Jordan Platten: "Female names convert better than male names on these bots." Consider names like Emma, Sarah, Amy for the AI persona. Test both — measure response rates.</p></div>
+  </div>
+
+  <h3 style="margin-top:1.75rem;">Qualification Questions</h3>
+  <div class="g3">
+    <div class="card sm"><h4>Property Questions</h4><ul class="slist"><li>Do you own or rent your property?</li><li>Is it a house, bungalow, or flat?</li><li>Approximately when was it built?</li></ul></div>
+    <div class="card sm"><h4>Heating Questions</h4><ul class="slist"><li>What heating do you currently have?</li><li>Are you aware of the BUS grant?</li><li>Have you had any insulation done recently?</li></ul></div>
+    <div class="card sm"><h4>Survey Readiness</h4><ul class="slist"><li>How soon are you looking to make the switch?</li><li>What days work best for a surveyor to visit?</li><li>Morning or afternoon preference?</li></ul></div>
+  </div>
+
+  <h3 style="margin-top:1.75rem;">Follow-Up Messages</h3>
+  <div class="script">
+    <span class="sc-lbl">Follow-Up 1 — 24 hours</span>
+    <span class="sc-txt">Hi {{first_name}}, just following up on your enquiry about the heat pump survey. We've got availability this week — would any of these times work for you? [Time 1] or [Time 2]?</span>
+    <span class="sc-lbl">Follow-Up 2 — 48 hours</span>
+    <span class="sc-txt">Hey {{first_name}}, I know things get busy! Just didn't want you to miss out on the free survey — the BUS grant applications are processed on a first-come basis so it's worth getting the survey done sooner rather than later.</span>
+    <span class="sc-lbl">Follow-Up 3 — 72 hours (firmer)</span>
+    <span class="sc-txt">Last check-in {{first_name}} — I'll close out your enquiry if I don't hear back. No pressure either way, just let me know if you'd like to rearrange!</span>
+  </div>
+
+  <div class="alert warn">
+    <span class="alert-i">⚠️</span>
+    <div><p><strong>Test before launch.</strong> Use AppointWise's "Test AI" tab. Spend 30–60 minutes running through every scenario: qualified homeowner, renter, "not interested," grant questions, pricing questions. Fix edge cases before live leads come in.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 05 INTEGRATION -->
+<section id="integration">
+  <div class="sec-num">05 — GHL + AppointWise Integration</div>
+  <h2>Connecting the full pipeline</h2>
+  <p class="intro">The technical setup. Follow these steps exactly. Done correctly once — runs automatically from there.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content"><h4>Connect AppointWise to GHL</h4><p>AppointWise → Integrations → Connect Go High Level → Log in with GHL credentials. Do this at agency level, not sub-account level.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Import the AppointWise Snapshot</h4>
+        <p>In GHL → Sub-Account → Actions → Load Snapshot → Select "AppointWise 6.0". Select all items → Proceed. This imports all necessary automations, custom fields, trigger configurations, and pipeline templates.</p>
+        <div class="alert info" style="margin-top:.75rem;"><span class="alert-i">💡</span><div><p>Book an AppointWise onboarding call if you get stuck here. Per Jordan: "Such a great support team." They'll walk you through it.</p></div></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Set Custom Values</h4>
+        <p>GHL → Settings → Custom Values. Two values required:</p>
+        <div class="code">
+          <span class="cm">// Custom Value 1</span><br>
+          <span class="cv">appointwise_api_key</span>: <span class="cs">[Your AppointWise API Key]</span><br><br>
+          <span class="cm">// Custom Value 2</span><br>
+          <span class="cv">appointwise_client_id</span>: <span class="cs">[Your Client ID from AppointWise URL]</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content"><h4>Set Notification Emails</h4><p>Edit "AppointWise Error Notification" workflow → Add your email to receive alerts when automations fail. Optional: add installer's email to receive win/loss notifications directly.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content"><h4>Link Calendar to AppointWise Strategy</h4><p>AppointWise → Strategy → Booking → Automated AI Booking → Select the GHL calendar you created for this installer. This is what lets the AI check availability and book times automatically.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <h4>Create Test Contact & Run Test</h4>
+        <p>GHL → Contacts → New → Create "Test Lead" with your own phone number. Copy the Contact ID from the URL. Paste into AppointWise → Strategy → Test Customer ID.</p>
+        <p>GHL → Automations → AI Companion → Step 3 → Click first step → Scroll to Test → Select test contact → Send. Confirm "Success." Run a full test conversation with your own phone.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl" style="margin-top:2rem;">
+    <h3>The 5 Key Automations (Snapshot Imported)</h3>
+    <table class="tbl">
+      <tr><th>Automation</th><th>Purpose</th></tr>
+      <tr><td><strong>Step 1: Triggers</strong></td><td>Defines when the bot activates (new lead enters pipeline stage)</td></tr>
+      <tr><td><strong>Step 2: Apply Strategy</strong></td><td>Connects the lead to the correct AppointWise strategy</td></tr>
+      <tr><td><strong>Step 3: Generate Response</strong></td><td>AI generates response when lead replies</td></tr>
+      <tr><td><strong>Step 4: Send Message</strong></td><td>Delivers AI response via SMS or WhatsApp</td></tr>
+      <tr><td><strong>Step 5: Follow-Ups</strong></td><td>Sends configured follow-up messages to non-responders automatically</td></tr>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 06 METRICS -->
+<section id="metrics">
+  <div class="sec-num">06 — Performance Metrics</div>
+  <h2>Track everything. Optimise relentlessly.</h2>
+  <p class="intro">Every number in the pipeline is a lever. Know your benchmarks. Red flag early. Fix at the right stage.</p>
+
+  <div class="pipeline">
+    <div class="pipe-stage"><h5>Ad Impressions</h5><p>100,000</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Leads</h5><p>1,000 (1% CTR)</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Surveys Set</h5><p>450 (45% rate)</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Show-Ups</h5><p>315 (70% rate)</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Installs</h5><p>95 (30% close)</p></div>
+  </div>
+
+  <div class="g4" style="margin-top:1.5rem;">
+    <div class="mbox"><div class="mbox-val">1%</div><div class="mbox-lbl">CTR Target</div></div>
+    <div class="mbox"><div class="mbox-val">45%</div><div class="mbox-lbl">Survey Set Rate</div></div>
+    <div class="mbox"><div class="mbox-val">70%</div><div class="mbox-lbl">Show-Up Rate</div></div>
+    <div class="mbox"><div class="mbox-val">30%</div><div class="mbox-lbl">Install Rate</div></div>
+  </div>
+
+  <h3 style="margin-top:2rem;">KPI Table</h3>
+  <table class="tbl" style="margin-top:.85rem;">
+    <tr><th>Metric</th><th>Target</th><th>Red Flag</th><th>Fix At</th></tr>
+    <tr><td><strong>Cost Per Lead (CPL)</strong></td><td>£8–20 for heat pumps</td><td>&gt;£35</td><td>Ad creative, targeting, offer</td></tr>
+    <tr><td><strong>Response Rate</strong></td><td>55%+</td><td>&lt;35%</td><td>Initial AI message, timing</td></tr>
+    <tr><td><strong>Qualification Rate</strong></td><td>65%+</td><td>&lt;45%</td><td>Lead form questions, targeting</td></tr>
+    <tr><td><strong>Survey Set Rate</strong></td><td>40–50%</td><td>&lt;25%</td><td>AppointWise script, follow-ups</td></tr>
+    <tr><td><strong>Show-Up Rate</strong></td><td>70%+</td><td>&lt;50%</td><td>Confirmation sequence, reminders</td></tr>
+    <tr><td><strong>Opt-Out Rate</strong></td><td>&lt;10%</td><td>&gt;20%</td><td>Message frequency, tone</td></tr>
+    <tr><td><strong>Cost Per Survey (CPS)</strong></td><td>£20–50</td><td>&gt;£80</td><td>Full funnel review</td></tr>
+  </table>
+
+  <div class="hl" style="margin-top:2rem;">
+    <h3>Speed to Lead is Everything</h3>
+    <p style="color:var(--t3);font-size:.875rem;margin-bottom:1.25rem;">"The single biggest attributing factor to increasing appointment set rate is speed to lead. With every minute that a lead has opted in, they're getting colder." — Jordan Platten</p>
+    <div class="g3">
+      <div class="mbox"><div class="mbox-val">&lt;1 min</div><div class="mbox-lbl">AI Response Time</div></div>
+      <div class="mbox"><div class="mbox-val">10+ min</div><div class="mbox-lbl">Human Response Time</div></div>
+      <div class="mbox"><div class="mbox-val">3×</div><div class="mbox-lbl">AI vs Human Effectiveness</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 07 CLIENT ONBOARDING -->
+<section id="onboarding">
+  <div class="sec-num">07 — Client Onboarding</div>
+  <h2>Getting installers set up for results</h2>
+  <p class="intro">A smooth onboarding sets the tone. Collect everything upfront. Launch fast. The goal is surveys in their calendar within 2 weeks of signing.</p>
+
+  <div class="g2">
+    <div class="card">
+      <h3>Information Needed — Day 1</h3>
+      <ul class="chk" style="margin-top:.75rem;">
+        <li>Company name (as they want it displayed)</li>
+        <li>MCS certificate number (verify status)</li>
+        <li>Service area (radius/postcodes they cover)</li>
+        <li>Business phone and email</li>
+        <li>Website URL</li>
+        <li>Available days/hours for surveys</li>
+        <li>How many surveys/week they can handle</li>
+        <li>Google Calendar access (for sync)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Marketing Assets</h3>
+      <ul class="chk" style="margin-top:.75rem;">
+        <li>Company logo (high-res PNG)</li>
+        <li>Any existing customer testimonials</li>
+        <li>Before/after installation photos (if any)</li>
+        <li>Brands of heat pumps they install</li>
+        <li>Types of installation they specialise in (ASHP, GSHP, hybrid)</li>
+        <li>Facebook Business Page access</li>
+        <li>Google Business Profile link</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem;">48-Hour Launch Checklist</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content"><h4>Hour 0–4: GHL Setup</h4><p>Create sub-account. Import AppointWise snapshot. Configure pipeline stages. Set custom values. Create calendar and connect Google Calendar.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content"><h4>Hour 4–12: AppointWise Config</h4><p>Create strategy. Input business details and AI instructions. Configure qualification questions and follow-up messages. Connect calendar. Run full test conversation.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content"><h4>Hour 12–24: Ad Campaign Build</h4><p>Build Meta Ads campaign. Write 3 ad creatives. Create lead form with qualification questions. Connect lead form to GHL sub-account. Test lead flow end-to-end.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content"><h4>Hour 24–48: Test & Launch</h4><p>Submit a test lead through the actual form. Verify it lands in GHL. Verify AppointWise fires the initial message. Confirm calendar booking flow works. Then go live.</p></div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem;">Client Communication — Weekly Cadence</h3>
+  <div class="card" style="margin-top:1rem;">
+    <ul class="slist">
+      <li><strong>Monday:</strong> Send weekly performance snapshot (surveys booked, cost per survey, show rate)</li>
+      <li><strong>Wednesday:</strong> Quick check-in — any show quality issues? Any no-shows from last week?</li>
+      <li><strong>Friday:</strong> Internal review — optimise what's underperforming before next week</li>
+      <li><strong>Monthly:</strong> Full performance review call — ROI analysis, plan for next month</li>
+    </ul>
+  </div>
+
+  <h3 style="margin-top:2rem;">Client Retention — What Keeps Them</h3>
+  <div class="g3">
+    <div class="card sm"><h4>Deliver the Guarantee</h4><p>Hit the minimum survey target every month. Under-deliver and you're one invoice from losing them. Over-deliver and they'll never leave.</p></div>
+    <div class="card sm"><h4>Proactive Reporting</h4><p>Send the numbers before they ask. Installers who see consistent data trust you. Silence breeds doubt. A weekly 5-line update is all it takes.</p></div>
+    <div class="card sm"><h4>Survey Quality First</h4><p>Quantity means nothing if the surveys are tyre-kickers. One high-quality survey that converts to a £12k install is worth 10 no-shows. Qualify harder if quality drops.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>SummitFlow</strong> — Guaranteed Survey Appointments for MCS Heat Pump Installers</p>
+  <p style="margin-top:.5rem;">Lead Gen → GHL → AppointWise → Calendar. Deliver it consistently. Build the agency.</p>
+  <p style="margin-top:1.25rem;font-size:.78rem;">Make Mum proud by November 30th.</p>
+</footer>
+
+</body>
+</html>

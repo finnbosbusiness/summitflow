@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SummitFlow — Sales Meeting Strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --a:#4f46e5;--ah:#4338ca;--al:#eef2ff;--am:#818cf8;--abd:#c7d2fe;
+  --txt:#0f172a;--t2:#374151;--t3:#6b7280;--t4:#9ca3af;
+  --bg:#f1f5f9;--card:#ffffff;--bd:#e2e8f0;--bd2:#f1f5f9;
+  --grn:#059669;--gnl:#ecfdf5;--red:#dc2626;--rdl:#fef2f2;
+  --gld:#d97706;--gdl:#fef3c7;--blu:#2563eb;--bll:#eff6ff;--prp:#7c3aed;--ppl:#f5f3ff;
+  --sh:0 1px 3px rgba(15,23,42,.07),0 1px 2px rgba(15,23,42,.05);
+  --sh2:0 4px 6px -1px rgba(15,23,42,.07),0 2px 4px rgba(15,23,42,.05);
+  --fn:'Outfit',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);line-height:1.65;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+html{scroll-behavior:smooth;}
+nav{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);z-index:100;padding:.85rem 2rem;}
+.nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;}
+.logo-icon{width:30px;height:30px;background:var(--a);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--fn);font-weight:900;font-size:.95rem;}
+.logo-text{font-family:var(--fn);font-weight:800;font-size:1rem;color:var(--txt);}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center;}
+.nav-links a{color:var(--t3);text-decoration:none;font-size:.78rem;font-weight:500;transition:color .15s;}
+.nav-links a:hover{color:var(--txt);}
+.nav-links .back{color:var(--a);font-weight:700;background:var(--al);padding:.35rem .75rem;border-radius:7px;}
+@media(max-width:768px){.nav-links{display:none;}}
+.mob-back{display:none;position:fixed;bottom:1.5rem;right:1.5rem;background:var(--a);color:#fff;padding:.7rem 1.1rem;border-radius:100px;text-decoration:none;font-size:.8rem;font-weight:700;box-shadow:0 4px 14px rgba(79,70,229,.35);z-index:99;}
+@media(max-width:768px){.mob-back{display:flex;}}
+
+section{padding:4rem 2rem;max-width:900px;margin:0 auto;}
+.hero{padding:6.5rem 2rem 3.5rem;max-width:900px;margin:0 auto;text-align:center;}
+.hero-tag{display:inline-block;padding:.4rem .9rem;background:var(--al);border:1px solid var(--abd);color:var(--a);font-size:.68rem;font-weight:700;border-radius:100px;margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.08em;}
+.hero h1{font-family:var(--fn);font-weight:900;font-size:clamp(2rem,4.5vw,2.75rem);line-height:1.15;margin-bottom:1rem;letter-spacing:-.03em;}
+.hero p{font-size:1rem;color:var(--t3);max-width:580px;margin:0 auto 2rem;}
+.stats-row{display:flex;justify-content:center;gap:3rem;padding-top:2rem;border-top:1px solid var(--bd);flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-val{font-family:var(--fn);font-weight:900;font-size:2rem;color:var(--a);}
+.stat-lbl{font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-top:.2rem;}
+
+.sec-num{font-size:.65rem;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.6rem;}
+section h2{font-family:var(--fn);font-weight:800;font-size:clamp(1.4rem,3vw,1.85rem);margin-bottom:.75rem;letter-spacing:-.02em;}
+.intro{font-size:.95rem;color:var(--t3);max-width:680px;margin-bottom:2rem;}
+.divider{height:1px;background:var(--bd);margin:0 2rem;}
+
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:1.6rem;box-shadow:var(--sh);}
+.card-icon{width:40px;height:40px;background:var(--al);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:.85rem;}
+.card h3{font-family:var(--fn);font-weight:700;font-size:1rem;color:var(--txt);margin-bottom:.5rem;}
+.card p{font-size:.875rem;color:var(--t3);line-height:1.65;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
+@media(max-width:768px){.g2,.g3{grid-template-columns:1fr;}}
+
+.hl{background:linear-gradient(135deg,var(--al) 0%,var(--card) 100%);border:1px solid var(--abd);border-radius:14px;padding:2rem;margin:1.5rem 0;}
+.hl h3{font-family:var(--fn);font-weight:800;font-size:1.1rem;margin-bottom:1rem;}
+
+.script{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:1.75rem 2rem;margin:1.25rem 0;font-size:.87rem;line-height:1.9;}
+.sc-lbl{color:var(--am);font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.2rem;}
+.sc-line{color:#e2e8f0;display:block;margin-bottom:.85rem;}
+.sc-line:last-child{margin-bottom:0;}
+
+ul.slist{list-style:none;}
+ul.slist li{position:relative;padding-left:1.25rem;margin-bottom:.6rem;color:var(--t2);font-size:.875rem;}
+ul.slist li::before{content:"";position:absolute;left:0;top:.5rem;width:5px;height:5px;background:var(--a);border-radius:50%;}
+ul.slist li strong{color:var(--txt);}
+
+ul.chk{list-style:none;}
+ul.chk li{display:flex;align-items:flex-start;gap:.7rem;padding:.6rem 0;border-bottom:1px solid var(--bd2);font-size:.875rem;color:var(--t2);}
+ul.chk li:last-child{border-bottom:none;}
+ul.chk li::before{content:"☐";color:var(--a);font-size:1rem;flex-shrink:0;line-height:1.4;}
+
+.alert{padding:1rem 1.3rem;border-radius:10px;margin:1.25rem 0;display:flex;align-items:flex-start;gap:.75rem;font-size:.875rem;}
+.alert-i{font-size:1.1rem;flex-shrink:0;}
+.alert.warn{background:var(--gdl);border:1px solid #fcd34d;}
+.alert.success{background:var(--gnl);border:1px solid #6ee7b7;}
+.alert.danger{background:var(--rdl);border:1px solid #fca5a5;}
+.alert.info{background:var(--bll);border:1px solid #93c5fd;}
+
+.quote{font-family:var(--fn);font-size:1.05rem;font-weight:600;line-height:1.55;color:var(--txt);padding:1.4rem 1.65rem;background:var(--card);border-left:4px solid var(--a);border-radius:0 12px 12px 0;margin:1.5rem 0;box-shadow:var(--sh);}
+.quote cite{display:block;font-family:var(--fb);font-size:.78rem;color:var(--t3);margin-top:.6rem;font-style:normal;font-weight:400;}
+
+/* pipeline visual */
+.pipeline{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:1.2rem;margin:1.5rem 0;box-shadow:var(--sh);}
+.pipe-stage{flex:1;min-width:80px;text-align:center;padding:.65rem .5rem;border-radius:8px;background:var(--bg);}
+.pipe-stage.hl-stage{background:var(--al);border:1px solid var(--abd);}
+.pipe-stage h5{font-family:var(--fn);font-weight:700;font-size:.8rem;color:var(--txt);margin-bottom:.2rem;}
+.pipe-stage p{font-size:.65rem;color:var(--t3);}
+.pipe-arr{color:var(--a);font-size:.9rem;}
+
+/* tier stack */
+.tier{display:flex;gap:1rem;align-items:flex-start;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:1.4rem;margin-bottom:.85rem;box-shadow:var(--sh);}
+.tier.active{border-color:var(--abd);background:var(--al);}
+.tier-num{width:32px;height:32px;background:var(--a);color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fn);font-weight:900;font-size:.9rem;flex-shrink:0;}
+.tier-content h4{font-family:var(--fn);font-weight:700;font-size:.95rem;color:var(--txt);margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.tier-content p{font-size:.875rem;color:var(--t3);line-height:1.6;}
+.tier-impact{font-size:.65rem;background:var(--grn);color:#fff;padding:.15rem .5rem;border-radius:100px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.badge-auto{font-size:.65rem;background:var(--txt);color:#fff;padding:.15rem .5rem;border-radius:100px;font-weight:700;}
+
+/* metrics compare */
+.mcomp{display:flex;gap:1.5rem;justify-content:center;margin:1.75rem 0;flex-wrap:wrap;}
+.mbox{text-align:center;padding:1.4rem 1.75rem;background:var(--card);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh);}
+.mbox.bad{opacity:.55;}
+.mbox.good{border-color:var(--grn);background:var(--gnl);}
+.mbox .val{font-family:var(--fn);font-weight:900;font-size:2.25rem;}
+.mbox.bad .val{color:var(--t3);}
+.mbox.good .val{color:var(--grn);}
+.mbox .lbl{font-size:.78rem;color:var(--t3);}
+
+/* outcome grid */
+.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0;}
+@media(max-width:768px){.outcome-grid{grid-template-columns:1fr;}}
+.outcome-card{border-radius:12px;padding:1.4rem;border:1px solid var(--bd);}
+.outcome-card.win{background:var(--gnl);border-color:#a7f3d0;}
+.outcome-card.noshow{background:var(--orl);border-color:#fed7aa;}
+.outcome-card.nxt{background:var(--al);border-color:var(--abd);}
+.outcome-card h4{font-family:var(--fn);font-weight:700;font-size:.9rem;margin-bottom:.5rem;}
+.outcome-card p{font-size:.82rem;color:var(--t2);margin-bottom:.85rem;}
+ul.oa{list-style:none;}
+ul.oa li{font-size:.78rem;padding:.35rem 0;border-bottom:1px solid rgba(0,0,0,.06);color:var(--t2);display:flex;align-items:center;gap:.4rem;}
+ul.oa li:last-child{border-bottom:none;}
+
+/* discovery steps */
+.disc-step{display:flex;gap:1rem;align-items:flex-start;padding:1.2rem;border-bottom:1px solid var(--bd2);}
+.disc-step:last-child{border-bottom:none;}
+.disc-num{width:28px;height:28px;background:var(--a);color:#fff;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--fn);font-weight:900;font-size:.8rem;flex-shrink:0;margin-top:.1rem;}
+.disc-title{font-family:var(--fn);font-weight:700;font-size:.95rem;color:var(--txt);margin-bottom:.35rem;}
+.disc-desc{font-size:.875rem;color:var(--t3);line-height:1.6;}
+
+/* automation box */
+.auto-box{background:var(--bll);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:1.3rem;margin:1rem 0;}
+.auto-box h4{color:var(--blu);font-size:.82rem;font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;}
+.auto-box p{font-size:.875rem;color:var(--t2);}
+
+footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--bd);background:var(--card);}
+footer p{color:var(--t3);font-size:.82rem;}
+footer strong{color:var(--txt);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">SummitFlow</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="back">← Dashboard</a></li>
+      <li><a href="#showup">Show-Up</a></li>
+      <li><a href="#qualification">Qualification</a></li>
+      <li><a href="#discovery">Discovery</a></li>
+      <li><a href="#close">Close</a></li>
+      <li><a href="#recovery">Recovery</a></li>
+    </ul>
+  </div>
+</nav>
+<a href="index.html" class="mob-back">← Dashboard</a>
+
+<header class="hero">
+  <span class="hero-tag">Sales Meeting Strategy</span>
+  <h1>Convert booked meetings into paying installer clients</h1>
+  <p>The complete sales process from booked meeting to signed retainer — with recovery systems for every drop-off point.</p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val">70%+</div><div class="stat-lbl">Target Show-Up Rate</div></div>
+    <div class="stat"><div class="stat-val">30%</div><div class="stat-lbl">Close Rate</div></div>
+    <div class="stat"><div class="stat-val">£2k</div><div class="stat-lbl">Avg Monthly Retainer</div></div>
+  </div>
+</header>
+
+<div class="divider"></div>
+
+<!-- 01 BIG PICTURE -->
+<section>
+  <div class="sec-num">01 — The Big Picture</div>
+  <h2>Why most agencies leave money on the table</h2>
+  <p class="intro">You've done the hard work — 100 calls a day, booking meetings. But without a tight sales system, you're leaking revenue at every stage. Most agencies have under 50% show-up rate and let no-shows disappear completely.</p>
+
+  <div class="pipeline">
+    <div class="pipe-stage"><h5>Booked Call</h5><p>Meeting scheduled</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage hl-stage"><h5>Show-Up Flow</h5><p>Confirmation process</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Qualified</h5><p>Revenue check</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Discovery Call</h5><p>Problem → Solution</p></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-stage"><h5>Closed</h5><p>Retainer signed</p></div>
+  </div>
+
+  <div class="quote">
+    "Why go through all the effort to cold call if you're just going to accept when someone doesn't turn up? Across thousands of prospects, you are literally saying no to potentially millions in revenue if you don't have a tight system."
+    <cite>— Jordan Platten</cite>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 02 SHOW-UP -->
+<section id="showup">
+  <div class="sec-num">02 — Show-Up Rate System</div>
+  <h2>From 50% to 70%+ attendance</h2>
+  <p class="intro">Most people only have Tier 1 figured out. That's why most agencies have under 50% show-up rate. Each tier you add increases attendance dramatically.</p>
+
+  <div class="mcomp">
+    <div class="mbox bad"><div class="val">&lt;50%</div><div class="lbl">Industry Average — Tier 1 only</div></div>
+    <div class="mbox good"><div class="val">70%+</div><div class="lbl">SummitFlow Target — All 4 tiers</div></div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-num">1</div>
+    <div class="tier-content">
+      <h4>Robotic Notifications <span class="badge-auto">Automated</span></h4>
+      <p>Standard calendar reminders. Confirmation on booking, 24 hours before, 1 hour before. This is what everyone does — it's the baseline, not the solution.</p>
+    </div>
+  </div>
+  <div class="tier active">
+    <div class="tier-num">2</div>
+    <div class="tier-content">
+      <h4>Pre-Call Homework <span class="tier-impact">+10% show-up</span></h4>
+      <p>Thank-you page with 2–3 minute video after booking. Three instructions: watch the video, mark the calendar, reply when we confirm 24 hours before. Adds case studies. Makes them invested before the call.</p>
+    </div>
+  </div>
+  <div class="tier active">
+    <div class="tier-num">3</div>
+    <div class="tier-content">
+      <h4>AI Interaction — 24hr Before <span class="tier-impact">+15% show-up</span></h4>
+      <p>AppointWise reaches out via WhatsApp/SMS: "Hey [Name], it's Finn here. Looking forward to speaking tomorrow. Please respond YES to confirm." AI handles questions, reschedules, cancellations — 24/7.</p>
+    </div>
+  </div>
+  <div class="tier active">
+    <div class="tier-num">4</div>
+    <div class="tier-content">
+      <h4>Human Follow-Up (Failsafe) <span class="tier-impact">Mops up rest</span></h4>
+      <p>ONLY if they haven't responded to the AI. Call them 24 hours before: "Just confirming you're attending tomorrow." Some people deliberately ignore AI — this catches them.</p>
+    </div>
+  </div>
+
+  <div class="hl" style="margin-top:1.5rem;">
+    <h3>Thank-You Page Video Script</h3>
+    <ul class="slist">
+      <li><strong>0:00–0:30:</strong> "Thanks for booking! I'm Finn from SummitFlow. I'm excited to show you how we're helping heat pump installers fill their survey calendars with BUS grant homeowners."</li>
+      <li><strong>0:30–1:00:</strong> "Three things to do: watch this entire video, click YES on the calendar invite, and reply when I reach out 24 hours before to confirm."</li>
+      <li><strong>1:00–2:00:</strong> "On our call, I'll show you exactly how our AI system books qualified survey appointments directly into your calendar — so you always have a consistent pipeline regardless of the season."</li>
+      <li><strong>2:00–3:00:</strong> Case studies — "[Company] went from 3 surveys/month to 14 within 6 weeks. [Another] filled their quiet summer slots within the first fortnight." End with energy.</li>
+    </ul>
+  </div>
+
+  <div class="auto-box">
+    <h4>⚡ AppointWise AI Confirmation (24hr Before)</h4>
+    <p>"Hey [Name], it's Finn from SummitFlow 👋 Really looking forward to chatting tomorrow at [time] about filling your survey calendar. Just reply YES to confirm you'll be there!"</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 03 QUALIFICATION -->
+<section id="qualification">
+  <div class="sec-num">03 — Lead Qualification</div>
+  <h2>Only take qualified prospects into the sales call</h2>
+  <p class="intro">Don't waste call slots on installers who can't convert surveys into jobs. Qualify on the booking form before the meeting happens.</p>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Qualification Question on Booking Form</h3>
+      <p>"How many heat pump installations does your business complete per month on average?"</p>
+      <ul class="slist" style="margin-top:1rem;">
+        <li>Under 2/month — Not qualified (too small)</li>
+        <li>2–5/month — Borderline, review case by case</li>
+        <li>5–15/month — Qualified ✓</li>
+        <li>15+/month — High priority ✓</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚙️</div>
+      <h3>GHL Automation</h3>
+      <p>Go High Level automation checks the answer automatically:</p>
+      <ul class="slist" style="margin-top:1rem;">
+        <li>Qualified → Show-up sequence activates immediately</li>
+        <li>Borderline → Manual review notification sent to you</li>
+        <li>Not qualified → Polite automated decline email</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert info">
+    <span class="alert-i">💡</span>
+    <div><p><strong>Additional qualification signals:</strong> MCS certification status (mandatory), whether they currently run any paid advertising (shows marketing sophistication), and company size (how many engineers). Use Companies House to verify before the call.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 04 DISCOVERY CALL -->
+<section id="discovery">
+  <div class="sec-num">04 — The Discovery Call</div>
+  <h2>Consultative Problem Solving — not a pitch</h2>
+  <p class="intro">Your job on the discovery call is not to sell. It's to understand their situation, surface the pain, and present SummitFlow as the obvious solution. Lead with questions, not features.</p>
+
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="disc-step">
+      <div class="disc-num">1</div>
+      <div><div class="disc-title">Set the Agenda</div><div class="disc-desc">"Thanks for joining. I'll keep this to 15–20 minutes. I want to ask you a few questions about your current survey pipeline, then if it looks like we can genuinely help I'll show you exactly what we do. Sound good?"</div></div>
+    </div>
+    <div class="disc-step">
+      <div class="disc-num">2</div>
+      <div><div class="disc-title">Understand Current State</div><div class="disc-desc">"How are you currently getting new surveys? What's your biggest source — manufacturer leads, referrals, ads? How consistent is that?"</div></div>
+    </div>
+    <div class="disc-step">
+      <div class="disc-num">3</div>
+      <div><div class="disc-title">Surface the Pain</div><div class="disc-desc">"Are there months where you've got more capacity than surveys? What happens to your engineers in those quieter periods? What does an empty week cost you in lost installations?"</div></div>
+    </div>
+    <div class="disc-step">
+      <div class="disc-num">4</div>
+      <div><div class="disc-title">Quantify the Cost</div><div class="disc-desc">"What's a completed installation worth to you on average? And roughly how many surveys convert to installs? So a qualified survey is worth roughly £X to you, right?"</div></div>
+    </div>
+    <div class="disc-step">
+      <div class="disc-num">5</div>
+      <div><div class="disc-title">Present the Solution</div><div class="disc-desc">"Based on what you've told me, here's exactly what we'd do for you..." — Show the delivery process. Make it specific to their situation. Tie it back to the numbers they gave you.</div></div>
+    </div>
+    <div class="disc-step">
+      <div class="disc-num">6</div>
+      <div><div class="disc-title">The Assumptive Close</div><div class="disc-desc">"So given that a single install covers months of retainer — and we're guaranteeing the surveys — does this look like a good fit to get started this week?"</div></div>
+    </div>
+  </div>
+
+  <div class="alert success">
+    <span class="alert-i">🔑</span>
+    <div><p><strong>The CPS Principle:</strong> Consultative Problem Solving. Never pitch features. Ask questions until they've articulated their own problem clearly. Then present your solution as the answer to what THEY said. They sell themselves.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 05 CLOSE -->
+<section id="close">
+  <div class="sec-num">05 — Closing</div>
+  <h2>Handling the final objections</h2>
+  <p class="intro">Most deals are lost not because the product is wrong but because the sales process loses momentum after the call. Close on the call. Always.</p>
+
+  <div class="g2">
+    <div class="card">
+      <h3>The ROI Close</h3>
+      <p>"You told me an installation is worth £X to you. At 30% survey-to-install conversion, 8 surveys a month = 2–3 installs = £[X × 2.5] revenue. The retainer is £1,500. That's covered by half an install. Does the maths make sense?"</p>
+    </div>
+    <div class="card">
+      <h3>The Risk Reversal Close</h3>
+      <p>"We guarantee a minimum number of surveys. If we fall short, we work free until we deliver. You pay for results, not promises. What's the worst that happens?"</p>
+    </div>
+    <div class="card">
+      <h3>The Urgency Close</h3>
+      <p>"There are homeowners in your area searching for MCS installers to do BUS grant surveys right now. Every day you wait is another day those surveys go to a competitor. When do you want to start capturing them?"</p>
+    </div>
+    <div class="card">
+      <h3>The Confusion Frame</h3>
+      <p>When they're on the fence: "What have you got to lose?" makes them think about the actual answer instead of auto-rejecting. Forces them to confront that the risk is actually on us, not them.</p>
+    </div>
+  </div>
+
+  <div class="hl" style="margin-top:1.5rem;">
+    <h3>Sales Call Pricing Script</h3>
+    <div class="script" style="margin-top:.85rem;">
+      <span class="sc-lbl">Present Pricing</span>
+      <span class="sc-line">"So our starter package is £1,500/month. That gets you 8 guaranteed qualified survey appointments per month, AI qualification, full CRM pipeline, and our shortfall guarantee."</span>
+      <span class="sc-lbl">Anchor the Value</span>
+      <span class="sc-line">"You told me an install is worth £[X] to you. Two installs from those 8 surveys — which is conservative — covers the retainer many times over."</span>
+      <span class="sc-lbl">Close</span>
+      <span class="sc-line">"I'd like to get you started this week so we can have surveys in your calendar within a fortnight. Does that work for you?"</span>
+    </div>
+  </div>
+
+  <div class="alert warn">
+    <span class="alert-i">⚠️</span>
+    <div><p><strong>Never discount on the first meeting.</strong> If they ask for a lower price, offer a trial month at the starter package instead. Discounting destroys your positioning and signals desperation. The ROI argument is so strong it shouldn't be necessary.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 06 RECOVERY -->
+<section id="recovery">
+  <div class="sec-num">06 — Recovery Systems</div>
+  <h2>No-shows and maybes aren't lost</h2>
+  <p class="intro">Most agencies give up when someone doesn't show. That's the difference between average and exceptional revenue. Have a system for every outcome.</p>
+
+  <div class="outcome-grid">
+    <div class="outcome-card win">
+      <h4>✅ Closed — Signed</h4>
+      <p>Retainer agreed. Card on file.</p>
+      <ul class="oa">
+        <li>→ Send contract within 2 hours</li>
+        <li>→ Onboarding call within 48hrs</li>
+        <li>→ GHL pipeline activated same day</li>
+        <li>→ First surveys targeting within week 1</li>
+      </ul>
+    </div>
+    <div class="outcome-card noshow">
+      <h4>⏱️ No-Show</h4>
+      <p>Didn't attend — not lost yet.</p>
+      <ul class="oa">
+        <li>→ AppointWise follow-up within 15 mins</li>
+        <li>→ You call personally same afternoon</li>
+        <li>→ Email with video and rebook link</li>
+        <li>→ 3 touchpoints over 72 hours</li>
+      </ul>
+    </div>
+    <div class="outcome-card nxt">
+      <h4>🔄 "Need to Think"</h4>
+      <p>On the fence — follow up hard.</p>
+      <ul class="oa">
+        <li>→ Same-day email with ROI breakdown</li>
+        <li>→ Call back in 48 hours</li>
+        <li>→ Urgency message: BUS grant demand</li>
+        <li>→ Final offer at day 7</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="auto-box">
+    <h4>⚡ No-Show Recovery Script (AppointWise)</h4>
+    <p>"Hey [Name], looks like we missed each other just now. No worries — I know things come up. I've got some ideas about filling your survey calendar that I think you'll want to hear. When's a good time to reschedule? I can do [time 1] or [time 2] this week."</p>
+  </div>
+</section>
+
+<footer>
+  <p><strong>SummitFlow</strong> — Guaranteed Survey Appointments for MCS Heat Pump Installers</p>
+  <p style="margin-top:.5rem;">70% show-up rate. 30% close rate. Squeeze every drop of revenue.</p>
+  <p style="margin-top:1.25rem;font-size:.78rem;">Make Mum proud by November 30th.</p>
+</footer>
+
+</body>
+</html>
