@@ -571,6 +571,11 @@ def test_best_match_needs_the_distinctive_words():
                "address_snippet": "Sutton Coldfield B75 7BU", "company_type": "ltd"}]
     assert best_match("Sutton Kitchens", "B75 7BU", sutton)["company_number"] == "5"
     assert best_match("Sutton Kitchens", "LS1 1AA", sutton) is None
+    # One distinctive word ("precision") is too common to match outside the area
+    precision = [{"title": "PRECISION ROOFING LTD", "company_number": "6", "company_status": "active",
+                  "address_snippet": "Rugby CV22 5PB", "company_type": "ltd"}]
+    assert best_match("Precision Roofing", "CV22 5PB", precision)["company_number"] == "6"
+    assert best_match("Precision Roofing", "PL2 2PB", precision) is None
 
 
 
@@ -654,3 +659,8 @@ def test_clean_town():
     assert clean_town("Little Warley, Brentwood, Essex") == "Brentwood"
     assert clean_town("Birmingham") == "Birmingham"
     assert clean_town("Newcastle", "", "ST5 0RF") == "Newcastle-under-Lyme"
+    assert clean_town("Newcastle", "", "NE40 4LZ") == "Newcastle upon Tyne"
+    assert clean_town("Bb24ht", "Aqueduct Rd, Blackburn, Bb24ht BB2 4HT", "BB2 4HT") == "Blackburn"
+    assert clean_town("hull") == "Hull"
+    assert clean_town("surrounding areas", "Serves, Hastings, surrounding areas TN31 6DX", "TN31 6DX") == "Hastings"
+    assert clean_town("US&Co", "Office 505, 11 Burford Rd, US&Co E15 2ST", "E15 2ST") == "London"

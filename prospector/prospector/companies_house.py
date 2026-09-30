@@ -91,7 +91,8 @@ def best_match(name, postcode, candidates):
     Accept a very close name match on its own, or a reasonable name match
     whose registered address shares the outward postcode (e.g. CV34).
     Either way the distinctive words must agree: "ASE Kitchens & Bathrooms"
-    is not "KITCHENS & BATHROOMS LTD", however similar the strings are.
+    is not "KITCHENS & BATHROOMS LTD", however similar the strings are. A
+    name with only one distinctive word must also be in the same area.
 
     Dissolved companies are never matched: the showroom is open on Google
     Maps, so a dissolved company with the same name is an old or unrelated
@@ -111,6 +112,10 @@ def best_match(name, postcode, candidates):
             same_area = bool(area) and area in (c.get("address_snippet") or "").upper()
             theirs = distinctive_words(c.get("title", ""))
             if not own or not theirs or not (own == theirs or (same_area and (own <= theirs or theirs <= own))):
+                continue
+            # "Precision Roofing" is a name dozens of firms use: with one
+            # distinctive word, the registered address must be local too.
+            if len(own) < 2 and not same_area:
                 continue
             if sim >= 0.9 or (sim >= 0.6 and same_area):
                 score = sim + (0.2 if same_area else 0) + (0.1 if c.get("company_status") == "active" else 0)

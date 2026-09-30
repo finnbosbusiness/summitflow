@@ -44,6 +44,8 @@ kitchen kitchens bathroom bathrooms bedroom bedrooms interior interiors design d
 showroom showrooms studio studios furniture fitted bespoke home homes living house centre center
 solutions services group company co ltd limited llp plc uk the and of by for at in on to a an
 bath baths kbb joinery carpentry installations installation fitters fitting luxury quality direct
+roof roofs roofing roofer roofers flat building builders construction contractor contractors maintenance
+property repair repairs specialist specialists
 """.split())
 
 

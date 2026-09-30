@@ -127,7 +127,7 @@ _NOT_TOWNS = {
     "shropshire", "somerset", "staffordshire", "suffolk", "surrey", "sussex", "east sussex", "west sussex",
     "tyne and wear", "warwickshire", "west midlands", "wiltshire", "worcestershire", "yorkshire",
     "north yorkshire", "south yorkshire", "west yorkshire", "east riding of yorkshire", "isle of wight", "uk",
-    "england", "farm", "garden",
+    "england", "farm", "garden", "estate", "house", "surrounding areas", "industrial estate", "unit",
 }
 
 
@@ -144,14 +144,18 @@ def clean_town(town, address="", postcode=""):
     if "," in t:  # "Little Warley, Brentwood, Essex"
         parts = [p.strip() for p in t.split(",") if p.strip().lower() not in _NOT_TOWNS]
         t = parts[-1] if parts else ""
-    if not t or t.lower() in _NOT_TOWNS or not re.search(r"[a-z]", t.lower()) or re.match(r"^[A-Z]{1,2}\d", t):
+    postcode_like = re.match(r"^[A-Z]{1,2}\d", t.upper()) and not re.search(r"[a-z]{3}", t.lower())
+    if (not t or t.lower() in _NOT_TOWNS or not re.search(r"[a-z]", t.lower()) or postcode_like
+            or not re.match(r"^[A-Za-z][A-Za-z' .\-]*$", t)):
         t = _town_from_address(address, postcode) or t
-    if re.match(r"^[A-Z]{1,2}\d", t) and AREA_REGION.get(area(t)) == "London" and area(t) in _LONDON_POSTAL:
+    if (re.match(r"^[A-Z]{1,2}\d", t.upper()) or not re.match(r"^[A-Za-z][A-Za-z' .\-]*$", t)) and area(postcode or t) in _LONDON_POSTAL:
         t = "London"
-    if t.isupper():
+    if t.isupper() or t.islower():
         t = t.title()
     if t == "Newcastle" and area(postcode) == "ST":
         t = "Newcastle-under-Lyme"
+    elif t == "Newcastle" and area(postcode) == "NE":
+        t = "Newcastle upon Tyne"
     t = re.sub(r"^(Saint|St\.)\s", "St ", t)
     t = re.sub(r"\s(Saint|St\.)\s", " St ", t)
     if t.lower().startswith("st ") and t.lower().endswith("-on-sea"):
@@ -166,6 +170,7 @@ def _town_from_address(address, postcode):
     for part in reversed(parts):
         part = re.sub(r"\s*[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\s*$", "", part).replace(pc, "").strip()
         part = re.sub(r"\bUK\b|\bUnited Kingdom\b", "", part).strip()
-        if part and part.lower() not in _NOT_TOWNS and not re.search(r"\d", part):
+        if (part and part.lower() not in _NOT_TOWNS and not re.search(r"\d", part)
+                and re.match(r"^[A-Za-z][A-Za-z' .\-]*$", part)):
             return part
     return ""
