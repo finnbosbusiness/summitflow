@@ -3,7 +3,7 @@
 import json
 import os
 
-from .columns import FIRST_ROW, INPUT_COLUMNS, LAST_ROW, col_index, contiguous_blocks
+from .columns import FIRST_ROW, FORMULA_COLUMNS, INPUT_COLUMNS, LAST_ROW, col_index, contiguous_blocks
 from .matching import phone_key, prospect_key
 
 
@@ -209,3 +209,53 @@ def write_skipped(spreadsheet, skipped, last_row=20003):
     if rows:
         ws.update(values=rows, range_name=f"B4:J{3 + len(rows)}", value_input_option="USER_ENTERED")
     return len(rows)
+
+
+_COMPANY_FIELDS = ("company_number", "company_status", "incorporated", "decision_maker_name", "decision_maker_role")
+
+
+def tidy(spreadsheet, plan):
+    """Fix town names, clear Companies House matches that can't be trusted
+    (companies_house.unreliable_numbers), then sort the tab by town and
+    postcode. Returns (towns fixed, rows cleared). Re-read the tab after."""
+    from .companies_house import unreliable_numbers
+    from .location import clean_town
+
+    towns = cleared = 0
+    filled = {r: v for r, v in plan.rows.items() if str(v.get("company", "")).strip()}
+    for r, v in filled.items():
+        town = clean_town(v.get("town", ""), v.get("address", ""), v.get("postcode", ""))
+        if town and town != v.get("town"):
+            plan.set(r, {"town": town})
+            towns += 1
+    bad = unreliable_numbers(filled.values())
+    for r, v in filled.items():
+        if str(v.get("company_number", "")).strip() in bad:
+            plan.set(r, {f: "" for f in _COMPANY_FIELDS})
+            cleared += 1
+    write(spreadsheet, plan)
+    if filled:
+        sort_by_town(spreadsheet, max(filled))
+    return towns, cleared
+
+
+def sort_by_town(spreadsheet, last_filled_row):
+    """Sort the data rows by Town then Postcode, then re-copy every formula
+    column from the tab's last (always empty) row so each row's formulas
+    point at that row."""
+    ws = spreadsheet.worksheet(TAB)
+    last = ROWS[0]
+    requests = [{"sortRange": {
+        "range": {"sheetId": ws.id, "startRowIndex": FIRST_ROW - 1, "endRowIndex": last_filled_row,
+                  "startColumnIndex": 0, "endColumnIndex": col_index("AR") + 1},
+        "sortSpecs": [{"dimensionIndex": col_index("E"), "sortOrder": "ASCENDING"},
+                      {"dimensionIndex": col_index("F"), "sortOrder": "ASCENDING"}]}}]
+    for letter in sorted(FORMULA_COLUMNS, key=col_index):
+        c = col_index(letter)
+        requests.append({"copyPaste": {
+            "source": {"sheetId": ws.id, "startRowIndex": last - 1, "endRowIndex": last,
+                       "startColumnIndex": c, "endColumnIndex": c + 1},
+            "destination": {"sheetId": ws.id, "startRowIndex": FIRST_ROW - 1, "endRowIndex": last_filled_row,
+                            "startColumnIndex": c, "endColumnIndex": c + 1},
+            "pasteType": "PASTE_FORMULA"}})
+    spreadsheet.batch_update({"requests": requests})

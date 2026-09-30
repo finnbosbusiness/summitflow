@@ -662,5 +662,22 @@ def test_clean_town():
     assert clean_town("Newcastle", "", "NE40 4LZ") == "Newcastle upon Tyne"
     assert clean_town("Bb24ht", "Aqueduct Rd, Blackburn, Bb24ht BB2 4HT", "BB2 4HT") == "Blackburn"
     assert clean_town("hull") == "Hull"
+    assert clean_town("house", "13 Lyme Grove, Loddiges Rd, house E9 6FF", "E9 6FF") == "London"
+    assert clean_town("Rm41he", "Church Rd, Rm41he RM4 1HE", "RM4 1HE") != "Church Rd"
     assert clean_town("surrounding areas", "Serves, Hastings, surrounding areas TN31 6DX", "TN31 6DX") == "Hastings"
     assert clean_town("US&Co", "Office 505, 11 Burford Rd, US&Co E15 2ST", "E15 2ST") == "London"
+
+
+def test_unreliable_company_numbers():
+    from prospector.companies_house import unreliable_numbers
+    rows = [
+        {"company": "Precision Roofing", "company_number": "1", "postcode": "CV22 5PB"},
+        {"company": "Precision Roofing", "company_number": "1", "postcode": "PL2 2PB"},
+        {"company": "ASE Kitchens & Bathrooms", "company_number": "2"},
+        {"company": "ATD Kitchens & Bathrooms", "company_number": "2"},
+        {"company": "Countrywide Roofing & Insulation", "company_number": "3"},
+        {"company": "Countrywide Roofing & Insulation", "company_number": "3"},
+        {"company": "The Roofing Company", "company_number": "4"},
+        {"company": "Norton Kitchen & Bedroom", "company_number": "5"},
+    ]
+    assert unreliable_numbers(rows) == {"1", "2", "4"}

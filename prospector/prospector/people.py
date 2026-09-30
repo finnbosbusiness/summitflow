@@ -350,7 +350,7 @@ def facebook_people(token, urls):
 def main(argv=None):
     from .companies_house import CompaniesHouse
     from .run import DEFAULT_SHEET_ID, OUTPUT, sheet_id_from
-    from .sheet import Plan, configure, open_sheet, read_prospects, write
+    from .sheet import Plan, configure, open_sheet, read_prospects, tidy, write
 
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--niche", default="kitchen", choices=["kitchen", "roofing"], help="which trade's tab")
@@ -362,6 +362,10 @@ def main(argv=None):
 
     configure(args.niche)
     spreadsheet = open_sheet(sheet_id_from(os.environ.get("SHEET_ID") or DEFAULT_SHEET_ID))
+    if not args.dry_run:
+        towns, cleared = tidy(spreadsheet, Plan(read_prospects(spreadsheet)))
+        print(f"Tidy: {towns} town names fixed, {cleared} untrustworthy Companies House matches cleared, "
+              "sorted by town")
     plan = Plan(read_prospects(spreadsheet))
     todo = [r for r, v in sorted(plan.rows.items())
             if str(v.get("company", "")).strip() and not str(v.get("decision_maker_name", "")).strip()]

@@ -145,3 +145,24 @@ def format_officer_name(raw: str) -> str:
     words = [w.strip(",") for w in forenames.split()]
     words = [w for w in words if w and w.lower().rstrip(".") not in ("mr", "mrs", "ms", "miss", "dr")]
     return " ".join(words + [surname.title()])
+
+
+def unreliable_numbers(rows):
+    """Company numbers on the sheet that can't be trusted: one number given to
+    showrooms with different names, or to a common one-word name in several
+    places ("Precision Roofing" in Rugby, Norwich and Plymouth). A name with
+    two or more distinctive words at several addresses is kept: that's one
+    firm with branches. rows: iterable of row dicts."""
+    groups = {}
+    for r in rows:
+        number = str(r.get("company_number", "")).strip()
+        if number:
+            groups.setdefault(number, []).append(r)
+    bad = set()
+    for number, rs in groups.items():
+        names = {frozenset(distinctive_words(r.get("company", ""))) for r in rs}
+        if not any(names):
+            bad.add(number)
+        elif len(rs) > 1 and not (len(names) == 1 and len(next(iter(names))) >= 2):
+            bad.add(number)
+    return bad

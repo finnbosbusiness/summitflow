@@ -148,7 +148,8 @@ def clean_town(town, address="", postcode=""):
     if (not t or t.lower() in _NOT_TOWNS or not re.search(r"[a-z]", t.lower()) or postcode_like
             or not re.match(r"^[A-Za-z][A-Za-z' .\-]*$", t)):
         t = _town_from_address(address, postcode) or t
-    if (re.match(r"^[A-Z]{1,2}\d", t.upper()) or not re.match(r"^[A-Za-z][A-Za-z' .\-]*$", t)) and area(postcode or t) in _LONDON_POSTAL:
+    if (re.match(r"^[A-Z]{1,2}\d", t.upper()) or not re.match(r"^[A-Za-z][A-Za-z' .\-]*$", t)
+            or t.lower() in _NOT_TOWNS) and area(postcode or t) in _LONDON_POSTAL:
         t = "London"
     if t.isupper() or t.islower():
         t = t.title()
@@ -163,6 +164,10 @@ def clean_town(town, address="", postcode=""):
     return t
 
 
+_STREET = re.compile(r"\b(rd|road|st|street|ln|lane|ave|avenue|way|close|cl|dr|drive|grove|gr|ct|court|"
+                     r"pl|place|terrace|cres|crescent|row|hill|park|parade|square|sq)\.?$", re.I)
+
+
 def _town_from_address(address, postcode):
     """'1 High St, Sittingbourne, Kent ME10 1PP' -> 'Sittingbourne'."""
     pc = (postcode or "").upper().strip()
@@ -171,6 +176,6 @@ def _town_from_address(address, postcode):
         part = re.sub(r"\s*[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\s*$", "", part).replace(pc, "").strip()
         part = re.sub(r"\bUK\b|\bUnited Kingdom\b", "", part).strip()
         if (part and part.lower() not in _NOT_TOWNS and not re.search(r"\d", part)
-                and re.match(r"^[A-Za-z][A-Za-z' .\-]*$", part)):
+                and re.match(r"^[A-Za-z][A-Za-z' .\-]*$", part) and not _STREET.search(part)):
             return part
     return ""
