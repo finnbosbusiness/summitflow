@@ -1,0 +1,48 @@
+name: Weekly prospect run
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"   # Mondays 05:17 UTC
+  workflow_dispatch:
+    inputs:
+      region:
+        description: "Only this region (blank = every town in towns.csv)"
+        default: "West Midlands"
+      max_towns:
+        description: "Only the first N towns (blank = all)"
+        default: ""
+      dry_run:
+        description: "Dry run (don't write to the sheet)"
+        type: boolean
+        default: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: prospector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Run
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          COMPANIES_HOUSE_API_KEY: ${{ secrets.COMPANIES_HOUSE_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SHEET_ID: ${{ vars.SHEET_ID }}
+          REGION: ${{ github.event_name == 'schedule' && 'West Midlands' || inputs.region }}
+          MAX_TOWNS: ${{ inputs.max_towns }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        # Scraped data is never uploaded as a workflow artifact: this repo is
+        # public, so artifacts would be downloadable by anyone.
+        run: |
+          args=()
+          [ -n "$REGION" ] && args+=(--region "$REGION")
+          [ -n "$MAX_TOWNS" ] && args+=(--max-towns "$MAX_TOWNS")
+          [ "$DRY_RUN" = "true" ] && args+=(--dry-run)
+          python -m prospector.run "${args[@]}"
