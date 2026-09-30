@@ -116,3 +116,54 @@ def country_of_region(region: str) -> str:
     if not region:
         return ""
     return region if region in _NOT_ENGLAND else "England"
+
+
+# County or area names Google sometimes gives in place of the town.
+_NOT_TOWNS = {
+    "bedfordshire", "beds", "berkshire", "buckinghamshire", "cambridgeshire", "cheshire", "cornwall", "cumbria",
+    "derbyshire", "devon", "dorset", "durham", "essex", "gloucestershire", "greater manchester", "hampshire",
+    "herefordshire", "hertfordshire", "kent", "lancashire", "leicestershire", "lincolnshire", "merseyside",
+    "middlesex", "norfolk", "northamptonshire", "northumberland", "nottinghamshire", "oxfordshire", "rutland",
+    "shropshire", "somerset", "staffordshire", "suffolk", "surrey", "sussex", "east sussex", "west sussex",
+    "tyne and wear", "warwickshire", "west midlands", "wiltshire", "worcestershire", "yorkshire",
+    "north yorkshire", "south yorkshire", "west yorkshire", "east riding of yorkshire", "isle of wight", "uk",
+    "england", "farm", "garden",
+}
+
+
+# Postcode areas whose post town is London (the rest of Greater London,
+# e.g. BR or CR, has its own post towns).
+_LONDON_POSTAL = {"E", "EC", "N", "NW", "SE", "SW", "W", "WC"}
+
+
+def clean_town(town, address="", postcode=""):
+    """One spelling per town, so a town's rows group together:
+    'Saint Helens' / 'St. Helens' -> 'St Helens', 'ELY' -> 'Ely', and a
+    county ('Kent') or scrap ('Farm', 'SW16') -> the town from the address."""
+    t = " ".join((town or "").split())
+    if "," in t:  # "Little Warley, Brentwood, Essex"
+        parts = [p.strip() for p in t.split(",") if p.strip().lower() not in _NOT_TOWNS]
+        t = parts[-1] if parts else ""
+    if not t or t.lower() in _NOT_TOWNS or not re.search(r"[a-z]", t.lower()) or re.match(r"^[A-Z]{1,2}\d", t):
+        t = _town_from_address(address, postcode) or t
+    if re.match(r"^[A-Z]{1,2}\d", t) and AREA_REGION.get(area(t)) == "London" and area(t) in _LONDON_POSTAL:
+        t = "London"
+    if t.isupper():
+        t = t.title()
+    t = re.sub(r"^(Saint|St\.)\s", "St ", t)
+    t = re.sub(r"\s(Saint|St\.)\s", " St ", t)
+    if t.lower().startswith("st ") and t.lower().endswith("-on-sea"):
+        t = t[:-7] + "-on-Sea"
+    return t
+
+
+def _town_from_address(address, postcode):
+    """'1 High St, Sittingbourne, Kent ME10 1PP' -> 'Sittingbourne'."""
+    pc = (postcode or "").upper().strip()
+    parts = [p.strip() for p in (address or "").split(",") if p.strip()]
+    for part in reversed(parts):
+        part = re.sub(r"\s*[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\s*$", "", part).replace(pc, "").strip()
+        part = re.sub(r"\bUK\b|\bUnited Kingdom\b", "", part).strip()
+        if part and part.lower() not in _NOT_TOWNS and not re.search(r"\d", part):
+            return part
+    return ""

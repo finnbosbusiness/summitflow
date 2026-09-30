@@ -19,9 +19,21 @@ def keys_for(record):
         out.append("t:" + phone)
     return out
 
+# Which trade's tab is read and written; configure() switches it.
 TAB = "All Prospects"
-_READ_RANGE = f"B{FIRST_ROW}:AR{LAST_ROW}"
 SKIPPED_TAB = "Skipped"
+ROWS = [LAST_ROW]  # last row the tab's formulas reach
+
+
+def configure(niche):
+    """Point reads and writes at one trade's tabs (see niches.py)."""
+    from .niches import NICHES
+
+    global TAB, SKIPPED_TAB
+    cfg = NICHES[niche]
+    TAB, SKIPPED_TAB = cfg["tab"], cfg["skipped_tab"]
+    ROWS[0] = cfg["last_row"]
+    return cfg
 _OFFSET = col_index("B")
 # Written as text: Sheets would otherwise read "+44 ..." as a formula and
 # drop the leading zero from phone and company numbers.
@@ -58,9 +70,9 @@ def read_prospects(spreadsheet):
     """Return {row_number: {field: value}} for every row on the Prospects tab,
     including blank ones (so we know where to add new rows)."""
     ws = spreadsheet.worksheet(TAB)
-    grid = ws.get(_READ_RANGE)
+    grid = ws.get(f"B{FIRST_ROW}:AR{ROWS[0]}")
     rows = {}
-    for i in range(LAST_ROW - FIRST_ROW + 1):
+    for i in range(ROWS[0] - FIRST_ROW + 1):
         cells = grid[i] if i < len(grid) else []
         rows[FIRST_ROW + i] = {
             f: (cells[col_index(c) - _OFFSET] if col_index(c) - _OFFSET < len(cells) else "")

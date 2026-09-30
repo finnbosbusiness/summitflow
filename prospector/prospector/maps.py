@@ -4,8 +4,9 @@ whether it is an independent kitchen showroom at all."""
 import re
 from urllib.parse import urlparse
 
-from .location import normalise
+from .location import clean_town, normalise
 from .matching import domain
+from .niches import roofing_reason
 
 QUERY = "kitchen showroom {town}"
 
@@ -61,7 +62,7 @@ def _categories(item):
     return [c.lower() for c in cats]
 
 
-def to_prospect(item, town_regions):
+def to_prospect(item, town_regions, niche="kitchen", query=QUERY):
     """Convert one Apify place into a Prospects row dict.
 
     Returns (row, None) or (None, reason) where reason is 'closed',
@@ -75,9 +76,14 @@ def to_prospect(item, town_regions):
     name = (item.get("title") or "").strip()
     cats = _categories(item)
     lname = name.lower()
-    kitchen = "kitchen" in lname or any(k in c for c in cats for k in _RELEVANT)
     if item.get("countryCode") and item["countryCode"] != "GB":
         return None, "outside UK"
+    if niche == "roofing":
+        why = roofing_reason(name, cats, item.get("categoryName") or "")
+        if not name or why:
+            return None, why or "not roofing"
+        return _row(item, name, town_regions, query, showroom=False), None
+    kitchen = "kitchen" in lname or any(k in c for c in cats for k in _RELEVANT)
     if item.get("_trusted") and not kitchen:
         # Google matched it to "kitchen showroom", but without "kitchen" in
         # the name it must also be the kind of business a showroom is listed
@@ -96,14 +102,19 @@ def to_prospect(item, town_regions):
     if not name or not kitchen or off_topic:
         return None, "not kitchen"
 
-    website = item.get("website") or ""
-    if is_branch_page(website):
+    if is_branch_page(item.get("website") or ""):
         return None, "branch"
+    return _row(item, name, town_regions, query, showroom=True), None
 
+
+def _row(item, name, town_regions, query, showroom):
+    website = item.get("website") or ""
+    cats = _categories(item)
     search = (item.get("searchString") or "").strip()
-    prefix = QUERY.format(town="")
+    prefix = query.format(town="")
     searched = search[len(prefix):].strip() if search.lower().startswith(prefix.lower()) else ""
-    town = (item.get("city") or "").strip() or searched
+    town = clean_town((item.get("city") or "").strip() or searched, item.get("address") or "",
+                      item.get("postalCode") or "")
 
     return {
         "company": name,
@@ -115,7 +126,7 @@ def to_prospect(item, town_regions):
         "source": "Google Maps",
         # Y when Maps lists it as a store/showroom. Blank (not N) otherwise:
         # a "Kitchen remodeler" listing may still have a showroom.
-        "physical_showroom": "Y" if any(k in c for c in cats for k in _PHYSICAL) else "",
+        "physical_showroom": "Y" if showroom and any(k in c for c in cats for k in _PHYSICAL) else "",
         "google_rating": item.get("totalScore") or "",
         "google_reviews": item.get("reviewsCount") or "",
         "address": item.get("address") or "",
@@ -123,7 +134,7 @@ def to_prospect(item, town_regions):
         "google_category": item.get("categoryName") or "",
         "place_id": item.get("placeId") or "",
         "_searched_region": town_regions.get(searched, ""),
-    }, None
+    }
 
 
 MULTI_SITE = 3

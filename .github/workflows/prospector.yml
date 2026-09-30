@@ -6,6 +6,11 @@ name: Prospect run
 on:
   workflow_dispatch:
     inputs:
+      niche:
+        description: "Which trade: kitchen (All Prospects tab) or roofing (Roofing Prospects tab)"
+        type: choice
+        options: [kitchen, roofing]
+        default: kitchen
       region:
         description: "Region to run, or England for every town"
         default: "England"
@@ -61,6 +66,7 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHEET_ID: ${{ vars.SHEET_ID }}
           GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          NICHE: ${{ inputs.niche }}
           REGION: ${{ inputs.region }}
           ONLY: ${{ inputs.only }}
           MAX_TOWNS: ${{ inputs.max_towns }}
@@ -75,14 +81,14 @@ jobs:
         # public, so artifacts would be downloadable by anyone.
         run: |
           if [ "$FIND_PEOPLE" = "true" ]; then
-            args=()
+            args=(--niche "${NICHE:-kitchen}")
             [ -n "$MAX_ROWS" ] && args+=(--limit "$MAX_ROWS")
             [ "$FACEBOOK" = "true" ] && args+=(--facebook)
             [ "$DRY_RUN" = "true" ] && args+=(--dry-run)
             python -m prospector.people "${args[@]}"
             exit
           fi
-          args=()
+          args=(--niche "${NICHE:-kitchen}")
           [ -n "$REGION" ] && args+=(--region "$REGION")
           [ -n "$ONLY" ] && args+=(--only "$ONLY")
           [ -n "$MAX_TOWNS" ] && args+=(--max-towns "$MAX_TOWNS")

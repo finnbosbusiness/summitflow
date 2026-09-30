@@ -20,6 +20,7 @@ from .chains import FALLBACK_CHAINS, is_chain
 from .columns import FIRST_ROW, INPUT_COLUMNS, LAST_ROW
 from .companies_house import CompaniesHouse
 from .matching import domain
+from . import sheet
 from .sheet import Plan, keys_for, open_sheet, read_chains, read_prospects, write, write_skipped
 
 # Only showrooms in these countries are added.
@@ -49,6 +50,8 @@ def load_towns(path, region=None):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--niche", default="kitchen", choices=["kitchen", "roofing"],
+                    help="which trade to search for; each has its own tab (see niches.py)")
     ap.add_argument("--towns", default=str(HERE / "towns.csv"), help="CSV with town,region columns")
     ap.add_argument("--region", help="only run towns in this region, e.g. 'West Midlands'")
     ap.add_argument("--only", help="comma-separated towns to run, e.g. 'Birmingham,Solihull'")
@@ -67,6 +70,8 @@ def main(argv=None):
     ap.add_argument("--dry-run", action="store_true", help="write a CSV to output/ instead of the sheet")
     args = ap.parse_args(argv)
 
+    niche = sheet.configure(args.niche)
+    query = niche["query"]
     stamp = dt.datetime.now().strftime("%Y%m%d-%H%M")
     OUTPUT.mkdir(exist_ok=True)
     sheet_id = sheet_id_from(os.environ.get("SHEET_ID"))
@@ -89,10 +94,10 @@ def main(argv=None):
 
     # Existing sheet state
     spreadsheet = open_sheet(sheet_id) if has_sheet else None
-    chains = read_chains(spreadsheet) if spreadsheet else FALLBACK_CHAINS
+    chains = (read_chains(spreadsheet) if spreadsheet else FALLBACK_CHAINS) if niche["chains"] else []
     plan = Plan(read_prospects(spreadsheet) if spreadsheet else {})
     if not spreadsheet:
-        plan.free = list(range(FIRST_ROW, LAST_ROW + 1))
+        plan.free = list(range(FIRST_ROW, sheet.ROWS[0] + 1))
     print(f"Sheet: {len(plan.index)} prospects already, {len(plan.free)} free rows, {len(chains)} chains excluded")
 
     # Stage 1: Google Maps
@@ -106,10 +111,10 @@ def main(argv=None):
         places_key or sys.exit("GOOGLE_PLACES_API_KEY is not set.")
 
         def worth_next_page(page_items):
-            relevant = sum(1 for it in page_items if maps.to_prospect(it, towns)[0])
+            relevant = sum(1 for it in page_items if maps.to_prospect(it, towns, args.niche, query)[0])
             return relevant >= args.min_relevant_per_page
 
-        items = places.run_search(places_key, [maps.QUERY.format(town=t) for t in towns], args.max_per_town,
+        items = places.run_search(places_key, [query.format(town=t) for t in towns], args.max_per_town,
                                   keep_paging=worth_next_page, progress=print)
         raw = OUTPUT / f"maps-{stamp}.json"
         raw.write_text(json.dumps(items))
@@ -134,7 +139,7 @@ def main(argv=None):
     multi_site = maps.multi_site_domains(items)
     by_ident = {}
     for item in items:
-        p, reason = maps.to_prospect(item, towns)
+        p, reason = maps.to_prospect(item, towns, args.niche, query)
         if not p:
             skip(item, reason)
             continue
@@ -164,11 +169,11 @@ def main(argv=None):
             continue
         p["region"] = region
         kept.append(p)
-    # New rows go onto the sheet in postcode order.
-    prospects = sorted(kept, key=lambda p: location.sort_key(p["postcode"]))
+    # New rows go onto the sheet grouped by town, in postcode order within it.
+    prospects = sorted(kept, key=lambda p: (p["town"].lower(), location.sort_key(p["postcode"])))
 
     if not args.no_maps:
-        print(f"Maps: {len(items)} places, {len(prospects)} independent kitchen showrooms kept. Skipped: "
+        print(f"Maps: {len(items)} places, {len(prospects)} {args.niche} businesses kept. Skipped: "
               + ", ".join(f"{n} {why}" for why, n in counts.most_common()))
         by_region = Counter(p["region"] or "unknown" for p in prospects)
         print("  by region: " + ", ".join(f"{r} {n}" for r, n in sorted(by_region.items())))
@@ -281,7 +286,7 @@ def main(argv=None):
 
     if plan.out_of_room:
         print(f"WARNING: Prospects tab is full; {plan.out_of_room} prospects not added. "
-              f"Extend the formulas past row {LAST_ROW} and raise LAST_ROW in columns.py.")
+              f"Extend the formulas past row {sheet.ROWS[0]} and raise last_row in niches.py.")
 
     if args.dry_run:
         out = OUTPUT / f"prospects-{stamp}.csv"

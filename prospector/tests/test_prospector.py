@@ -209,13 +209,13 @@ def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
     main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--skip-meta", "--skip-google", "--dry-run"])
     out = capsys.readouterr().out
-    assert "3 independent kitchen showrooms kept" in out
+    assert "3 kitchen businesses kept" in out
     assert "1 chain" in out and "1 duplicate" in out and "1 outside England" in out
     rows = list(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
-    # Sorted by postcode: B91, CV34, NG17
-    assert [r["company"] for r in rows] == ["Beta Kitchen Design", "Acme Kitchens", "Charles Yorke Kitchens"]
+    # Grouped by town, then postcode order: Kirkby-in-Ashfield, then Warwick B91 and CV34
+    assert [r["company"] for r in rows] == ["Charles Yorke Kitchens", "Beta Kitchen Design", "Acme Kitchens"]
     assert [r["sheet_row"] for r in rows] == ["4", "5", "6"]
-    assert rows[2]["region"] == "East Midlands" and rows[2]["town"] == "Kirkby-in-Ashfield"
+    assert rows[0]["region"] == "East Midlands" and rows[0]["town"] == "Kirkby-in-Ashfield"
 
 
 def test_sheet_id():
@@ -625,3 +625,27 @@ def test_json_ld_founder():
     from prospector.people import people_from_json_ld
     ld = '{"@type": "LocalBusiness", "founder": {"@type": "Person", "name": "Anna Lee"}}'
     assert people_from_json_ld([ld]) == [("Anna Lee", "Founder")]
+
+
+def test_roofing_filter():
+    def reason(**kw):
+        kw = {"categoryName": "Roofing contractor", "categories": ["Roofing contractor"], **kw}
+        item = place(searchString="roofing company Warwick", **kw)
+        return maps.to_prospect(item, TOWNS, "roofing", "roofing company {town}")
+    p, why = reason(title="Warwick Roofing Ltd", website="https://warwickroofing.co.uk/")
+    assert why is None and p["town"] == "Warwick" and p["physical_showroom"] == ""
+    assert reason(title="A1 Roofers")[1] is None
+    assert reason(title="SIG Roofing Supplies")[1] == "not a roofer"
+    assert reason(title="The Rooftop Bar", categoryName="Bar", categories=["Bar"])[1] in ("not a roofer", "not roofing")
+    assert reason(title="Smith Builders", categoryName="General contractor", categories=["General contractor"])[1] == "not roofing"
+
+
+def test_clean_town():
+    from prospector.location import clean_town
+    assert clean_town("Kent", "29 Sandford Rd, Sittingbourne, Kent ME10 1PP", "ME10 1PP") == "Sittingbourne"
+    assert clean_town("Saint Helens") == "St Helens"
+    assert clean_town("St. Neots") == "St Neots"
+    assert clean_town("ELY") == "Ely"
+    assert clean_town("SW16", "9A Streatham High Rd, SW16 SW16 1EE", "SW16 1EE") == "London"
+    assert clean_town("Little Warley, Brentwood, Essex") == "Brentwood"
+    assert clean_town("Birmingham") == "Birmingham"

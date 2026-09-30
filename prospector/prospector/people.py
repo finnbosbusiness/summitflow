@@ -350,15 +350,17 @@ def facebook_people(token, urls):
 def main(argv=None):
     from .companies_house import CompaniesHouse
     from .run import DEFAULT_SHEET_ID, OUTPUT, sheet_id_from
-    from .sheet import Plan, open_sheet, read_prospects, write
+    from .sheet import Plan, configure, open_sheet, read_prospects, write
 
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--niche", default="kitchen", choices=["kitchen", "roofing"], help="which trade's tab")
     ap.add_argument("--limit", type=int, help="only the first N rows without a name (for a test)")
     ap.add_argument("--facebook", action="store_true", help="also check Facebook pages via Apify (paid)")
     ap.add_argument("--workers", type=int, default=8, help="websites read at once")
     ap.add_argument("--dry-run", action="store_true", help="write a CSV to output/ instead of the sheet")
     args = ap.parse_args(argv)
 
+    configure(args.niche)
     spreadsheet = open_sheet(sheet_id_from(os.environ.get("SHEET_ID") or DEFAULT_SHEET_ID))
     plan = Plan(read_prospects(spreadsheet))
     todo = [r for r, v in sorted(plan.rows.items())
