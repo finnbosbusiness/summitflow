@@ -17,7 +17,7 @@ from . import google, location, maps, meta, places
 from .chains import FALLBACK_CHAINS, is_chain
 from .columns import INPUT_COLUMNS
 from .companies_house import CompaniesHouse
-from .matching import prospect_key
+from .matching import domain, prospect_key
 from .sheet import Plan, open_sheet, read_chains, read_prospects, write
 
 # Only showrooms in these countries are added.
@@ -106,10 +106,14 @@ def main(argv=None):
 
     counts = Counter()
     prospects, seen = [], set()
+    multi_site = maps.multi_site_domains(items)
     for item in items:
         p, reason = maps.to_prospect(item, towns)
         if not p:
             counts[reason] += 1
+            continue
+        if domain(p["website"]) in multi_site:
+            counts["multi-site"] += 1
             continue
         if is_chain(p["company"], p["website"], chains):
             counts["chain"] += 1

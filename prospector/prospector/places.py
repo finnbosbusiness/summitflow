@@ -12,6 +12,7 @@ import requests
 
 API = "https://places.googleapis.com/v1/places:searchText"
 PAGE_SIZE = 20  # Google's maximum per page
+UK_BOUNDS = {"low": {"latitude": 49.8, "longitude": -8.7}, "high": {"latitude": 60.9, "longitude": 1.8}}
 FIELDS = ",".join([
     "places.id", "places.displayName", "places.addressComponents", "places.websiteUri",
     "places.nationalPhoneNumber", "places.rating", "places.userRatingCount", "places.types",
@@ -23,7 +24,10 @@ def search(key: str, text: str, max_results: int = PAGE_SIZE, session=None):
     """Raw Places results for one query, in Google's ranking order."""
     session = session or requests
     headers = {"X-Goog-Api-Key": key, "X-Goog-FieldMask": FIELDS}
-    body = {"textQuery": text, "regionCode": "gb", "languageCode": "en", "pageSize": PAGE_SIZE}
+    body = {"textQuery": text, "regionCode": "gb", "languageCode": "en", "pageSize": PAGE_SIZE,
+            # Keep results in the UK: "Warwick" or "Leominster" otherwise
+            # also returns showrooms in the US towns of the same name.
+            "locationRestriction": {"rectangle": UK_BOUNDS}}
     out = []
     while len(out) < max_results:
         for attempt in range(3):
@@ -43,10 +47,10 @@ def search(key: str, text: str, max_results: int = PAGE_SIZE, session=None):
     return out[:max_results]
 
 
-def _component(place, kind):
+def _component(place, kind, short=False):
     for c in place.get("addressComponents") or []:
         if kind in (c.get("types") or []):
-            return c.get("longText") or ""
+            return (c.get("shortText") if short else c.get("longText")) or ""
     return ""
 
 
@@ -68,6 +72,7 @@ def to_item(place, search_string: str, rank: int) -> dict:
         "temporarilyClosed": status == "CLOSED_TEMPORARILY",
         "searchString": search_string,
         "rank": rank,
+        "countryCode": _component(place, "country", short=True),
         # Google already matched these to "kitchen showroom", and its own
         # categories are too vague ("General contractor") to re-check.
         "_trusted": True,

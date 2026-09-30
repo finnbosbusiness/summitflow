@@ -16,7 +16,18 @@ _NOT_SHOWROOM = (
     "coffee", "cafe", "restaurant", "takeaway", "heating", "plumb", "boiler",
     "builders merchant", "building materials", "building supplies", "timber",
     "appliance", "electrical", "countertop", "worktop", "granite", "quartz",
-    "hardware", "diy", "cleaning", "catering",
+    "hardware", "diy", "cleaning", "catering", "food", "bakery", "meal", "plumber", "gift",
+)
+# Google's main category for businesses that can be kitchen showrooms.
+_SHOWROOM_TYPES = (
+    "furniture store", "general contractor", "home improvement", "home goods", "manufacturer",
+    "interior designer", "kitchen", "cabinet", "carpenter", "joiner", "designer",
+)
+# Name words that mean some other trade, when the name doesn't say kitchen.
+_OTHER_TRADES = (
+    "bathroom", "bedroom", "tile", "flooring", "door", "window", "taps", "bed centre", "beds",
+    "garden", "fire", "stove", "marble", "stone", "spray", "wardrobe", "sofa", "blind", "curtain",
+    "carpet", "furnishers", "gift", "lighting",
 )
 # A website path like /showrooms/solihull means one branch of a bigger business.
 _BRANCH_PATH = re.compile(r"/(showrooms?|branch(es)?|stores?|locations?)/[^/]+", re.I)
@@ -65,11 +76,16 @@ def to_prospect(item, town_regions):
     cats = _categories(item)
     lname = name.lower()
     kitchen = "kitchen" in lname or any(k in c for c in cats for k in _RELEVANT)
+    if item.get("countryCode") and item["countryCode"] != "GB":
+        return None, "outside UK"
     if item.get("_trusted") and not kitchen:
-        # Google matched it to "kitchen showroom"; only drop names that say
-        # they are something else, like a bathroom-only showroom.
-        kitchen = not any(w in lname for w in ("bathroom", "bedroom", "tile", "flooring", "door", "window"))
-        kitchen = kitchen or "kbb" in lname
+        # Google matched it to "kitchen showroom", but without "kitchen" in
+        # the name it must also be the kind of business a showroom is listed
+        # as, and not say it's something else (bathroom-only, taps, beds).
+        kitchen = "kbb" in lname or (
+            any(t in (item.get("categoryName") or "").lower() for t in _SHOWROOM_TYPES)
+            and not any(w in lname for w in _OTHER_TRADES)
+        )
     # The main Maps category decides it ("Appliance store", "Coffee machine
     # supplier"). The name only counts when it doesn't say kitchen, so
     # "Connelly's Kitchens & Appliances" stays in.
@@ -104,3 +120,19 @@ def to_prospect(item, town_regions):
         "google_reviews": item.get("reviewsCount") or "",
         "_searched_region": town_regions.get(searched, ""),
     }, None
+
+
+MULTI_SITE = 3
+
+
+def multi_site_domains(items, threshold: int = MULTI_SITE):
+    """Website domains listed at `threshold` or more different postcodes in
+    one run: branches of a multi-site business, even if it isn't on the
+    Chain Exclusions tab yet."""
+    seen = {}
+    for it in items:
+        d = domain(it.get("website") or "")
+        pc = (it.get("postalCode") or "").replace(" ", "").upper()
+        if d and pc:
+            seen.setdefault(d, set()).add(pc)
+    return {d for d, pcs in seen.items() if len(pcs) >= threshold}
