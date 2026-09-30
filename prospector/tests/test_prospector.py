@@ -414,6 +414,34 @@ def test_places_relevance_trusts_google_but_drops_other_trades():
     assert reason("Bathroom Centre") == "not kitchen"
     assert reason("Macphersons Appliances") == "not kitchen"
     assert reason("Howdens - Solihull", primary="Hardware store") == "not kitchen"
+    # Real categories Google gave non-showrooms in the West Midlands run
+    assert reason("One and Every", primary="Gift shop") == "not kitchen"
+    assert reason("Purple Kidderminster", primary="Suppliers") == "not kitchen"
+    assert reason("Worcestershire Tile & Stone", primary="Building materials store") == "not kitchen"
+    assert reason("1st Call 24/7 Limited", primary="Plumber") == "not kitchen"
+    assert reason("Taps UK", primary="Home goods store") == "not kitchen"
+    assert reason("Supervalue Furniture & Bed Centre", primary="Furniture store") == "not kitchen"
+    assert reason("Fire and Garden Ltd", primary="Home improvement store") == "not kitchen"
+    assert reason("Impact Joinery", primary="Furniture store") is None
+    assert reason("KAW Interior Design", primary="General contractor") is None
+    assert reason("Little Al's Kitchen", primary="Food") == "not kitchen"
+    assert reason("Brew & Eat", primary="Coffee shop") == "not kitchen"
+
+
+def test_places_outside_uk_dropped():
+    us = gplace("S&S Kitchens", pc="01453", town="Leominster")
+    us["addressComponents"].append({"longText": "United States", "shortText": "US", "types": ["country", "political"]})
+    assert maps.to_prospect(places.to_item(us, "kitchen showroom Leominster", 1), {})[1] == "outside UK"
+    gb = gplace("Heritage Oak Kitchens")
+    gb["addressComponents"].append({"longText": "United Kingdom", "shortText": "GB", "types": ["country", "political"]})
+    assert maps.to_prospect(places.to_item(gb, "kitchen showroom Leominster", 1), {})[1] is None
+
+
+def test_multi_site_domains():
+    items = [{"website": "https://www.classicinteriors.co.uk/", "postalCode": pc} for pc in ("B91 1BQ", "CV32 4DW", "WR5 1AA")]
+    items += [{"website": "https://www.kitchenfactoryshowroom.co.uk/", "postalCode": "DY2 9NP"},
+              {"website": "https://www.kitchenfactoryshowroom.co.uk/", "postalCode": "DY2 9NP"}]
+    assert maps.multi_site_domains(items) == {"classicinteriors.co.uk"}
 
 
 def test_places_pagination():
