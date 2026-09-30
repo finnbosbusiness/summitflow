@@ -1,6 +1,8 @@
-"""Weekly prospect run: Google Maps -> Companies House -> Prospects tab.
+"""Prospect run: Google Places -> Companies House -> Prospects tab
+(optionally the Google search and Meta ad checks).
 
     python -m prospector.run --region "West Midlands" --dry-run
+    python -m prospector.run --region England --skip-google --skip-meta
 """
 
 import argparse
@@ -15,10 +17,10 @@ from pathlib import Path
 
 from . import google, location, maps, meta, places
 from .chains import FALLBACK_CHAINS, is_chain
-from .columns import INPUT_COLUMNS
+from .columns import FIRST_ROW, INPUT_COLUMNS, LAST_ROW
 from .companies_house import CompaniesHouse
-from .matching import domain, prospect_key
-from .sheet import Plan, open_sheet, read_chains, read_prospects, write
+from .matching import domain
+from .sheet import Plan, keys_for, open_sheet, read_chains, read_prospects, write, write_skipped
 
 # Only showrooms in these countries are added.
 COUNTRIES = {"England"}
@@ -40,8 +42,8 @@ def sheet_id_from(value):
 def load_towns(path, region=None):
     with open(path, newline="") as f:
         towns = {r["town"].strip(): r["region"].strip() for r in csv.DictReader(f) if r.get("town", "").strip()}
-    if region:
-        towns = {t: r for t, r in towns.items() if r.lower() == region.lower()}
+    if region and region.strip().lower() not in ("all", "england"):
+        towns = {t: r for t, r in towns.items() if r.lower() == region.strip().lower()}
     return towns
 
 
@@ -51,7 +53,10 @@ def main(argv=None):
     ap.add_argument("--region", help="only run towns in this region, e.g. 'West Midlands'")
     ap.add_argument("--only", help="comma-separated towns to run, e.g. 'Birmingham,Solihull'")
     ap.add_argument("--max-towns", type=int, help="only the first N towns (for a cheap test)")
-    ap.add_argument("--max-per-town", type=int, default=20, help="Google Places results per town (default 20, one page)")
+    ap.add_argument("--max-per-town", type=int, default=60,
+                    help="Google Places results per town (default 60, Google's maximum)")
+    ap.add_argument("--min-relevant-per-page", type=int, default=8,
+                    help="only fetch the next page of 20 if this many on the last page were kitchen businesses")
     ap.add_argument("--maps-json", help="reuse a saved Apify result instead of scraping again")
     ap.add_argument("--skip-companies-house", action="store_true")
     ap.add_argument("--skip-meta", action="store_true", help="skip stage 2 (Meta Ad Library)")
@@ -87,7 +92,7 @@ def main(argv=None):
     chains = read_chains(spreadsheet) if spreadsheet else FALLBACK_CHAINS
     plan = Plan(read_prospects(spreadsheet) if spreadsheet else {})
     if not spreadsheet:
-        plan.free = list(range(4, 3004))
+        plan.free = list(range(FIRST_ROW, LAST_ROW + 1))
     print(f"Sheet: {len(plan.index)} prospects already, {len(plan.free)} free rows, {len(chains)} chains excluded")
 
     # Stage 1: Google Maps
@@ -99,31 +104,53 @@ def main(argv=None):
         items = json.loads(Path(args.maps_json).read_text())
     else:
         places_key or sys.exit("GOOGLE_PLACES_API_KEY is not set.")
-        items = places.run_search(places_key, [maps.QUERY.format(town=t) for t in towns], args.max_per_town)
+
+        def worth_next_page(page_items):
+            relevant = sum(1 for it in page_items if maps.to_prospect(it, towns)[0])
+            return relevant >= args.min_relevant_per_page
+
+        items = places.run_search(places_key, [maps.QUERY.format(town=t) for t in towns], args.max_per_town,
+                                  keep_paging=worth_next_page, progress=print)
         raw = OUTPUT / f"maps-{stamp}.json"
         raw.write_text(json.dumps(items))
-        print(f"Saved raw Places results to {raw} (reuse with --maps-json)")
+        print(f"Places: {places.SEARCH_CALLS[0]} requests. Saved raw results to {raw} (reuse with --maps-json)")
 
     counts = Counter()
-    prospects, seen = [], set()
+    prospects, seen, skipped, skipped_seen = [], set(), [], set()
+
+    def skip(item, reason):
+        counts[reason] += 1
+        # Record each skipped business once, so nothing is lost without a trace.
+        ident = item.get("placeId") or (item.get("title"), item.get("postalCode"))
+        if ident not in skipped_seen:
+            skipped_seen.add(ident)
+            skipped.append({
+                "reason": reason, "company": item.get("title") or "", "website": item.get("website") or "",
+                "phone": item.get("phone") or "", "postcode": item.get("postalCode") or "",
+                "town": item.get("city") or "", "google_category": item.get("categoryName") or "",
+                "maps_url": item.get("mapsUrl") or "", "searched": item.get("searchString") or "",
+            })
+
     multi_site = maps.multi_site_domains(items)
+    by_ident = {}
     for item in items:
         p, reason = maps.to_prospect(item, towns)
         if not p:
-            counts[reason] += 1
+            skip(item, reason)
             continue
         if domain(p["website"]) in multi_site:
-            counts["multi-site"] += 1
+            skip(item, "multi-site")
             continue
         if is_chain(p["company"], p["website"], chains):
-            counts["chain"] += 1
+            skip(item, "chain")
             continue
         # The same showroom often shows up in several towns' searches.
-        key = prospect_key(p["website"], p["company"], p["postcode"])
-        if key in seen:
+        ks = keys_for(p)
+        if any(k in seen for k in ks):
             counts["duplicate"] += 1
             continue
-        seen.add(key)
+        seen.update(ks)
+        by_ident[id(p)] = item
         prospects.append(p)
 
     # Region from each showroom's own postcode, not from the search.
@@ -133,7 +160,7 @@ def main(argv=None):
         info = postcode_info.get(location.normalise(p["postcode"]))
         region = (info or {}).get("region") or location.region_from_area(p["postcode"]) or p["_searched_region"]
         if location.country_of_region(region) not in COUNTRIES:
-            counts["outside England"] += 1
+            skip(by_ident[id(p)], "outside England")
             continue
         p["region"] = region
         kept.append(p)
@@ -148,6 +175,16 @@ def main(argv=None):
 
     rows = [plan.upsert(p) for p in prospects]
 
+    def save(label):
+        # Save as the run goes, so a long run that stops part-way keeps what it found.
+        if not args.dry_run and plan.updates:
+            n = write(spreadsheet, plan)
+            print(f"  saved to sheet ({label}, {n} ranges)")
+
+    save("new showrooms")
+    if not args.dry_run and not args.no_maps:
+        print(f"Skipped tab: {write_skipped(spreadsheet, skipped)} businesses listed")
+
     # Stage 4: Companies House, only for rows never looked up before
     if not args.skip_companies_house:
         key = os.environ.get("COMPANIES_HOUSE_API_KEY") or sys.exit("COMPANIES_HOUSE_API_KEY is not set (or use --skip-companies-house).")
@@ -156,12 +193,19 @@ def main(argv=None):
         print(f"Companies House: looking up {len(todo)} companies")
         found = 0
         for i, r in enumerate(todo, 1):
-            info = ch.lookup(plan.rows[r]["company"], plan.rows[r]["postcode"])
+            try:
+                info = ch.lookup(plan.rows[r]["company"], plan.rows[r]["postcode"])
+            except Exception as e:  # one bad lookup shouldn't stop the run
+                print(f"  lookup failed for {plan.rows[r]['company']}: {e}")
+                continue
             found += "company_number" in info
             plan.fill(r, info)
-            if i % 25 == 0:
+            if i % 100 == 0:
                 print(f"  {i}/{len(todo)}")
+            if i % 500 == 0:
+                save(f"Companies House {i}/{len(todo)}")
         print(f"Companies House: matched {found} of {len(todo)}")
+        save("Companies House")
 
     # Stages 2 and 3 check the showrooms found this run (new or already on
     # the sheet, so their ad status is refreshed) plus any row never checked.
@@ -236,7 +280,8 @@ def main(argv=None):
         print(f"Meta: FAILED, skipped this run ({e})")
 
     if plan.out_of_room:
-        print(f"WARNING: Prospects tab is full; {plan.out_of_room} prospects not added. Extend formulas past row 3003.")
+        print(f"WARNING: Prospects tab is full; {plan.out_of_room} prospects not added. "
+              f"Extend the formulas past row {LAST_ROW} and raise LAST_ROW in columns.py.")
 
     if args.dry_run:
         out = OUTPUT / f"prospects-{stamp}.csv"
@@ -244,12 +289,17 @@ def main(argv=None):
         with open(out, "w", newline="") as f:
             w = csv.writer(f)
             w.writerow(["sheet_row", *fields])
-            for r in sorted(plan.updates):
+            for r in sorted(plan.updated_rows):
                 w.writerow([r, *[plan.rows[r].get(fld, "") for fld in fields]])
+        with open(OUTPUT / f"skipped-{stamp}.csv", "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=["reason", "company", "website", "phone", "postcode", "town",
+                                              "google_category", "maps_url", "searched"])
+            w.writeheader()
+            w.writerows(skipped)
         print(f"Dry run: {plan.added} new, {plan.filled} updated. Written to {out}")
     else:
-        n = write(spreadsheet, plan)
-        print(f"Sheet: {plan.added} new prospects added, {plan.filled} existing rows updated ({n} ranges written)")
+        save("final")
+        print(f"Sheet: {plan.added} new prospects added, {plan.filled} existing rows updated")
     if failures:
         # Fail the workflow so the red run shows something needs a look,
         # after everything that did work has been written.

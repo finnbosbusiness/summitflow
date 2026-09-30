@@ -118,6 +118,10 @@ def to_prospect(item, town_regions):
         "physical_showroom": "Y" if any(k in c for c in cats for k in _PHYSICAL) else "",
         "google_rating": item.get("totalScore") or "",
         "google_reviews": item.get("reviewsCount") or "",
+        "address": item.get("address") or "",
+        "maps_url": item.get("mapsUrl") or "",
+        "google_category": item.get("categoryName") or "",
+        "place_id": item.get("placeId") or "",
         "_searched_region": town_regions.get(searched, ""),
     }, None
 
