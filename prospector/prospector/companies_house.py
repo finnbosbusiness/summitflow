@@ -112,5 +112,6 @@ def format_officer_name(raw: str) -> str:
         return raw.strip(" ,")
     surname, forenames = (p.strip(" ,") for p in raw.split(",", 1))
     # Drop titles such as 'Mr' that Companies House sometimes leaves in.
-    words = [w for w in forenames.split() if w.lower().rstrip(".") not in ("mr", "mrs", "ms", "miss", "dr")]
+    words = [w.strip(",") for w in forenames.split()]
+    words = [w for w in words if w and w.lower().rstrip(".") not in ("mr", "mrs", "ms", "miss", "dr")]
     return " ".join(words + [surname.title()])
