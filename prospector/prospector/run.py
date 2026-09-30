@@ -8,6 +8,7 @@ import csv
 import datetime as dt
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -21,6 +22,16 @@ from .sheet import Plan, open_sheet, read_chains, read_prospects, write
 DEFAULT_SHEET_ID = "1OB_KfC0N6aigLFe5-_y8D4_VFD8RW7zRnXEXCKN3ZYQ"
 HERE = Path(__file__).resolve().parent.parent
 OUTPUT = HERE / "output"
+
+
+def sheet_id_from(value):
+    """Accepts a sheet ID or a full sheet URL. Blank (e.g. an unset GitHub
+    variable, which Actions passes as '') means the Cold Lead Template."""
+    value = (value or "").strip()
+    if not value:
+        return DEFAULT_SHEET_ID
+    m = re.search(r"/d/([A-Za-z0-9_-]+)", value)
+    return m.group(1) if m else value
 
 
 def load_towns(path, region=None):
@@ -44,7 +55,7 @@ def main(argv=None):
 
     stamp = dt.datetime.now().strftime("%Y%m%d-%H%M")
     OUTPUT.mkdir(exist_ok=True)
-    sheet_id = os.environ.get("SHEET_ID", DEFAULT_SHEET_ID)
+    sheet_id = sheet_id_from(os.environ.get("SHEET_ID"))
     has_sheet = bool(os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON") or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
     if not args.dry_run and not has_sheet:
         sys.exit("No Google credentials set. Set GOOGLE_SERVICE_ACCOUNT_JSON, or use --dry-run.")

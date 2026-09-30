@@ -5,7 +5,7 @@ from prospector.chains import FALLBACK_CHAINS, is_chain
 from prospector.columns import FORMULA_COLUMNS, INPUT_COLUMNS, contiguous_blocks
 from prospector.companies_house import best_match, format_officer_name, pick_director
 from prospector.matching import domain, prospect_key
-from prospector.run import main
+from prospector.run import DEFAULT_SHEET_ID, main, sheet_id_from
 from prospector.sheet import Plan
 
 TOWNS = {"Warwick": "West Midlands", "Leamington Spa": "West Midlands"}
@@ -134,3 +134,10 @@ def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
     assert "2 independent kitchen businesses, 1 chains skipped" in out
     csv_text = next(tmp_path.glob("prospects-*.csv")).read_text()
     assert "Acme Kitchens" in csv_text and "Beta Kitchen Design" in csv_text and "Howdens" not in csv_text
+
+
+def test_sheet_id():
+    assert sheet_id_from("") == DEFAULT_SHEET_ID
+    assert sheet_id_from(None) == DEFAULT_SHEET_ID
+    assert sheet_id_from("https://docs.google.com/spreadsheets/d/abc_123-X/edit#gid=0") == "abc_123-X"
+    assert sheet_id_from("abc") == "abc"
