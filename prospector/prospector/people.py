@@ -84,7 +84,8 @@ _COMPANY_NO = re.compile(
     re.I,
 )
 _EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
-_BAD_EMAIL = ("example.", "sentry", "wixpress", "domain.com", "email.com", "yourname", ".png", ".jpg", ".webp")
+_BAD_EMAIL = ("example.", "sentry", "wixpress", "domain.com", "email.com", "yourname", ".png", ".jpg", ".webp",
+              "godaddy", "filler@", "yourdomain", "test@", "user@", "name@", "wordpress", "squarespace")
 
 
 class _Page(HTMLParser):
@@ -359,10 +360,11 @@ def main(argv=None):
             if str(v.get("company", "")).strip() and not str(v.get("decision_maker_name", "")).strip()]
     no_site = [r for r in todo if not domain(plan.rows[r].get("website", ""))]
     todo = [r for r in todo if r not in no_site]
+    print(f"{len(todo) + len(no_site)} showrooms without a decision maker: {len(todo)} have a website, "
+          f"{len(no_site)} don't")
     if args.limit:
         todo = todo[: args.limit]
-    print(f"{len(todo) + len(no_site)} showrooms without a decision maker: checking {len(todo)} websites "
-          f"({len(no_site)} have no website)")
+        print(f"  checking the first {len(todo)} (--limit)")
 
     key = os.environ.get("COMPANIES_HOUSE_API_KEY")
     ch = CompaniesHouse(key) if key else None
