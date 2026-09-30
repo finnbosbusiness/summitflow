@@ -14,6 +14,10 @@ on:
       max_towns:
         description: "Only the first N towns (blank = all)"
         default: ""
+      checks_only:
+        description: "Don't search for new showrooms; only run the Meta and Google checks on rows already in the sheet"
+        type: boolean
+        default: false
       dry_run:
         description: "Dry run (don't write to the sheet)"
         type: boolean
@@ -22,7 +26,7 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 330
+    timeout-minutes: 350
     defaults:
       run:
         working-directory: prospector
@@ -57,6 +61,7 @@ jobs:
           ONLY: ${{ inputs.only }}
           MAX_TOWNS: ${{ inputs.max_towns }}
           DRY_RUN: ${{ inputs.dry_run }}
+          CHECKS_ONLY: ${{ inputs.checks_only }}
         # Scraped data is never uploaded as a workflow artifact: this repo is
         # public, so artifacts would be downloadable by anyone.
         run: |
@@ -65,4 +70,5 @@ jobs:
           [ -n "$ONLY" ] && args+=(--only "$ONLY")
           [ -n "$MAX_TOWNS" ] && args+=(--max-towns "$MAX_TOWNS")
           [ "$DRY_RUN" = "true" ] && args+=(--dry-run)
+          [ "$CHECKS_ONLY" = "true" ] && args+=(--no-maps)
           python -m prospector.run "${args[@]}"

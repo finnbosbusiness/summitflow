@@ -1,7 +1,7 @@
 import csv
 import json
 
-from prospector import location, maps
+from prospector import google, location, maps, meta
 from prospector.chains import FALLBACK_CHAINS, is_chain
 from prospector.columns import FORMULA_COLUMNS, INPUT_COLUMNS, contiguous_blocks
 from prospector.companies_house import best_match, format_officer_name, pick_director
@@ -201,7 +201,7 @@ def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("GOOGLE_SERVICE_ACCOUNT_JSON", raising=False)
     monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
     monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
-    main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--dry-run"])
+    main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--skip-meta", "--skip-google", "--dry-run"])
     out = capsys.readouterr().out
     assert "3 independent kitchen showrooms kept" in out
     assert "1 chain" in out and "1 duplicate" in out and "1 outside England" in out
@@ -217,3 +217,133 @@ def test_sheet_id():
     assert sheet_id_from(None) == DEFAULT_SHEET_ID
     assert sheet_id_from("https://docs.google.com/spreadsheets/d/abc_123-X/edit#gid=0") == "abc_123-X"
     assert sheet_id_from("abc") == "abc"
+
+
+# ---- Stage 2: Meta ----
+
+def ad(page="Madina Kitchens", link="https://www.madinakitchens.co.uk/offer", start=1788073200, text="Spring sale: 20% off all kitchens. Book a visit!", active=True):
+    # Shape taken from a real apify/facebook-ads-scraper item
+    return {"pageName": page, "isActive": active, "startDate": start,
+            "startDateFormatted": "2026-08-30T07:00:00.000Z",
+            "snapshot": {"pageName": page, "linkUrl": link, "caption": "", "body": {"text": text}, "cards": []}}
+
+
+def test_meta_search_name():
+    assert meta.search_name("Avanti | Kitchens, Bathrooms and Bedrooms Showroom | Solihull") == "Avanti"
+    assert meta.search_name("Madina Kitchens Ltd") == "Madina Kitchens"
+    assert "q=Madina+Kitchens" in meta.library_url("Madina Kitchens Ltd")
+
+
+def test_meta_matches_on_domain_or_page_name_only():
+    other = ad(page="Social Presence.uk", link="https://socialpresence.info/")
+    r = meta.result_for("Madina Kitchens Ltd", "https://www.madinakitchens.co.uk/", [other])
+    assert r == {"running_meta_ads": "N", "oldest_ad_start": "", "meta_ad_hook": ""}
+
+    by_domain = ad(page="MK Interiors Birmingham")
+    assert meta.result_for("Madina Kitchens Ltd", "https://www.madinakitchens.co.uk/", [by_domain])["running_meta_ads"] == "Y"
+
+    by_page = ad(link="https://fb.me/xyz")
+    assert meta.result_for("Madina Kitchens Ltd", "", [by_page])["running_meta_ads"] == "Y"
+
+    inactive = ad(active=False)
+    assert meta.result_for("Madina Kitchens Ltd", "https://www.madinakitchens.co.uk/", [inactive])["running_meta_ads"] == "N"
+
+
+def test_meta_oldest_ad_and_hook():
+    newer = ad(start=1790000000, text="New range just landed.")
+    older = ad(start=1780000000, text="Spring sale: 20% off all kitchens. Book a visit!")
+    r = meta.result_for("Madina Kitchens", "https://www.madinakitchens.co.uk/", [newer, older])
+    assert r["oldest_ad_start"] == "2026-05-28"
+    assert r["meta_ad_hook"] == "Spring sale: 20% off all kitchens."
+    assert meta.hook(ad(text="{{product.name}} from {{product.price}}")) == ""
+
+
+# ---- Stage 3: Google ----
+
+def serp(organic=(), paid=()):
+    # Shape taken from a real apify/google-search-scraper item
+    org = [{"title": "Map", "url": "https://www.google.co.uk/search?q=kitchen+showroom+Solihull", "position": 1}]
+    org += [{"title": t, "url": u, "position": i + 2} for i, (t, u) in enumerate(organic)]
+    return {"searchQuery": {"term": "kitchen showroom Solihull"}, "organicResults": org,
+            "paidResults": [{"title": t, "url": u} for t, u in paid]}
+
+
+PACK = [{"title": "Cucina Kitchens", "website": "http://www.cucina-kitchens.co.uk/", "rank": 1},
+        {"title": "Kitchen Gallery SieMatic", "website": "https://kitchengallery.co.uk/", "rank": 2},
+        {"title": "Reflections Studio", "website": "http://rstudio.co.uk/", "rank": 3}]
+
+
+def test_google_not_found_names_competitor():
+    s = serp(organic=[("Houzz - Best Kitchen Designers", "https://www.houzz.co.uk/x"),
+                      ("Plum Kitchens | Solihull Showroom", "https://www.plumkitchens.co.uk/")])
+    r = google.result_for("Madina Kitchens", "https://www.madinakitchens.co.uk/", s, PACK)
+    assert r == {"running_google_ads": "N", "search_result": "Not found", "competitor_ranking": "Cucina Kitchens"}
+    r = google.result_for("Madina Kitchens", "https://www.madinakitchens.co.uk/", s, [])
+    assert r["competitor_ranking"] == "Plum Kitchens"  # directories skipped
+
+
+def test_google_positions():
+    s = serp(organic=[("Plum Kitchens | Solihull", "https://www.plumkitchens.co.uk/")],
+             paid=[("Avanti", "https://www.avantikb.co.uk/offer")])
+    assert google.result_for("Avanti", "https://www.avantikb.co.uk/", s, PACK)["search_result"] == "Google Ads"
+    assert google.result_for("Avanti", "https://www.avantikb.co.uk/", s, PACK)["running_google_ads"] == "Y"
+    assert google.result_for("Kitchen Gallery", "https://kitchengallery.co.uk/", s, PACK)["search_result"] == "Map pack"
+    r = google.result_for("Plum Kitchens", "https://www.plumkitchens.co.uk/", s, PACK)
+    assert r["search_result"] == "Organic top 10" and r["competitor_ranking"] == "Cucina Kitchens"
+    # The google.co.uk "Map" placeholder never counts as the showroom's own listing
+    assert google.result_for("Map", "", s, [])["search_result"] == "Not found"
+
+
+def test_map_packs_from_stage1_items():
+    items = [{"searchString": "kitchen showroom Solihull", "title": t, "rank": r} for t, r in
+             [("D", 4), ("B", 2), ("A", 1), ("C", 3)]]
+    assert [p["title"] for p in google.map_packs_from_items(items, ["Solihull"])["Solihull"]] == ["A", "B", "C"]
+
+
+def test_plan_set_overwrites_and_clears():
+    rows = {4: {f: "" for f in INPUT_COLUMNS} | {"company": "Acme", "running_meta_ads": "Y", "meta_ad_hook": "Old"}}
+    plan = Plan(rows)
+    plan.set(4, {"running_meta_ads": "N", "meta_ad_hook": "", "oldest_ad_start": ""})
+    assert plan.updates[4] == {"running_meta_ads": "N", "meta_ad_hook": ""}
+    flat = [v for r in plan.value_ranges() for v in r["values"][0]]
+    assert "" in flat and "'" not in flat  # a cleared cell is "", not a lone apostrophe
+
+
+def test_stages_2_and_3_end_to_end(tmp_path, monkeypatch, capsys):
+    items = [place(title="Madina Kitchens", website="https://www.madinakitchens.co.uk/", postalCode="B12 8DN",
+                   city="Birmingham", searchString="kitchen showroom Birmingham", rank=5),
+             place(title="Cucina Kitchens", website="http://www.cucina-kitchens.co.uk/", postalCode="B94 5JU",
+                   city="Birmingham", searchString="kitchen showroom Birmingham", rank=1),
+             # Chains are skipped as prospects but still take map pack places
+             place(title="Howdens", website="https://howdens.com", searchString="kitchen showroom Birmingham", rank=2),
+             place(title="Wren Kitchens", website="https://wrenkitchens.com", searchString="kitchen showroom Birmingham", rank=3)]
+    f = tmp_path / "items.json"
+    f.write_text(json.dumps(items))
+    towns = tmp_path / "towns.csv"
+    towns.write_text("town,region\nBirmingham,West Midlands\n")
+    calls = []
+
+    def fake_actor(token, actor, payload, timeout_s=0):
+        calls.append(actor)
+        if actor == meta.ACTOR:
+            return [ad()]
+        if actor == google.SEARCH_ACTOR:
+            return [serp() | {"searchQuery": {"term": "kitchen showroom Birmingham"}}]
+        raise AssertionError(f"unexpected actor {actor}")
+
+    monkeypatch.setattr("prospector.meta.run_actor", fake_actor)
+    monkeypatch.setattr("prospector.google.run_actor", fake_actor)
+    monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
+    monkeypatch.setenv("APIFY_TOKEN", "x")
+    monkeypatch.delenv("GOOGLE_SERVICE_ACCOUNT_JSON", raising=False)
+    monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
+    monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
+    main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--dry-run"])
+    # Map pack reused from the stage 1 Maps results: no extra Maps run
+    assert calls == [meta.ACTOR, google.SEARCH_ACTOR]
+    rows = {r["company"]: r for r in csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open())}
+    assert rows["Madina Kitchens"]["running_meta_ads"] == "Y"
+    assert rows["Madina Kitchens"]["search_result"] == "Not found"
+    assert rows["Madina Kitchens"]["competitor_ranking"] == "Cucina Kitchens"
+    assert rows["Cucina Kitchens"]["search_result"] == "Map pack"
+    assert rows["Cucina Kitchens"]["running_meta_ads"] == "N"

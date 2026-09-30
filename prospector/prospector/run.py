@@ -13,7 +13,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from . import location, maps
+from . import google, location, maps, meta
 from .chains import FALLBACK_CHAINS, is_chain
 from .columns import INPUT_COLUMNS
 from .companies_house import CompaniesHouse
@@ -54,6 +54,11 @@ def main(argv=None):
     ap.add_argument("--max-per-town", type=int, default=40, help="Google Maps results per town (default 40)")
     ap.add_argument("--maps-json", help="reuse a saved Apify result instead of scraping again")
     ap.add_argument("--skip-companies-house", action="store_true")
+    ap.add_argument("--skip-meta", action="store_true", help="skip stage 2 (Meta Ad Library)")
+    ap.add_argument("--skip-google", action="store_true", help="skip stage 3 (Google search check)")
+    ap.add_argument("--no-maps", action="store_true",
+                    help="don't search for new showrooms; only fill in ad and search checks for rows already on the sheet")
+    ap.add_argument("--ads-per-search", type=int, default=30, help="Meta ads fetched per showroom (default 30)")
     ap.add_argument("--dry-run", action="store_true", help="write a CSV to output/ instead of the sheet")
     args = ap.parse_args(argv)
 
@@ -70,9 +75,12 @@ def main(argv=None):
         towns = {t: r for t, r in towns.items() if t.lower() in wanted}
     if args.max_towns:
         towns = dict(list(towns.items())[: args.max_towns])
-    if not towns:
+    if args.no_maps:
+        towns = {}
+    elif not towns:
         sys.exit("No towns selected. Check --region matches the towns.csv spelling.")
-    print(f"{len(towns)} towns: {', '.join(towns)}")
+    else:
+        print(f"{len(towns)} towns: {', '.join(towns)}")
 
     # Existing sheet state
     spreadsheet = open_sheet(sheet_id) if has_sheet else None
@@ -83,10 +91,13 @@ def main(argv=None):
     print(f"Sheet: {len(plan.index)} prospects already, {len(plan.free)} free rows, {len(chains)} chains excluded")
 
     # Stage 1: Google Maps
-    if args.maps_json:
+    token = os.environ.get("APIFY_TOKEN", "")
+    if args.no_maps:
+        items = []
+    elif args.maps_json:
         items = json.loads(Path(args.maps_json).read_text())
     else:
-        token = os.environ.get("APIFY_TOKEN") or sys.exit("APIFY_TOKEN is not set.")
+        token or sys.exit("APIFY_TOKEN is not set.")
         items = maps.run_search(token, list(towns), args.max_per_town)
         raw = OUTPUT / f"maps-{stamp}.json"
         raw.write_text(json.dumps(items))
@@ -124,10 +135,11 @@ def main(argv=None):
     # New rows go onto the sheet in postcode order.
     prospects = sorted(kept, key=lambda p: location.sort_key(p["postcode"]))
 
-    print(f"Maps: {len(items)} places, {len(prospects)} independent kitchen showrooms kept. Skipped: "
-          + ", ".join(f"{n} {why}" for why, n in counts.most_common()))
-    by_region = Counter(p["region"] or "unknown" for p in prospects)
-    print("  by region: " + ", ".join(f"{r} {n}" for r, n in sorted(by_region.items())))
+    if not args.no_maps:
+        print(f"Maps: {len(items)} places, {len(prospects)} independent kitchen showrooms kept. Skipped: "
+              + ", ".join(f"{n} {why}" for why, n in counts.most_common()))
+        by_region = Counter(p["region"] or "unknown" for p in prospects)
+        print("  by region: " + ", ".join(f"{r} {n}" for r, n in sorted(by_region.items())))
 
     rows = [plan.upsert(p) for p in prospects]
 
@@ -146,6 +158,58 @@ def main(argv=None):
                 print(f"  {i}/{len(todo)}")
         print(f"Companies House: matched {found} of {len(todo)}")
 
+    # Stages 2 and 3 check the showrooms found this run (new or already on
+    # the sheet, so their ad status is refreshed) plus any row never checked.
+    touched = {r for r in rows if r}
+
+    def targets(field):
+        out = []
+        for r, v in sorted(plan.rows.items()):
+            if not str(v.get("company", "")).strip() or is_chain(v["company"], v.get("website", ""), chains):
+                continue
+            if r in touched or not str(v.get(field, "")).strip():
+                out.append(r)
+        return out
+
+    # Stage 2: Meta Ad Library
+    if not args.skip_meta:
+        todo = targets("running_meta_ads")
+        if todo:
+            token or sys.exit("APIFY_TOKEN is not set (or use --skip-meta).")
+            print(f"Meta: searching the Ad Library for {len(todo)} showrooms")
+            ads = meta.run_search(token, [plan.rows[r]["company"] for r in todo], args.ads_per_search)
+            running = 0
+            for r in todo:
+                v = plan.rows[r]
+                res = meta.result_for(v["company"], v.get("website", ""), ads)
+                running += res["running_meta_ads"] == "Y"
+                plan.set(r, res)
+            print(f"Meta: {running} of {len(todo)} running Meta ads ({len(ads)} ads checked)")
+
+    # Stage 3: Google search for "kitchen showroom [town]"
+    if not args.skip_google:
+        todo = [r for r in targets("search_result") if str(plan.rows[r].get("town", "")).strip()]
+        if todo:
+            token or sys.exit("APIFY_TOKEN is not set (or use --skip-google).")
+            check_towns = sorted({plan.rows[r]["town"].strip() for r in todo})
+            print(f"Google: searching 'kitchen showroom [town]' for {len(check_towns)} towns ({len(todo)} showrooms)")
+            searches = google.run_searches(token, check_towns)
+            # Stage 1 already ran the same search on Maps for its towns; reuse
+            # its top 3 as the map pack and only look up the rest.
+            packs = google.map_packs_from_items(items, [t for t in check_towns if t in towns])
+            missing = [t for t in check_towns if t not in packs]
+            packs.update(google.run_map_packs(token, missing))
+            found = Counter()
+            for r in todo:
+                v = plan.rows[r]
+                town = v["town"].strip()
+                res = google.result_for(v["company"], v.get("website", ""), searches.get(town), packs.get(town))
+                found[res["search_result"]] += 1
+                plan.set(r, res)
+            print("Google: " + ", ".join(f"{n} {k}" for k, n in found.most_common()))
+            if len(searches) < len(check_towns):
+                print(f"  WARNING: no Google result came back for {len(check_towns) - len(searches)} towns")
+
     if plan.out_of_room:
         print(f"WARNING: Prospects tab is full; {plan.out_of_room} prospects not added. Extend formulas past row 3003.")
 
@@ -160,7 +224,7 @@ def main(argv=None):
         print(f"Dry run: {plan.added} new, {plan.filled} updated. Written to {out}")
     else:
         n = write(spreadsheet, plan)
-        print(f"Sheet: {plan.added} new prospects added, {plan.filled} existing rows filled in ({n} ranges written)")
+        print(f"Sheet: {plan.added} new prospects added, {plan.filled} existing rows updated ({n} ranges written)")
 
 
 if __name__ == "__main__":
