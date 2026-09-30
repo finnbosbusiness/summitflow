@@ -12,15 +12,14 @@ API = "https://api.company-information.service.gov.uk"
 
 _STATUS = {
     "active": "Active",
-    "dissolved": "Dissolved",
-    "closed": "Dissolved",
-    "converted-closed": "Dissolved",
     "liquidation": "Liquidation",
     "administration": "Liquidation",
     "insolvency-proceedings": "Liquidation",
     "receivership": "Liquidation",
     "voluntary-arrangement": "Active",
 }
+# Company number prefixes for Scottish and Northern Irish registrations.
+_NOT_ENGLAND_WALES = ("SC", "SO", "SL", "NI", "NC", "NL", "R0")
 
 
 class CompaniesHouse:
@@ -56,7 +55,7 @@ class CompaniesHouse:
 
         out = {
             "company_number": match["company_number"],
-            "company_status": _STATUS.get(match.get("company_status", ""), "Not found"),
+            "company_status": _STATUS[match["company_status"]],
             "incorporated": match.get("date_of_creation", ""),
         }
         officers = self._get(f"/company/{match['company_number']}/officers", items_per_page=50) or {}
@@ -72,10 +71,19 @@ def best_match(name, postcode, candidates):
 
     Accept a very close name match on its own, or a reasonable name match
     whose registered address shares the outward postcode (e.g. CV34).
+
+    Dissolved companies are never matched: the showroom is open on Google
+    Maps, so a dissolved company with the same name is an old or unrelated
+    business, not this one. Scottish and Northern Irish registrations are
+    skipped for the same reason, since every prospect is in England.
     """
     area = outward_postcode(postcode)
     best, best_score = None, 0.0
     for c in candidates:
+        if c.get("company_status") not in _STATUS:
+            continue
+        if (c.get("company_number") or "").upper().startswith(_NOT_ENGLAND_WALES):
+            continue
         if c.get("company_type") in ("ltd", "llp", "private-limited-guarant-nsc", "plc") or not c.get("company_type"):
             sim = name_similarity(name, c.get("title", ""))
             same_area = bool(area) and area in (c.get("address_snippet") or "").upper()
@@ -101,8 +109,8 @@ def pick_director(officers):
 def format_officer_name(raw: str) -> str:
     """'SMITH, John Paul' -> 'John Paul Smith'. Corporate officers pass through."""
     if "," not in raw:
-        return raw.strip()
-    surname, forenames = (p.strip() for p in raw.split(",", 1))
+        return raw.strip(" ,")
+    surname, forenames = (p.strip(" ,") for p in raw.split(",", 1))
     # Drop titles such as 'Mr' that Companies House sometimes leaves in.
     words = [w for w in forenames.split() if w.lower().rstrip(".") not in ("mr", "mrs", "ms", "miss", "dr")]
     return " ".join(words + [surname.title()])

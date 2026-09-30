@@ -1,6 +1,7 @@
+import csv
 import json
 
-from prospector import maps
+from prospector import location, maps
 from prospector.chains import FALLBACK_CHAINS, is_chain
 from prospector.columns import FORMULA_COLUMNS, INPUT_COLUMNS, contiguous_blocks
 from prospector.companies_house import best_match, format_officer_name, pick_director
@@ -37,20 +38,74 @@ def test_blocks_never_cover_formula_columns():
     assert sum(len(b[2]) for b in contiguous_blocks()) == len(INPUT_COLUMNS)
 
 
-def test_to_prospect_uses_searched_town():
-    p = maps.to_prospect(place(city="Royal Leamington Spa", searchString="kitchen showroom Leamington Spa"), TOWNS)
-    assert p["town"] == "Leamington Spa"
-    assert p["region"] == "West Midlands"
+def test_to_prospect_uses_own_town():
+    p, _ = maps.to_prospect(place(city="Royal Leamington Spa", searchString="kitchen showroom Warwick"), TOWNS)
+    assert p["town"] == "Royal Leamington Spa"
+    assert p["_searched_region"] == "West Midlands"
     assert p["physical_showroom"] == "Y"
     assert p["source"] == "Google Maps"
+    assert maps.to_prospect(place(city=""), TOWNS)[0]["town"] == "Warwick"
 
 
 def test_to_prospect_filters():
-    assert maps.to_prospect(place(title="Bob's Plumbing", categoryName="Plumber", categories=[]), TOWNS) is None
-    assert maps.to_prospect(place(permanentlyClosed=True), TOWNS) is None
-    remodeler = maps.to_prospect(place(categoryName="Kitchen remodeler", categories=[]), TOWNS)
+    assert maps.to_prospect(place(title="Bob's Plumbing", categoryName="Plumber", categories=[]), TOWNS)[1] == "not kitchen"
+    assert maps.to_prospect(place(permanentlyClosed=True), TOWNS)[1] == "closed"
+    remodeler, _ = maps.to_prospect(place(categoryName="Kitchen remodeler", categories=[]), TOWNS)
     assert remodeler["physical_showroom"] == ""
-    assert maps.to_prospect(place(website="https://facebook.com/acme"), TOWNS)["website"] == ""
+    assert maps.to_prospect(place(website="https://facebook.com/acme"), TOWNS)[0]["website"] == ""
+
+
+def test_off_topic_businesses_skipped():
+    def reason(**kw):
+        return maps.to_prospect(place(**kw), TOWNS)[1]
+    assert reason(title="Brondi | Coffee & Kitchen", categoryName="Coffee machine supplier") == "not kitchen"
+    assert reason(title="Macphersons Appliances", categoryName="Appliance store") == "not kitchen"
+    assert reason(title="T & S Heating", categoryName="Bathroom supply store", categories=["Kitchen supply store"]) == "not kitchen"
+    assert reason(title="Q Stone Quartz & Kitchens", categoryName="Countertop store") == "not kitchen"
+    # A kitchen showroom that also sells appliances stays in
+    assert reason(title="Connelly's Kitchens & Appliances", categoryName="Kitchen furniture store") is None
+
+
+def test_branch_pages_and_clean_urls():
+    assert maps.to_prospect(place(website="https://home-design-schmidt.uk/showrooms/solihull/"), TOWNS)[1] == "branch"
+    assert maps.to_prospect(place(website="https://mkm.com/branches/nottingham?utm_source=GMB"), TOWNS)[1] == "branch"
+    p, _ = maps.to_prospect(place(website="https://www.avantikb.co.uk/?utm_source=google&utm_medium=gmb"), TOWNS)
+    assert p["website"] == "https://www.avantikb.co.uk/"
+
+
+def test_location():
+    assert location.normalise("b913jw") == "B91 3JW"
+    assert location.normalise("B91") == ""
+    assert location.region_from_area("NG17 7LF") == "East Midlands"
+    assert location.region_from_area("S18 2GG") == "Yorkshire & Humber"
+    assert location.country_of_region("Wales") == "Wales"
+    assert location.country_of_region("London") == "England"
+    pcs = ["CV34 4AB", "B10 1AA", "", "B2 4QA", "B91 3JW"]
+    assert sorted(pcs, key=location.sort_key) == ["B2 4QA", "B10 1AA", "B91 3JW", "CV34 4AB", ""]
+
+
+def test_postcodes_io_parsing():
+    class Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"status": 200, "result": [
+                {"query": "NG17 7LF", "result": {"region": "East Midlands", "country": "England"}},
+                {"query": "HU1 1AA", "result": {"region": "Yorkshire and The Humber", "country": "England"}},
+                {"query": "CF10 1AA", "result": {"region": None, "country": "Wales"}},
+                {"query": "ZZ1 1ZZ", "result": None},
+            ]}
+
+    class Session:
+        def post(self, url, json, timeout):
+            return Resp()
+
+    out = location.lookup(["NG17 7LF", "hu11aa", "CF10 1AA", "ZZ1 1ZZ", ""], session=Session())
+    assert out["NG17 7LF"]["region"] == "East Midlands"
+    assert out["HU1 1AA"]["region"] == "Yorkshire & Humber"
+    assert out["CF10 1AA"]["region"] == "Wales"
+    assert "ZZ1 1ZZ" not in out
 
 
 def test_chain():
@@ -104,6 +159,15 @@ def test_best_match():
     assert best_match("Nothing Alike", "B1 1AA", cands) is None
 
 
+def test_best_match_skips_dissolved_and_non_english():
+    dissolved = [{"title": "REEHAL KITCHENS LIMITED", "company_number": "07004509", "company_status": "dissolved",
+                  "address_snippet": "Birmingham B21 0LH", "company_type": "ltd"}]
+    assert best_match("Reehal Kitchens", "B21 0LH", dissolved) is None
+    ni = [{"title": "CHOICE INTERIORS LTD", "company_number": "NI628519", "company_status": "active",
+           "address_snippet": "Belfast BT1 1AA", "company_type": "ltd"}]
+    assert best_match("Choice Interiors", "B11 2EX", ni) is None
+
+
 def test_director():
     officers = [
         {"name": "JONES, Mary", "officer_role": "secretary", "appointed_on": "2001-01-01"},
@@ -113,6 +177,8 @@ def test_director():
     ]
     assert pick_director(officers) == "John Paul Smith"
     assert format_officer_name("ACME HOLDINGS LIMITED") == "ACME HOLDINGS LIMITED"
+    assert format_officer_name("BRUNDRETT, Richard,") == "Richard Brundrett"
+    assert format_officer_name("BOGUE, Seamus Anthony,") == "Seamus Anthony Bogue"
 
 
 def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
@@ -120,8 +186,13 @@ def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
         place(),
         place(searchString="kitchen showroom Leamington Spa"),  # duplicate in second town
         place(title="Howdens", website="https://howdens.com"),
-        place(title="Beta Kitchen Design", website="", postalCode="CV32 5AA", searchString="kitchen showroom Leamington Spa"),
+        place(title="Beta Kitchen Design", website="", postalCode="B91 5AA", searchString="kitchen showroom Leamington Spa"),
+        # Found by a West Midlands search but actually in Nottingham: kept, labelled East Midlands
+        place(title="Charles Yorke", website="https://www.charlesyorke.com/", postalCode="NG17 7LA", city="Kirkby-in-Ashfield"),
+        # In Wales: dropped
+        place(title="Cardiff Kitchens", website="https://cardiffkitchens.co.uk", postalCode="CF10 1AA", city="Cardiff"),
     ]
+    monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
     f = tmp_path / "items.json"
     f.write_text(json.dumps(items))
     towns = tmp_path / "towns.csv"
@@ -131,9 +202,13 @@ def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
     main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--dry-run"])
     out = capsys.readouterr().out
-    assert "2 independent kitchen businesses, 1 chains skipped" in out
-    csv_text = next(tmp_path.glob("prospects-*.csv")).read_text()
-    assert "Acme Kitchens" in csv_text and "Beta Kitchen Design" in csv_text and "Howdens" not in csv_text
+    assert "3 independent kitchen showrooms kept" in out
+    assert "1 chain" in out and "1 duplicate" in out and "1 outside England" in out
+    rows = list(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
+    # Sorted by postcode: B91, CV34, NG17
+    assert [r["company"] for r in rows] == ["Beta Kitchen Design", "Acme Kitchens", "Charles Yorke"]
+    assert [r["sheet_row"] for r in rows] == ["4", "5", "6"]
+    assert rows[2]["region"] == "East Midlands" and rows[2]["town"] == "Kirkby-in-Ashfield"
 
 
 def test_sheet_id():

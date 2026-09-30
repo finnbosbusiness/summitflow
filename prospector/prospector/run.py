@@ -10,15 +10,18 @@ import json
 import os
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
-from . import maps
+from . import location, maps
 from .chains import FALLBACK_CHAINS, is_chain
 from .columns import INPUT_COLUMNS
 from .companies_house import CompaniesHouse
 from .matching import prospect_key
 from .sheet import Plan, open_sheet, read_chains, read_prospects, write
 
+# Only showrooms in these countries are added.
+COUNTRIES = {"England"}
 DEFAULT_SHEET_ID = "1OB_KfC0N6aigLFe5-_y8D4_VFD8RW7zRnXEXCKN3ZYQ"
 HERE = Path(__file__).resolve().parent.parent
 OUTPUT = HERE / "output"
@@ -46,6 +49,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--towns", default=str(HERE / "towns.csv"), help="CSV with town,region columns")
     ap.add_argument("--region", help="only run towns in this region, e.g. 'West Midlands'")
+    ap.add_argument("--only", help="comma-separated towns to run, e.g. 'Birmingham,Solihull'")
     ap.add_argument("--max-towns", type=int, help="only the first N towns (for a cheap test)")
     ap.add_argument("--max-per-town", type=int, default=40, help="Google Maps results per town (default 40)")
     ap.add_argument("--maps-json", help="reuse a saved Apify result instead of scraping again")
@@ -61,6 +65,9 @@ def main(argv=None):
         sys.exit("No Google credentials set. Set GOOGLE_SERVICE_ACCOUNT_JSON, or use --dry-run.")
 
     towns = load_towns(args.towns, args.region)
+    if args.only:
+        wanted = {t.strip().lower() for t in args.only.split(",") if t.strip()}
+        towns = {t: r for t, r in towns.items() if t.lower() in wanted}
     if args.max_towns:
         towns = dict(list(towns.items())[: args.max_towns])
     if not towns:
@@ -85,24 +92,42 @@ def main(argv=None):
         raw.write_text(json.dumps(items))
         print(f"Saved raw Maps results to {raw} (reuse with --maps-json)")
 
-    prospects, skipped_chain, skipped_other, seen = [], 0, 0, set()
+    counts = Counter()
+    prospects, seen = [], set()
     for item in items:
-        p = maps.to_prospect(item, towns)
+        p, reason = maps.to_prospect(item, towns)
         if not p:
-            skipped_other += 1
+            counts[reason] += 1
             continue
         if is_chain(p["company"], p["website"], chains):
-            skipped_chain += 1
+            counts["chain"] += 1
             continue
-        # The same showroom often shows up in neighbouring towns' searches;
-        # keep the first (the town it was found for first).
+        # The same showroom often shows up in several towns' searches.
         key = prospect_key(p["website"], p["company"], p["postcode"])
         if key in seen:
+            counts["duplicate"] += 1
             continue
         seen.add(key)
         prospects.append(p)
-    print(f"Maps: {len(items)} places, {len(prospects)} independent kitchen businesses, "
-          f"{skipped_chain} chains skipped, {skipped_other} not kitchen/closed")
+
+    # Region from each showroom's own postcode, not from the search.
+    places = location.lookup(p["postcode"] for p in prospects)
+    kept = []
+    for p in prospects:
+        info = places.get(location.normalise(p["postcode"]))
+        region = (info or {}).get("region") or location.region_from_area(p["postcode"]) or p["_searched_region"]
+        if location.country_of_region(region) not in COUNTRIES:
+            counts["outside England"] += 1
+            continue
+        p["region"] = region
+        kept.append(p)
+    # New rows go onto the sheet in postcode order.
+    prospects = sorted(kept, key=lambda p: location.sort_key(p["postcode"]))
+
+    print(f"Maps: {len(items)} places, {len(prospects)} independent kitchen showrooms kept. Skipped: "
+          + ", ".join(f"{n} {why}" for why, n in counts.most_common()))
+    by_region = Counter(p["region"] or "unknown" for p in prospects)
+    print("  by region: " + ", ".join(f"{r} {n}" for r, n in sorted(by_region.items())))
 
     rows = [plan.upsert(p) for p in prospects]
 
