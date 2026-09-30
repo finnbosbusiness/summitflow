@@ -121,15 +121,19 @@ def country_of_region(region: str) -> str:
 # County or area names Google sometimes gives in place of the town.
 _NOT_TOWNS = {
     "bedfordshire", "beds", "berkshire", "buckinghamshire", "cambridgeshire", "cheshire", "cornwall", "cumbria",
-    "derbyshire", "devon", "dorset", "durham", "essex", "gloucestershire", "greater manchester", "hampshire",
+    "derbyshire", "devon", "dorset", "county durham", "essex", "gloucestershire", "greater manchester", "hampshire",
     "herefordshire", "hertfordshire", "kent", "lancashire", "leicestershire", "lincolnshire", "merseyside",
     "middlesex", "norfolk", "northamptonshire", "northumberland", "nottinghamshire", "oxfordshire", "rutland",
     "shropshire", "somerset", "staffordshire", "suffolk", "surrey", "sussex", "east sussex", "west sussex",
     "tyne and wear", "warwickshire", "west midlands", "wiltshire", "worcestershire", "yorkshire",
     "north yorkshire", "south yorkshire", "west yorkshire", "east riding of yorkshire", "isle of wight", "uk",
-    "england", "farm", "garden", "estate", "house", "surrounding areas", "industrial estate", "unit",
+    "england", "farm", "garden", "estate", "house", "surrounding areas", "industrial estate", "unit", "mobile",
 }
 
+
+_ALIASES = {"ashton u lyne": "Ashton-under-Lyne", "newcastle-upon-tyne": "Newcastle upon Tyne",
+            "stoke on trent": "Stoke-on-Trent", "burton upon trent": "Burton-on-Trent"}
+_SMALL_WORDS = {"upon", "on", "under", "le", "la", "de", "in", "by", "the", "of", "en", "sub"}
 
 # Postcode areas whose post town is London (the rest of Greater London,
 # e.g. BR or CR, has its own post towns).
@@ -153,6 +157,9 @@ def clean_town(town, address="", postcode=""):
         t = "London"
     if t.isupper() or t.islower():
         t = t.title()
+    t = _ALIASES.get(t.lower(), t)
+    # "Milton keynes" -> "Milton Keynes"; connecting words stay lower case.
+    t = " ".join(w if w.lower() in _SMALL_WORDS and i else w[:1].upper() + w[1:] for i, w in enumerate(t.split()))
     if t == "Newcastle" and area(postcode) == "ST":
         t = "Newcastle-under-Lyme"
     elif t == "Newcastle" and area(postcode) == "NE":
