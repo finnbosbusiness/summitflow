@@ -62,6 +62,7 @@ jobs:
           MAX_TOWNS: ${{ inputs.max_towns }}
           DRY_RUN: ${{ inputs.dry_run }}
           CHECKS_ONLY: ${{ inputs.checks_only }}
+          PYTHONUNBUFFERED: "1"
         # Scraped data is never uploaded as a workflow artifact: this repo is
         # public, so artifacts would be downloadable by anyone.
         run: |

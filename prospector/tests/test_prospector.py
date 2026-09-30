@@ -347,3 +347,34 @@ def test_stages_2_and_3_end_to_end(tmp_path, monkeypatch, capsys):
     assert rows["Madina Kitchens"]["competitor_ranking"] == "Cucina Kitchens"
     assert rows["Cucina Kitchens"]["search_result"] == "Map pack"
     assert rows["Cucina Kitchens"]["running_meta_ads"] == "N"
+
+
+def test_failed_stage_does_not_stop_the_run(tmp_path, monkeypatch, capsys):
+    items = [place(title="Madina Kitchens", website="https://www.madinakitchens.co.uk/", postalCode="B12 8DN",
+                   city="Birmingham", searchString="kitchen showroom Birmingham", rank=1)]
+    f = tmp_path / "items.json"
+    f.write_text(json.dumps(items))
+    towns = tmp_path / "towns.csv"
+    towns.write_text("town,region\nBirmingham,West Midlands\n")
+
+    def fake_actor(token, actor, payload, timeout_s=0):
+        if actor == meta.ACTOR:
+            raise RuntimeError("ended with status ABORTED: out of credit")
+        return [serp() | {"searchQuery": {"term": "kitchen showroom Birmingham"}}]
+
+    monkeypatch.setattr("prospector.meta.run_actor", fake_actor)
+    monkeypatch.setattr("prospector.google.run_actor", fake_actor)
+    monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
+    monkeypatch.setenv("APIFY_TOKEN", "x")
+    monkeypatch.delenv("GOOGLE_SERVICE_ACCOUNT_JSON", raising=False)
+    monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
+    monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
+    try:
+        main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--dry-run"])
+        raise AssertionError("expected a non-zero exit")
+    except SystemExit as e:
+        assert "Meta" in str(e)
+    out = capsys.readouterr().out
+    assert "Meta: FAILED" in out and "out of credit" in out
+    row = next(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
+    assert row["search_result"] == "Map pack" and row["running_meta_ads"] == ""

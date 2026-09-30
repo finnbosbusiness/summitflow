@@ -171,44 +171,54 @@ def main(argv=None):
                 out.append(r)
         return out
 
+    failures = []
+
     # Stage 2: Meta Ad Library
-    if not args.skip_meta:
-        todo = targets("running_meta_ads")
-        if todo:
-            token or sys.exit("APIFY_TOKEN is not set (or use --skip-meta).")
-            print(f"Meta: searching the Ad Library for {len(todo)} showrooms")
-            ads = meta.run_search(token, [plan.rows[r]["company"] for r in todo], args.ads_per_search)
-            running = 0
-            for r in todo:
-                v = plan.rows[r]
-                res = meta.result_for(v["company"], v.get("website", ""), ads)
-                running += res["running_meta_ads"] == "Y"
-                plan.set(r, res)
-            print(f"Meta: {running} of {len(todo)} running Meta ads ({len(ads)} ads checked)")
+    try:
+        if not args.skip_meta:
+            todo = targets("running_meta_ads")
+            if todo:
+                token or sys.exit("APIFY_TOKEN is not set (or use --skip-meta).")
+                print(f"Meta: searching the Ad Library for {len(todo)} showrooms")
+                ads = meta.run_search(token, [plan.rows[r]["company"] for r in todo], args.ads_per_search)
+                running = 0
+                for r in todo:
+                    v = plan.rows[r]
+                    res = meta.result_for(v["company"], v.get("website", ""), ads)
+                    running += res["running_meta_ads"] == "Y"
+                    plan.set(r, res)
+                print(f"Meta: {running} of {len(todo)} running Meta ads ({len(ads)} ads checked)")
+    except Exception as e:  # keep going: the other stages' results still get written
+        failures.append("Meta")
+        print(f"Meta: FAILED, skipped this run ({e})")
 
     # Stage 3: Google search for "kitchen showroom [town]"
-    if not args.skip_google:
-        todo = [r for r in targets("search_result") if str(plan.rows[r].get("town", "")).strip()]
-        if todo:
-            token or sys.exit("APIFY_TOKEN is not set (or use --skip-google).")
-            check_towns = sorted({plan.rows[r]["town"].strip() for r in todo})
-            print(f"Google: searching 'kitchen showroom [town]' for {len(check_towns)} towns ({len(todo)} showrooms)")
-            searches = google.run_searches(token, check_towns)
-            # Stage 1 already ran the same search on Maps for its towns; reuse
-            # its top 3 as the map pack and only look up the rest.
-            packs = google.map_packs_from_items(items, [t for t in check_towns if t in towns])
-            missing = [t for t in check_towns if t not in packs]
-            packs.update(google.run_map_packs(token, missing))
-            found = Counter()
-            for r in todo:
-                v = plan.rows[r]
-                town = v["town"].strip()
-                res = google.result_for(v["company"], v.get("website", ""), searches.get(town), packs.get(town))
-                found[res["search_result"]] += 1
-                plan.set(r, res)
-            print("Google: " + ", ".join(f"{n} {k}" for k, n in found.most_common()))
-            if len(searches) < len(check_towns):
-                print(f"  WARNING: no Google result came back for {len(check_towns) - len(searches)} towns")
+    try:
+        if not args.skip_google:
+            todo = [r for r in targets("search_result") if str(plan.rows[r].get("town", "")).strip()]
+            if todo:
+                token or sys.exit("APIFY_TOKEN is not set (or use --skip-google).")
+                check_towns = sorted({plan.rows[r]["town"].strip() for r in todo})
+                print(f"Google: searching 'kitchen showroom [town]' for {len(check_towns)} towns ({len(todo)} showrooms)")
+                searches = google.run_searches(token, check_towns)
+                # Stage 1 already ran the same search on Maps for its towns; reuse
+                # its top 3 as the map pack and only look up the rest.
+                packs = google.map_packs_from_items(items, [t for t in check_towns if t in towns])
+                missing = [t for t in check_towns if t not in packs]
+                packs.update(google.run_map_packs(token, missing))
+                found = Counter()
+                for r in todo:
+                    v = plan.rows[r]
+                    town = v["town"].strip()
+                    res = google.result_for(v["company"], v.get("website", ""), searches.get(town), packs.get(town))
+                    found[res["search_result"]] += 1
+                    plan.set(r, res)
+                print("Google: " + ", ".join(f"{n} {k}" for k, n in found.most_common()))
+                if len(searches) < len(check_towns):
+                    print(f"  WARNING: no Google result came back for {len(check_towns) - len(searches)} towns")
+    except Exception as e:  # keep going: the other stages' results still get written
+        failures.append("Google")
+        print(f"Google: FAILED, skipped this run ({e})")
 
     if plan.out_of_room:
         print(f"WARNING: Prospects tab is full; {plan.out_of_room} prospects not added. Extend formulas past row 3003.")
@@ -225,6 +235,10 @@ def main(argv=None):
     else:
         n = write(spreadsheet, plan)
         print(f"Sheet: {plan.added} new prospects added, {plan.filled} existing rows updated ({n} ranges written)")
+    if failures:
+        # Fail the workflow so the red run shows something needs a look,
+        # after everything that did work has been written.
+        sys.exit(f"Finished with failed stages: {', '.join(failures)}")
 
 
 if __name__ == "__main__":
