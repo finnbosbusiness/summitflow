@@ -1,8 +1,8 @@
-name: Weekly prospect run
+name: Prospect run
 
+# Run by hand (Actions -> Run workflow) when the Call Queue is running low,
+# one region at a time, so you only pay for leads you'll call.
 on:
-  schedule:
-    - cron: "17 5 * * 1"   # Mondays 05:17 UTC, one region per week (see "Pick region")
   workflow_dispatch:
     inputs:
       region:
@@ -26,7 +26,7 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 180
     defaults:
       run:
         working-directory: prospector
@@ -36,28 +36,14 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
-      - name: Pick region
-        id: region
-        env:
-          INPUT_REGION: ${{ inputs.region }}
-        run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            # Rotate through England's regions, one per week, so every region
-            # is refreshed every 9 weeks at a steady weekly cost.
-            regions=("London" "South East" "South West" "East of England" "East Midlands" \
-                     "West Midlands" "Yorkshire & Humber" "North West" "North East")
-            week=$(( 10#$(date -u +%V) ))
-            echo "value=${regions[$(( week % 9 ))]}" >> "$GITHUB_OUTPUT"
-          else
-            echo "value=$INPUT_REGION" >> "$GITHUB_OUTPUT"
-          fi
       - name: Run
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           COMPANIES_HOUSE_API_KEY: ${{ secrets.COMPANIES_HOUSE_API_KEY }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHEET_ID: ${{ vars.SHEET_ID }}
-          REGION: ${{ steps.region.outputs.value }}
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          REGION: ${{ inputs.region }}
           ONLY: ${{ inputs.only }}
           MAX_TOWNS: ${{ inputs.max_towns }}
           DRY_RUN: ${{ inputs.dry_run }}

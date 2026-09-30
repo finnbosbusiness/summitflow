@@ -1,7 +1,7 @@
 import csv
 import json
 
-from prospector import google, location, maps, meta
+from prospector import google, location, maps, meta, places
 from prospector.chains import FALLBACK_CHAINS, is_chain
 from prospector.columns import FORMULA_COLUMNS, INPUT_COLUMNS, contiguous_blocks
 from prospector.companies_house import best_match, format_officer_name, pick_director
@@ -339,14 +339,15 @@ def test_stages_2_and_3_end_to_end(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
     monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
     main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--dry-run"])
-    # Map pack reused from the stage 1 Maps results: no extra Maps run
-    assert calls == [meta.ACTOR, google.SEARCH_ACTOR]
+    # Map pack reused from the stage 1 results: no extra Places search
+    assert calls == [google.SEARCH_ACTOR, meta.ACTOR]
     rows = {r["company"]: r for r in csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open())}
     assert rows["Madina Kitchens"]["running_meta_ads"] == "Y"
     assert rows["Madina Kitchens"]["search_result"] == "Not found"
     assert rows["Madina Kitchens"]["competitor_ranking"] == "Cucina Kitchens"
     assert rows["Cucina Kitchens"]["search_result"] == "Map pack"
-    assert rows["Cucina Kitchens"]["running_meta_ads"] == "N"
+    # Already in the map pack: not a gap prospect, so no paid Meta lookup
+    assert rows["Cucina Kitchens"]["running_meta_ads"] == ""
 
 
 def test_failed_stage_does_not_stop_the_run(tmp_path, monkeypatch, capsys):
@@ -358,9 +359,7 @@ def test_failed_stage_does_not_stop_the_run(tmp_path, monkeypatch, capsys):
     towns.write_text("town,region\nBirmingham,West Midlands\n")
 
     def fake_actor(token, actor, payload, timeout_s=0):
-        if actor == meta.ACTOR:
-            raise RuntimeError("ended with status ABORTED: out of credit")
-        return [serp() | {"searchQuery": {"term": "kitchen showroom Birmingham"}}]
+        raise RuntimeError("failed to start (403): Monthly usage hard limit exceeded")
 
     monkeypatch.setattr("prospector.meta.run_actor", fake_actor)
     monkeypatch.setattr("prospector.google.run_actor", fake_actor)
@@ -373,8 +372,90 @@ def test_failed_stage_does_not_stop_the_run(tmp_path, monkeypatch, capsys):
         main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--dry-run"])
         raise AssertionError("expected a non-zero exit")
     except SystemExit as e:
-        assert "Meta" in str(e)
+        assert "Google" in str(e)
     out = capsys.readouterr().out
-    assert "Meta: FAILED" in out and "out of credit" in out
+    assert "Google: FAILED" in out and "usage hard limit" in out
+    # The new showroom is still written
     row = next(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
-    assert row["search_result"] == "Map pack" and row["running_meta_ads"] == ""
+    assert row["company"] == "Madina Kitchens" and row["search_result"] == ""
+
+
+# ---- Google Places ----
+
+def gplace(name, pc="B91 3JW", town="Solihull", site="https://example.co.uk/", types=None, primary="General contractor",
+           status="OPERATIONAL"):
+    # Shape taken from a real Places API (New) Text Search response
+    return {"displayName": {"text": name}, "websiteUri": site, "nationalPhoneNumber": "07791 687261",
+            "rating": 5, "userRatingCount": 25, "businessStatus": status,
+            "primaryTypeDisplayName": {"text": primary},
+            "types": types or ["furniture_store", "home_improvement_store", "general_contractor", "home_goods_store", "store"],
+            "addressComponents": [
+                {"longText": "Widney Manor Road", "types": ["route"]},
+                {"longText": town, "types": ["postal_town"]},
+                {"longText": "England", "types": ["administrative_area_level_1", "political"]},
+                {"longText": pc, "types": ["postal_code"]}]}
+
+
+def test_places_item_conversion():
+    it = places.to_item(gplace("Kitchens of Solihull LTD"), "kitchen showroom Solihull", 1)
+    assert (it["title"], it["city"], it["postalCode"], it["rank"]) == ("Kitchens of Solihull LTD", "Solihull", "B91 3JW", 1)
+    assert "furniture store" in it["categories"] and it["_trusted"]
+    p, _ = maps.to_prospect(it, {"Solihull": "West Midlands"})
+    assert p["physical_showroom"] == "Y" and p["google_rating"] == 5 and p["town"] == "Solihull"
+    assert places.to_item(gplace("X", status="CLOSED_PERMANENTLY"), "q", 1)["permanentlyClosed"]
+
+
+def test_places_relevance_trusts_google_but_drops_other_trades():
+    def reason(name, **kw):
+        return maps.to_prospect(places.to_item(gplace(name, **kw), "kitchen showroom Solihull", 1), {})[1]
+    assert reason("No Thirty One") is None
+    assert reason("Culina+Balneo") is None
+    assert reason("Bluewater KBB") is None
+    assert reason("Bathroom Centre") == "not kitchen"
+    assert reason("Macphersons Appliances") == "not kitchen"
+    assert reason("Howdens - Solihull", primary="Hardware store") == "not kitchen"
+
+
+def test_places_pagination():
+    calls = []
+
+    class Resp:
+        def __init__(self, data):
+            self.status_code, self._data, self.text = 200, data, ""
+
+        def json(self):
+            return self._data
+
+    class Session:
+        def post(self, url, json, headers, timeout):
+            calls.append(json.get("pageToken"))
+            if not json.get("pageToken"):
+                return Resp({"places": [gplace(f"A{i}") for i in range(20)], "nextPageToken": "t2"})
+            return Resp({"places": [gplace(f"B{i}") for i in range(20)]})
+
+    assert len(places.search("k", "q", 20, Session())) == 20 and calls == [None]
+    calls.clear()
+    assert len(places.search("k", "q", 30, Session())) == 30 and calls == [None, "t2"]
+    items = places.run_search("k", ["kitchen showroom Solihull"], 3, Session())
+    assert [i["rank"] for i in items] == [1, 2, 3]
+
+
+def test_stage1_searches_places_per_town(tmp_path, monkeypatch, capsys):
+    seen = []
+
+    def fake_search(key, queries, max_per_query=20, session=None):
+        seen.append((key, list(queries), max_per_query))
+        return [places.to_item(gplace("No Thirty One", pc="B93 0HL"), "kitchen showroom Solihull", 1)]
+
+    monkeypatch.setattr("prospector.places.run_search", fake_search)
+    monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
+    monkeypatch.setenv("GOOGLE_PLACES_API_KEY", "k")
+    monkeypatch.delenv("GOOGLE_SERVICE_ACCOUNT_JSON", raising=False)
+    monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
+    monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
+    towns = tmp_path / "towns.csv"
+    towns.write_text("town,region\nSolihull,West Midlands\n")
+    main(["--towns", str(towns), "--skip-companies-house", "--skip-meta", "--skip-google", "--dry-run"])
+    assert seen == [("k", ["kitchen showroom Solihull"], 20)]
+    row = next(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
+    assert row["company"] == "No Thirty One" and row["region"] == "West Midlands"
