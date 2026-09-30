@@ -19,6 +19,17 @@ Premium check (positioning, brands, budget signals) and TPS are still manual.
 - **Running Google Ads** is Y only when they have an ad on that search. They could be advertising on other searches; this measures the search their customers would type.
 - These six columns are refreshed whenever a run finds the showroom again, so they can change. Your edits to them will be overwritten; every other column is only ever filled when blank.
 
+## Trades
+
+Pick the trade with **niche** when you run the workflow (or `--niche` locally):
+
+| Niche | Google search | Tab | Call queue |
+|---|---|---|---|
+| kitchen | kitchen showroom [town] | All Prospects | Call Queue |
+| roofing | roofing company [town] | Roofing Prospects (formulas to row 20003) | Roofing Call Queue |
+
+Roofing keeps listings with "roof" in the name or Google category and drops roofing merchants and suppliers (SIG, Burton Roofing, "supplies", "merchants"), rooftop bars and roof racks. The kitchen chain list isn't applied to roofers. Roofers who share a lead-generation website are kept and matched by name and postcode. Town names are tidied as rows are added (St not Saint, a county or postcode replaced with the town from the address) and rows go in grouped by town.
+
 ## Finding decision makers
 
 Actions → Prospect run → tick **find decision makers**. For every row on All Prospects with no Decision maker name it:
@@ -27,6 +38,8 @@ Actions → Prospect run → tick **find decision makers**. For every row on All
 2. If a page gives a company registration number (usually in the footer), looks it up on Companies House and uses the longest-serving director. Company number, status and incorporation date are filled in too, replacing a "Not found".
 3. Otherwise uses a name the site gives as Owner, Founder, Managing Director, Director or Proprietor ("Dave Smith, Founder", "Owner: Dave Smith", "Hi, I'm Dave, the owner").
 4. With **facebook** ticked (Apify credit), tries the Facebook page the website links to, with the same rules.
+
+Before it looks anyone up, each run tidies the tab: fixes town names, clears Companies House matches that can't be trusted (one company number on differently named showrooms, or on a one-word name like "Precision Roofing" in several towns), sorts by town and postcode, and re-copies the formulas. A name found on three or more unrelated websites (template filler), a place name, or the business's own name is ignored.
 
 Decision maker role is one of the sheet's dropdown options (Co-founder is written as Founder, Proprietor as Owner). Email is filled in from the site when blank. Nothing already filled in is overwritten. Use **max rows** for a small test first.
 

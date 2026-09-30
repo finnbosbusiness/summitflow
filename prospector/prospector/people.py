@@ -81,7 +81,22 @@ september october november december who we are what why how where when this that
 message chief executive officer ceo md co operations finance marketing creative technical senior lead
 by behind final step first last next north south east west yorkshire lancashire cheshire kent surrey essex
 sussex devon cornwall norfolk suffolk county
+roof roofs roofing roofer roofers roofline construction building builders specialist specialists area areas
+quote quotes free follow should must know trusted businesses occupier jobs led farm meadow local near best
 """.split())
+
+
+def _towns():
+    import csv
+    from pathlib import Path
+    try:
+        with open(Path(__file__).resolve().parent.parent / "towns.csv", newline="") as f:
+            return {r["town"].strip().lower() for r in csv.DictReader(f)}
+    except OSError:
+        return set()
+
+
+_TOWN_NAMES = _towns()
 
 _COMPANY_NO = re.compile(
     r"(?:company|registration|registered|reg\.?|co\.?)\s*(?:in\s+england(?:\s*(?:&|and)\s*wales)?\s*)?"
@@ -152,9 +167,15 @@ def parse(html_text):
     return p
 
 
-def _is_name(name):
+def _is_name(name, company=""):
     words = name.split()
-    return bool(words) and all(w.lower().strip("'") not in _NOT_NAME for w in words) and len(name) <= 40
+    if not words or len(name) > 40 or name.lower() in _TOWN_NAMES:
+        return False
+    if any(w.lower().strip("'.") in _NOT_NAME for w in words):
+        return False
+    # "Margan Roofing" on SB Margan Roofing's site is the business, not a person.
+    company_words = set(re.findall(r"[a-z]+", company.lower()))
+    return not (company_words and all(w.lower().strip("'.") in company_words for w in words))
 
 
 def _clean(name):
@@ -310,9 +331,10 @@ def scan_website(website, session=None):
     return out
 
 
-def decide(scan, companies_house=None):
+def decide(scan, companies_house=None, company=""):
     """Turn a website scan into sheet fields for one row."""
     fields = {}
+    scan = {**scan, "people": [(n, r) for n, r in scan["people"] if _is_name(n, company)]}
     for number in scan["company_numbers"]:
         if not companies_house:
             break
@@ -392,8 +414,20 @@ def main(argv=None):
 
     found, sources = 0, {"Companies House number on website": 0, "named on website": 0}
     stamp = dt.datetime.now().strftime("%Y%m%d-%H%M")
+    # A name found on three or more different showrooms' sites is template
+    # filler (a stock testimonial or "about us" page), not their owner.
+    seen = {}
+    for r in todo:
+        for name, _ in scans[r]["people"][:1]:
+            seen.setdefault(name.lower(), set()).add(domain(plan.rows[r]["website"]))
+    template = {n for n, sites in seen.items() if len(sites) >= 3}
+    if template:
+        print(f"  ignoring names used on 3+ sites: {', '.join(sorted(template))}")
+    for r in todo:
+        scans[r]["people"] = [(n, role) for n, role in scans[r]["people"] if n.lower() not in template]
+
     for i, r in enumerate(todo, 1):
-        fields = decide(scans[r], ch)
+        fields = decide(scans[r], ch, plan.rows[r]["company"])
         if fields.get("decision_maker_name"):
             found += 1
             sources["Companies House number on website" if fields.get("company_number") else "named on website"] += 1

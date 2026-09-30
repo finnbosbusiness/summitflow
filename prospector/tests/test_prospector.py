@@ -686,3 +686,14 @@ def test_unreliable_company_numbers():
         {"company": "Norton Kitchen & Bedroom", "company_number": "5"},
     ]
     assert unreliable_numbers(rows) == {"1", "2", "4"}
+
+
+def test_people_filters_non_names():
+    from prospector.people import _is_name, decide
+    assert not _is_name("Margan Roofing", "SB Margan Roofing")
+    assert not _is_name("Specialists In Braintree")
+    assert not _is_name("Sutton Coldfield")
+    assert not _is_name("Free Quotes")
+    assert _is_name("Steven Atkins", "Atkins Roofing")
+    scan = {"people": [("Prestige Roof", "Founder"), ("Jane Doe", "Owner")], "company_numbers": [], "emails": []}
+    assert decide(scan, company="Prestige Roof LTD")["decision_maker_name"] == "Jane Doe"
