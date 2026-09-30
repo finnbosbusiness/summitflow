@@ -28,7 +28,7 @@ Actions → Prospect run → tick **find decision makers**. For every row on All
 3. Otherwise uses a name the site gives as Owner, Founder, Managing Director, Director or Proprietor ("Dave Smith, Founder", "Owner: Dave Smith", "Hi, I'm Dave, the owner").
 4. With **facebook** ticked (Apify credit), tries the Facebook page the website links to, with the same rules.
 
-Decision maker role says where the name came from, e.g. "Founder (website)" or "Director (Companies House, number from website)". Email is filled in from the site when blank. Nothing already filled in is overwritten. Use **max rows** for a small test first.
+Decision maker role is one of the sheet's dropdown options (Co-founder is written as Founder, Proprietor as Owner). Email is filled in from the site when blank. Nothing already filled in is overwritten. Use **max rows** for a small test first.
 
 Companies House name matches need the distinctive part of the name to agree, so "ASE Kitchens & Bathrooms" no longer matches "KITCHENS & BATHROOMS LTD".
 

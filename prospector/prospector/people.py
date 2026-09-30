@@ -58,6 +58,9 @@ _ROLES = [
     ("Director", r"(?:company\s+)?director"),
     ("Managing Director", r"\bMD\b"),
 ]
+# The sheet's Decision maker role dropdown: Owner, Founder, Managing Director,
+# Director, Marketing Director, General Manager, Other.
+_DROPDOWN = {"Co-founder": "Founder", "Proprietor": "Owner"}
 _ROLE_RANK = {"Owner": 0, "Founder": 0, "Co-founder": 1, "Managing Director": 1, "Proprietor": 1, "Director": 2}
 
 _NAME_WORD = r"(?:O'|Mc|Mac)?[A-Z][a-z]+(?:-[A-Z][a-z]+)?"
@@ -316,12 +319,12 @@ def decide(scan, companies_house=None):
         info = companies_house.by_number(number)
         if info.get("decision_maker_name"):
             fields.update(info)
-            fields["decision_maker_role"] = "Director (Companies House, number from website)"
+            fields["decision_maker_role"] = "Director"
             break
     if not fields.get("decision_maker_name") and scan["people"]:
         name, role = scan["people"][0]
         fields["decision_maker_name"] = name
-        fields["decision_maker_role"] = f"{role} ({scan.get('source', 'website')})"
+        fields["decision_maker_role"] = _DROPDOWN.get(role, role)
     if scan["emails"]:
         fields["email"] = scan["emails"][0]
     return fields
@@ -381,14 +384,13 @@ def main(argv=None):
             if i % 100 == 0:
                 print(f"  websites read: {i}/{len(todo)}")
 
-    found, sources = 0, {}
+    found, sources = 0, {"Companies House number on website": 0, "named on website": 0}
     stamp = dt.datetime.now().strftime("%Y%m%d-%H%M")
     for i, r in enumerate(todo, 1):
         fields = decide(scans[r], ch)
         if fields.get("decision_maker_name"):
             found += 1
-            src = fields["decision_maker_role"].split("(", 1)[-1].rstrip(")")
-            sources[src] = sources.get(src, 0) + 1
+            sources["Companies House number on website" if fields.get("company_number") else "named on website"] += 1
         # Company details found via the website replace a "Not found".
         if fields.get("company_number") and plan.rows[r].get("company_status") in ("", "Not found"):
             plan.set(r, {k: fields.pop(k) for k in ("company_number", "company_status", "incorporated") if k in fields})
@@ -414,7 +416,8 @@ def main(argv=None):
             people = fb.get(url) or []
             if people:
                 n += 1
-                plan.fill(r, {"decision_maker_name": people[0][0], "decision_maker_role": f"{people[0][1]} (Facebook)"})
+                plan.fill(r, {"decision_maker_name": people[0][0],
+                              "decision_maker_role": _DROPDOWN.get(people[0][1], people[0][1])})
         print(f"Facebook: found a decision maker for {n} of {len(left)}")
 
     if args.dry_run:

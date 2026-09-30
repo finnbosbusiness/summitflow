@@ -617,8 +617,8 @@ def test_scan_website_reads_about_pages(monkeypatch):
     # A registration number on the site beats a name on the page
     fields = people.decide(scan, CH())
     assert fields["decision_maker_name"] == "Thomas Baker"
-    assert fields["decision_maker_role"] == "Director (Companies House, number from website)"
-    assert people.decide(scan)["decision_maker_role"] == "Founder (website)"
+    assert fields["decision_maker_role"] == "Director"
+    assert people.decide(scan)["decision_maker_role"] == "Founder"
 
 
 def test_json_ld_founder():
