@@ -6,7 +6,7 @@ import time
 
 import requests
 
-from .matching import name_similarity, outward_postcode
+from .matching import distinctive_words, name_similarity, outward_postcode
 
 API = "https://api.company-information.service.gov.uk"
 
@@ -71,6 +71,8 @@ def best_match(name, postcode, candidates):
 
     Accept a very close name match on its own, or a reasonable name match
     whose registered address shares the outward postcode (e.g. CV34).
+    Either way the distinctive words must agree: "ASE Kitchens & Bathrooms"
+    is not "KITCHENS & BATHROOMS LTD", however similar the strings are.
 
     Dissolved companies are never matched: the showroom is open on Google
     Maps, so a dissolved company with the same name is an old or unrelated
@@ -78,6 +80,7 @@ def best_match(name, postcode, candidates):
     skipped for the same reason, since every prospect is in England.
     """
     area = outward_postcode(postcode)
+    own = distinctive_words(name)
     best, best_score = None, 0.0
     for c in candidates:
         if c.get("company_status") not in _STATUS:
@@ -87,6 +90,9 @@ def best_match(name, postcode, candidates):
         if c.get("company_type") in ("ltd", "llp", "private-limited-guarant-nsc", "plc") or not c.get("company_type"):
             sim = name_similarity(name, c.get("title", ""))
             same_area = bool(area) and area in (c.get("address_snippet") or "").upper()
+            theirs = distinctive_words(c.get("title", ""))
+            if not own or not theirs or not (own == theirs or (same_area and (own <= theirs or theirs <= own))):
+                continue
             if sim >= 0.9 or (sim >= 0.6 and same_area):
                 score = sim + (0.2 if same_area else 0) + (0.1 if c.get("company_status") == "active" else 0)
                 if score > best_score:

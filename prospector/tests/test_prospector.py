@@ -189,12 +189,15 @@ def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
     items = [
         place(),
         place(searchString="kitchen showroom Leamington Spa"),  # duplicate in second town
-        place(title="Howdens", website="https://howdens.com"),
-        place(title="Beta Kitchen Design", website="", postalCode="B91 5AA", searchString="kitchen showroom Leamington Spa"),
+        place(title="Howdens", website="https://howdens.com", phone="01926 000001"),
+        place(title="Beta Kitchen Design", website="", postalCode="B91 5AA", searchString="kitchen showroom Leamington Spa",
+              phone="0121 000 0002"),
         # Found by a West Midlands search but actually in Nottingham: kept, labelled East Midlands
-        place(title="Charles Yorke", website="https://www.charlesyorke.com/", postalCode="NG17 7LA", city="Kirkby-in-Ashfield"),
+        place(title="Charles Yorke Kitchens", website="https://www.charlesyorke.com/", postalCode="NG17 7LA",
+              city="Kirkby-in-Ashfield", phone="01623 000003"),
         # In Wales: dropped
-        place(title="Cardiff Kitchens", website="https://cardiffkitchens.co.uk", postalCode="CF10 1AA", city="Cardiff"),
+        place(title="Cardiff Kitchens", website="https://cardiffkitchens.co.uk", postalCode="CF10 1AA", city="Cardiff",
+              phone="029 0000 0004"),
     ]
     monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
     f = tmp_path / "items.json"
@@ -210,7 +213,7 @@ def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
     assert "1 chain" in out and "1 duplicate" in out and "1 outside England" in out
     rows = list(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
     # Sorted by postcode: B91, CV34, NG17
-    assert [r["company"] for r in rows] == ["Beta Kitchen Design", "Acme Kitchens", "Charles Yorke"]
+    assert [r["company"] for r in rows] == ["Beta Kitchen Design", "Acme Kitchens", "Charles Yorke Kitchens"]
     assert [r["sheet_row"] for r in rows] == ["4", "5", "6"]
     assert rows[2]["region"] == "East Midlands" and rows[2]["town"] == "Kirkby-in-Ashfield"
 
@@ -316,7 +319,7 @@ def test_stages_2_and_3_end_to_end(tmp_path, monkeypatch, capsys):
     items = [place(title="Madina Kitchens", website="https://www.madinakitchens.co.uk/", postalCode="B12 8DN",
                    city="Birmingham", searchString="kitchen showroom Birmingham", rank=5),
              place(title="Cucina Kitchens", website="http://www.cucina-kitchens.co.uk/", postalCode="B94 5JU",
-                   city="Birmingham", searchString="kitchen showroom Birmingham", rank=1),
+                   city="Birmingham", searchString="kitchen showroom Birmingham", rank=1, phone="0121 000 0005"),
              # Chains are skipped as prospects but still take map pack places
              place(title="Howdens", website="https://howdens.com", searchString="kitchen showroom Birmingham", rank=2),
              place(title="Wren Kitchens", website="https://wrenkitchens.com", searchString="kitchen showroom Birmingham", rank=3)]
@@ -476,7 +479,7 @@ def test_stage1_searches_places_per_town(tmp_path, monkeypatch, capsys):
 
     def fake_search(key, queries, max_per_query=20, session=None, keep_paging=None, progress=None):
         seen.append((key, list(queries), max_per_query))
-        return [places.to_item(gplace("No Thirty One", pc="B93 0HL"), "kitchen showroom Solihull", 1)]
+        return [places.to_item(gplace("No Thirty One Kitchens", pc="B93 0HL"), "kitchen showroom Solihull", 1)]
 
     monkeypatch.setattr("prospector.places.run_search", fake_search)
     monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
@@ -489,7 +492,7 @@ def test_stage1_searches_places_per_town(tmp_path, monkeypatch, capsys):
     main(["--towns", str(towns), "--skip-companies-house", "--skip-meta", "--skip-google", "--dry-run"])
     assert seen == [("k", ["kitchen showroom Solihull"], 60)]
     row = next(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
-    assert row["company"] == "No Thirty One" and row["region"] == "West Midlands"
+    assert row["company"] == "No Thirty One Kitchens" and row["region"] == "West Midlands"
 
 
 def test_place_id_dedupe_and_new_fields():
@@ -553,3 +556,106 @@ def test_skipped_businesses_are_recorded(tmp_path, monkeypatch):
           "--skip-meta", "--skip-google", "--dry-run"])
     sk = {r["company"]: r["reason"] for r in csv.DictReader(next(tmp_path.glob("skipped-*.csv")).open())}
     assert sk == {"Howdens Joinery": "chain", "Brondi | Coffee & Kitchen": "not kitchen"}
+
+
+def row(**kw):
+    base = {"company": "Acme Kitchens", "website": "https://www.acmekitchens.co.uk/", "phone": "01926 000000",
+            "postcode": "CV34 4AB", "physical_showroom": "Y", "google_category": "Furniture store",
+            "company_status": "Active", "google_reviews": "52"}
+    base.update(kw)
+    return base
+
+
+def test_cleanse_keeps_kitchen_showrooms():
+    from prospector.cleanse import reason
+    assert reason(row()) == ""
+    assert reason(row(company="Leeds Trade Kitchens")) == ""  # trade-price showrooms sell to the public
+    assert reason(row(company="GM Kitchens and Worktops")) == ""
+    assert reason(row(company="Glotech Kitchen & Appliance Showroom")) == ""
+    assert reason(row(company="Charnay", website="http://www.charnaykitchens.co.uk/")) == ""
+    assert reason(row(company="Acme Kitchen Studio", physical_showroom="")) == ""
+
+
+def test_cleanse_removes_what_isnt_a_showroom():
+    from prospector.cleanse import reason
+    assert reason(row(company_status="Liquidation")) == "In liquidation"
+    assert reason(row(company="The Salad Kitchen", google_category="Salad shop")) == "Not a kitchen business"
+    assert reason(row(company="Fulcrum Commercial Kitchens Ltd")) == "Not a kitchen business"
+    assert reason(row(company="Quartz Kitchen Worktops - QuartzMatik")) == "Worktop or stone supplier"
+    assert reason(row(company="Wilson's Trade Kitchens & Components Wholesale")) == "Trade supplier"
+    assert reason(row(company="Northampton kitchen fitters")) == "Fitter or builder, no showroom"
+    assert reason(row(company="Chester Kitchen Revamps")) == "Fitter or builder, no showroom"
+    assert reason(row(company="Whitakers Of Shipley Kitchen Appliances")) == "Appliance shop"
+    assert reason(row(company="Cheap Furniture Warehouse", website="")) == "Furniture or homeware shop"
+    assert reason(row(company="ACR Woodworking", website="")) == "Joinery or furniture maker, not kitchens"
+    assert reason(row(physical_showroom="")) == "No showroom on Google Maps"
+    assert reason(row(company="Spires Interiors", website="https://spires.co.uk/")) == "Kitchens not in name or website"
+    assert reason(row(phone="")) == "No phone number"
+    assert reason(row(phone="(978) 466-9600", postcode="01453")) == "Not in the UK"
+
+
+def test_cleanse_duplicates_keep_the_fuller_row():
+    from prospector.cleanse import find_duplicates
+    rows = [
+        row(company="Your Beautiful Kitchen", website="", postcode="GU15 2QR", phone="01252 522400"),
+        row(company="Your Beautiful Kitchen", website="http://yourbeautifulkitchen.co.uk/", postcode="GU16 6EZ",
+            phone="+44 1252 522400"),
+        row(company="Victoria Kitchens", postcode="SE7 7AJ", phone="020 0000 0001", company_number="1"),
+        row(company="Victoria Kitchens", postcode="SM4 6EP", phone="020 0000 0002", company_number="1"),
+        row(company="Kitchen Studio Doncaster", postcode="DN2 4NY", phone="01302 000001", website=""),
+        row(company="Kitchen Studio Doncaster", postcode="DN2 5HU", phone="01302 000002", website=""),
+    ]
+    # Same phone, and same name in the same postcode area; a shared
+    # company number alone doesn't make two showrooms one business.
+    assert find_duplicates(rows) == {0: 1, 5: 4}
+
+
+def test_unreliable_company_numbers():
+    from prospector.cleanse import unreliable_company_numbers
+    rows = [
+        row(company="ASE Kitchens & Bathrooms", company_number="09626308"),
+        row(company="ATD Kitchens & Bathrooms", company_number="09626308"),
+        row(company="Victoria Kitchens", postcode="SE7 7AJ", company_number="2"),
+        row(company="Victoria Kitchens", postcode="SM4 6EP", company_number="2"),
+        row(company="The Kitchen Centre", company_number="3"),
+        row(company="Norton Kitchen & Bedroom", company_number="4"),
+    ]
+    assert unreliable_company_numbers(rows) == {"09626308", "2", "3"}
+
+
+def test_best_match_needs_the_distinctive_words():
+    generic = [{"title": "KITCHENS & BATHROOMS LTD", "company_number": "09626308", "company_status": "active",
+                "address_snippet": "London N1 1AA", "company_type": "ltd"}]
+    assert best_match("ASE Kitchens & Bathrooms", "SY8 1XD", generic) is None
+    hawk = [{"title": "HAWK KITCHENS & BATHROOMS LTD", "company_number": "07653840", "company_status": "active",
+             "address_snippet": "St Albans AL3 8AQ", "company_type": "ltd"}]
+    assert best_match("Hawkins Kitchens and Bathrooms Limited", "HP3 9NG", hawk) is None
+    assert best_match("Hawk Kitchens & Bathrooms", "AL3 8AQ", hawk)["company_number"] == "07653840"
+    # A longer registered name only counts in the same postcode area
+    sutton = [{"title": "SUTTON KITCHENS (BIRMINGHAM) LIMITED", "company_number": "5", "company_status": "active",
+               "address_snippet": "Sutton Coldfield B75 7BU", "company_type": "ltd"}]
+    assert best_match("Sutton Kitchens", "B75 7BU", sutton)["company_number"] == "5"
+    assert best_match("Sutton Kitchens", "LS1 1AA", sutton) is None
+
+
+def test_run_skips_showrooms_the_cleanse_removed(tmp_path, monkeypatch, capsys):
+    from prospector import run
+    items = [place(), place(title="Beta Kitchens", website="https://beta-kitchens.co.uk/", phone="01926 000009"),
+             place(title="Warwick Kitchen Fitters", website="https://wkf.co.uk/", phone="01926 000008")]
+    f = tmp_path / "items.json"
+    f.write_text(json.dumps(items))
+    towns = tmp_path / "towns.csv"
+    towns.write_text("town,region\nWarwick,West Midlands\n")
+    monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
+    monkeypatch.setattr(run, "open_sheet", lambda sheet_id: object())
+    monkeypatch.setattr(run, "read_chains", lambda s: [])
+    monkeypatch.setattr(run, "read_prospects", lambda s: {r: {f: "" for f in INPUT_COLUMNS} for r in range(4, 10)})
+    monkeypatch.setattr(run, "read_removed", lambda s: {"d:acmekitchens.co.uk"})
+    monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", "x")
+    monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
+    main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--skip-meta", "--skip-google",
+          "--dry-run"])
+    out = capsys.readouterr().out
+    assert "1 removed in cleanse" in out and "1 Fitter or builder, no showroom" in out
+    rows = list(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
+    assert [r["company"] for r in rows] == ["Beta Kitchens"]

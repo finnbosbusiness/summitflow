@@ -15,12 +15,12 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from . import google, location, maps, meta, places
+from . import cleanse, google, location, maps, meta, places
 from .chains import FALLBACK_CHAINS, is_chain
 from .columns import FIRST_ROW, INPUT_COLUMNS, LAST_ROW
 from .companies_house import CompaniesHouse
 from .matching import domain
-from .sheet import Plan, keys_for, open_sheet, read_chains, read_prospects, write, write_skipped
+from .sheet import Plan, keys_for, open_sheet, read_chains, read_prospects, read_removed, write, write_skipped
 
 # Only showrooms in these countries are added.
 COUNTRIES = {"England"}
@@ -91,6 +91,7 @@ def main(argv=None):
     spreadsheet = open_sheet(sheet_id) if has_sheet else None
     chains = read_chains(spreadsheet) if spreadsheet else FALLBACK_CHAINS
     plan = Plan(read_prospects(spreadsheet) if spreadsheet else {})
+    removed = read_removed(spreadsheet) if spreadsheet else set()
     if not spreadsheet:
         plan.free = list(range(FIRST_ROW, LAST_ROW + 1))
     print(f"Sheet: {len(plan.index)} prospects already, {len(plan.free)} free rows, {len(chains)} chains excluded")
@@ -144,6 +145,16 @@ def main(argv=None):
         if is_chain(p["company"], p["website"], chains):
             skip(item, "chain")
             continue
+        # Showrooms already on the tab stay, even if you put one back by hand
+        # after the cleanse took it off. New ones must pass the cleanse.
+        if plan.row_for(p) is None:
+            if any(k in removed for k in keys_for(p)):
+                skip(item, "removed in cleanse")
+                continue
+            why = cleanse.reason(p)
+            if why:
+                skip(item, why)
+                continue
         # The same showroom often shows up in several towns' searches.
         ks = keys_for(p)
         if any(k in seen for k in ks):

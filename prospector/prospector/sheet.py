@@ -4,21 +4,27 @@ import json
 import os
 
 from .columns import FIRST_ROW, INPUT_COLUMNS, LAST_ROW, col_index, contiguous_blocks
+from .cleanse import ALL_TAB, KEPT, phone_key
 from .matching import prospect_key
 
 
 def keys_for(record):
-    """Every identity a showroom can be matched on: Google's place ID, and
-    its website domain (or name plus postcode area)."""
+    """Every identity a showroom can be matched on: Google's place ID, its
+    website domain (or name plus postcode area), and its phone number."""
     out = []
     if str(record.get("place_id", "")).strip():
         out.append("p:" + str(record["place_id"]).strip())
     out.append(prospect_key(record.get("website", ""), record.get("company", ""), record.get("postcode", "")))
+    phone = phone_key(record.get("phone"))
+    if phone:
+        out.append("t:" + phone)
     return out
 
 TAB = "Prospects"
 _READ_RANGE = f"B{FIRST_ROW}:AR{LAST_ROW}"
 SKIPPED_TAB = "Skipped"
+# The All Prospects tab is a copy of Prospects with the cleanse result here.
+CLEANSE_COLUMN = "AS"
 _OFFSET = col_index("B")
 # Written as text: Sheets would otherwise read "+44 ..." as a formula and
 # drop the leading zero from phone and company numbers.
@@ -49,6 +55,28 @@ def open_sheet(sheet_id: str):
 def read_chains(spreadsheet):
     rows = spreadsheet.worksheet("Chain Exclusions").get("B4:B200")
     return [r[0].strip() for r in rows if r and r[0].strip()]
+
+
+def read_removed(spreadsheet):
+    """Keys of every showroom the cleanse took off the Prospects tab (rows on
+    the All Prospects tab whose Cleanse result isn't Kept), so a later run
+    doesn't add them back. Empty if there's no All Prospects tab."""
+    import gspread
+
+    try:
+        ws = spreadsheet.worksheet(ALL_TAB)
+    except gspread.WorksheetNotFound:
+        return set()
+    result_at = col_index(CLEANSE_COLUMN) - _OFFSET
+    removed = set()
+    for cells in ws.get(f"B{FIRST_ROW}:{CLEANSE_COLUMN}{LAST_ROW}"):
+        result = cells[result_at].strip() if result_at < len(cells) else ""
+        if not result or result == KEPT:
+            continue
+        record = {f: (cells[col_index(c) - _OFFSET] if col_index(c) - _OFFSET < len(cells) else "")
+                  for f, c in INPUT_COLUMNS.items()}
+        removed.update(keys_for(record))
+    return removed
 
 
 def read_prospects(spreadsheet):

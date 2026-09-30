@@ -38,6 +38,20 @@ def clean_name(name: str) -> str:
     return " ".join(name.split())
 
 
+# Words every kitchen business shares; what's left is what makes a name distinctive.
+GENERIC_WORDS = set("""
+kitchen kitchens bathroom bathrooms bedroom bedrooms interior interiors design designs designer designers
+showroom showrooms studio studios furniture fitted bespoke home homes living house centre center
+solutions services group company co ltd limited llp plc uk the and of by for at in on to a an
+bath baths kbb joinery carpentry installations installation fitters fitting luxury quality direct
+""".split())
+
+
+def distinctive_words(name):
+    """'ASE Kitchens & Bathrooms Ltd' -> {'ase'}."""
+    return {w for w in clean_name(name).split() if w not in GENERIC_WORDS and len(w) > 1}
+
+
 def name_similarity(a: str, b: str) -> float:
     a, b = clean_name(a), clean_name(b)
     if not a or not b:
