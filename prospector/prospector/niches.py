@@ -21,16 +21,19 @@ NICHES = {
     },
 }
 
-# Businesses that turn up for "roofing company" but aren't roofers.
+# Businesses that turn up for "roofing company" but aren't roofers. Decided by
+# name: Google lists plenty of real roofers as "Building materials store".
 _NOT_ROOFER = re.compile(
-    r"\b(roof ?top|roof ?garden|roof ?box(es)?|roof ?racks?|roof ?tents?|roof ?bars?|supplies|superstore|"
-    r"merchants?|wholesale|timber|building materials|builders? merchant|plant hire|skip hire|scaffold(ing)? hire|"
-    r"restaurant|cafe|café|bar|pub|hotel|kitchen|bistro|grill)\b",
+    r"\b(roof ?top (bar|restaurant|terrace|garden)|roof ?garden|roof ?box(es)?|roof ?racks?|roof ?tents?|"
+    r"roof ?bars?|supplies|supplier|superstore|merchants?|wholesale|warehouse|timber|building materials|"
+    r"roofing (centre|center|sheets?|outlet)|truss(es)?|distribution|plant hire|skip hire|scaffold(ing)? hire|"
+    r"restaurant|cafe|café|pub|hotel|kitchen|bistro|grill|"
+    # national roofing merchants
+    r"sig roofing|burton roofing|chandlers roofing|roofing outlaw|jewson|travis perkins|sydenhams|"
+    r"roofing superstore|keyline|buildbase)\b",
     re.I,
 )
-_NOT_ROOFER_CATEGORY = re.compile(
-    r"restaurant|\bbar\b|cafe|hotel|\bpub\b|building materials|hardware|wholesaler|supplier|car |auto|store$", re.I
-)
+_NOT_ROOFER_CATEGORY = re.compile(r"restaurant|\bbar\b|cafe|hotel|\bpub\b|car |auto", re.I)
 
 
 def roofing_reason(name, categories, main_category):

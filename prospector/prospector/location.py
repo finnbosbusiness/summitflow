@@ -150,6 +150,8 @@ def clean_town(town, address="", postcode=""):
         t = "London"
     if t.isupper():
         t = t.title()
+    if t == "Newcastle" and area(postcode) == "ST":
+        t = "Newcastle-under-Lyme"
     t = re.sub(r"^(Saint|St\.)\s", "St ", t)
     t = re.sub(r"\s(Saint|St\.)\s", " St ", t)
     if t.lower().startswith("st ") and t.lower().endswith("-on-sea"):

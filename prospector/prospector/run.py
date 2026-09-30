@@ -144,8 +144,14 @@ def main(argv=None):
             skip(item, reason)
             continue
         if domain(p["website"]) in multi_site:
-            skip(item, "multi-site")
-            continue
+            if args.niche != "roofing":
+                skip(item, "multi-site")
+                continue
+            # Independent roofers often share a lead-generation site
+            # (westmidlandsroofer.co.uk/roofer-in-bloxwich/), and regional
+            # firms list each branch: keep them all, matched by name and
+            # postcode instead of the shared website.
+            p["website"] = ""
         if is_chain(p["company"], p["website"], chains):
             skip(item, "chain")
             continue

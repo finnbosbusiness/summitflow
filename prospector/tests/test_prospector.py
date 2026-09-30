@@ -636,6 +636,10 @@ def test_roofing_filter():
     assert why is None and p["town"] == "Warwick" and p["physical_showroom"] == ""
     assert reason(title="A1 Roofers")[1] is None
     assert reason(title="SIG Roofing Supplies")[1] == "not a roofer"
+    assert reason(title="SIG Roofing Walsall", categoryName="Building materials store")[1] == "not a roofer"
+    # Real roofers Google files under "Building materials store"
+    assert reason(title="F.H. Roofing LTD", categoryName="Building materials store")[1] is None
+    assert reason(title="Rooftop Systems")[1] is None
     assert reason(title="The Rooftop Bar", categoryName="Bar", categories=["Bar"])[1] in ("not a roofer", "not roofing")
     assert reason(title="Smith Builders", categoryName="General contractor", categories=["General contractor"])[1] == "not roofing"
 
@@ -649,3 +653,4 @@ def test_clean_town():
     assert clean_town("SW16", "9A Streatham High Rd, SW16 SW16 1EE", "SW16 1EE") == "London"
     assert clean_town("Little Warley, Brentwood, Essex") == "Brentwood"
     assert clean_town("Birmingham") == "Birmingham"
+    assert clean_town("Newcastle", "", "ST5 0RF") == "Newcastle-under-Lyme"
