@@ -26,23 +26,18 @@ def shape(value, depth=0, max_depth=4):
 
 def main():
     token = os.environ["APIFY_TOKEN"]
-
-    print("=== apify/google-search-scraper ===")
-    url = "https://www.google.co.uk/search?q=" + quote_plus("kitchen showroom Solihull") + "&gl=uk&hl=en"
-    items = run_actor(token, "apify/google-search-scraper", {
-        "queries": url, "resultsPerPage": 10, "maxPagesPerQuery": 1, "mobileResults": False,
-    }, timeout_s=900)
-    print(f"{len(items)} items")
-    shape(items[0] if items else {})
-
-    print("=== apify/facebook-ads-scraper ===")
-    lib = ("https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=GB"
-           "&q=" + quote_plus("Madina Kitchens") + "&search_type=keyword_unordered&media_type=all")
+    base = ("https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=GB"
+            "&search_type=keyword_unordered&media_type=all&q=")
+    urls = [base + quote_plus("kitchens"), base + quote_plus("bathrooms")]
     items = run_actor(token, "apify/facebook-ads-scraper", {
-        "startUrls": [{"url": lib}], "resultsLimit": 5, "activeStatus": "active",
+        "startUrls": [{"url": u} for u in urls], "resultsLimit": 3, "activeStatus": "active",
     }, timeout_s=900)
-    print(f"{len(items)} items")
-    shape(items[0] if items else {})
+    per_url = {}
+    for it in items:
+        per_url[it.get("inputUrl")] = per_url.get(it.get("inputUrl"), 0) + 1
+    print(f"resultsLimit=3 with 2 URLs -> {len(items)} items total")
+    for u, n in per_url.items():
+        print(f"  {n} from ...{(u or '')[-20:]}")
 
 
 if __name__ == "__main__":
