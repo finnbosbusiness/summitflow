@@ -76,6 +76,8 @@ privacy policy terms cookies copyright all rights reserved registered number vat
 monday tuesday wednesday thursday friday saturday sunday january february march april may june july august
 september october november december who we are what why how where when this that with from your you
 message chief executive officer ceo md co operations finance marketing creative technical senior lead
+by behind final step first last next north south east west yorkshire lancashire cheshire kent surrey essex
+sussex devon cornwall norfolk suffolk county
 """.split())
 
 _COMPANY_NO = re.compile(
