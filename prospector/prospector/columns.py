@@ -6,7 +6,7 @@ never be touched.
 """
 
 FIRST_ROW = 4
-LAST_ROW = 3003
+LAST_ROW = 10003
 
 # field name -> column letter, input columns only
 INPUT_COLUMNS = {
@@ -36,6 +36,10 @@ INPUT_COLUMNS = {
     "decision_maker_role": "AC",
     "email": "AD",
     "tps_ctps": "AE",
+    "address": "AO",
+    "maps_url": "AP",
+    "google_category": "AQ",
+    "place_id": "AR",
 }
 
 FORMULA_COLUMNS = {"I", "O", "S", "AA", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN"}

@@ -24,7 +24,10 @@ Premium check (positioning, brands, budget signals) and TPS are still manual.
 - It only writes the light-header input columns. Formula columns (I, O, S, AA, AF to AN) are never written.
 - It never overwrites a cell that already has something in it. If you correct a phone number, it stays corrected.
 - A showroom already on the tab is matched by website domain (or name + postcode area if it has no website), so it's never added twice.
-- New showrooms go into the first row with a blank Company Name. Formulas run to row 3003; the run warns if the tab is full.
+- New showrooms go into the first row with a blank Company Name. Formulas run to row 10003; the run warns if the tab is full.
+- A showroom is recognised by its Google place ID as well as its website, so a run never adds the same one twice.
+- Everything Google returned that a run left out (chains, branches, other trades, outside England) is listed on the **Skipped** tab with the reason, so nothing disappears without a trace.
+- The run saves to the sheet as it goes (after the search, then every 500 Companies House lookups), so a run that stops part-way keeps what it found.
 - National chains on the **Chain Exclusions** tab are skipped. Add a name there and future runs skip it too.
 - Companies House is looked up once per showroom. A showroom marked "Not found" isn't retried; clear the cell to retry it.
 - Location comes from each showroom's own postcode (looked up on postcodes.io, free), not from the town that was searched. A Birmingham search that turns up a Nottingham showroom files it under Nottingham and East Midlands. Showrooms outside England are skipped.

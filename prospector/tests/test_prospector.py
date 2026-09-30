@@ -128,7 +128,10 @@ def test_plan_adds_to_first_blank_row_and_never_overwrites():
     assert plan.added == 1 and plan.filled == 1
 
     ranges = plan.value_ranges()
-    assert {"range": "Prospects!J4:N4", "values": [[None, 4.8, None, None, None]]} in ranges
+    # Rows 4 and 5 are consecutive, so each column block is one two-row range
+    assert {"range": "Prospects!J4:N5", "values": [[None, 4.8, None, None, None], [None, None, None, None, None]]} in ranges
+    assert {"range": "Prospects!B4:H5", "values": [[None, None, None, None, None, None, None],
+                                                  ["Beta Kitchens", None, None, None, "'CV34 1AA", None, None]]} in ranges
     assert all(":" in r["range"] for r in ranges)
 
 
@@ -471,7 +474,7 @@ def test_places_pagination():
 def test_stage1_searches_places_per_town(tmp_path, monkeypatch, capsys):
     seen = []
 
-    def fake_search(key, queries, max_per_query=20, session=None):
+    def fake_search(key, queries, max_per_query=20, session=None, keep_paging=None, progress=None):
         seen.append((key, list(queries), max_per_query))
         return [places.to_item(gplace("No Thirty One", pc="B93 0HL"), "kitchen showroom Solihull", 1)]
 
@@ -484,6 +487,69 @@ def test_stage1_searches_places_per_town(tmp_path, monkeypatch, capsys):
     towns = tmp_path / "towns.csv"
     towns.write_text("town,region\nSolihull,West Midlands\n")
     main(["--towns", str(towns), "--skip-companies-house", "--skip-meta", "--skip-google", "--dry-run"])
-    assert seen == [("k", ["kitchen showroom Solihull"], 20)]
+    assert seen == [("k", ["kitchen showroom Solihull"], 60)]
     row = next(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
     assert row["company"] == "No Thirty One" and row["region"] == "West Midlands"
+
+
+def test_place_id_dedupe_and_new_fields():
+    rows = {n: {f: "" for f in INPUT_COLUMNS} for n in range(4, 8)}
+    rows[4].update(company="No Thirty One", place_id="ChIJabc", postcode="B93 0HL")
+    plan = Plan(rows)
+    # Same place ID, different spelling and no website: still the same showroom
+    assert plan.upsert({"company": "No. 31 Kitchens", "place_id": "ChIJabc", "address": "1 High St, Knowle",
+                        "maps_url": "https://maps.google.com/?cid=1"}) == 4
+    assert plan.updates[4] == {"address": "1 High St, Knowle", "maps_url": "https://maps.google.com/?cid=1"}
+    assert plan.added == 0
+    ranges = plan.value_ranges()
+    assert {"range": "Prospects!AO4:AR4", "values": [["'1 High St, Knowle", "https://maps.google.com/?cid=1", None, None]]} in ranges
+
+
+def test_places_paging_stops_when_results_stop_being_relevant():
+    pages = {None: ([gplace(f"A{i} Kitchens") for i in range(20)], "t2"),
+             "t2": ([gplace(f"Bathroom World {i}") for i in range(20)], "t3"),
+             "t3": ([gplace(f"C{i} Kitchens") for i in range(20)], None)}
+    calls = []
+
+    class Resp:
+        status_code, text = 200, ""
+
+        def __init__(self, data):
+            self._data = data
+
+        def json(self):
+            return self._data
+
+    class Session:
+        def post(self, url, json, headers, timeout):
+            tok = json.get("pageToken")
+            calls.append(tok)
+            ps, nxt = pages[tok]
+            return Resp({"places": ps, **({"nextPageToken": nxt} if nxt else {})})
+
+    def relevant(items):
+        return sum(1 for it in items if maps.to_prospect(it, {})[0]) >= 8
+
+    items = places.run_search("k", ["kitchen showroom X"], 60, Session(), keep_paging=relevant)
+    # Page 1 was all kitchens so page 2 was fetched; page 2 wasn't, so page 3 wasn't
+    assert calls == [None, "t2"] and len(items) == 40
+    new = places.to_item(gplace("A"), "q", 1)
+    assert set(("address", "mapsUrl", "placeId")) <= set(new)
+
+
+def test_skipped_businesses_are_recorded(tmp_path, monkeypatch):
+    items = [place(title="Madina Kitchens", website="https://www.madinakitchens.co.uk/", postalCode="B12 8DN"),
+             place(title="Howdens Joinery", website="https://howdens.com", postalCode="B1 1AA"),
+             place(title="Brondi | Coffee & Kitchen", categoryName="Coffee machine supplier", postalCode="B93 8HH")]
+    f = tmp_path / "items.json"
+    f.write_text(json.dumps(items))
+    towns = tmp_path / "towns.csv"
+    towns.write_text("town,region\nWarwick,West Midlands\n")
+    monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
+    monkeypatch.delenv("GOOGLE_SERVICE_ACCOUNT_JSON", raising=False)
+    monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
+    monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
+    main(["--towns", str(towns), "--region", "England", "--maps-json", str(f), "--skip-companies-house",
+          "--skip-meta", "--skip-google", "--dry-run"])
+    sk = {r["company"]: r["reason"] for r in csv.DictReader(next(tmp_path.glob("skipped-*.csv")).open())}
+    assert sk == {"Howdens Joinery": "chain", "Brondi | Coffee & Kitchen": "not kitchen"}

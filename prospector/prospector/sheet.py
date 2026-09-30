@@ -6,14 +6,25 @@ import os
 from .columns import FIRST_ROW, INPUT_COLUMNS, LAST_ROW, col_index, contiguous_blocks
 from .matching import prospect_key
 
+
+def keys_for(record):
+    """Every identity a showroom can be matched on: Google's place ID, and
+    its website domain (or name plus postcode area)."""
+    out = []
+    if str(record.get("place_id", "")).strip():
+        out.append("p:" + str(record["place_id"]).strip())
+    out.append(prospect_key(record.get("website", ""), record.get("company", ""), record.get("postcode", "")))
+    return out
+
 TAB = "Prospects"
-_READ_RANGE = f"B{FIRST_ROW}:AE{LAST_ROW}"
+_READ_RANGE = f"B{FIRST_ROW}:AR{LAST_ROW}"
+SKIPPED_TAB = "Skipped"
 _OFFSET = col_index("B")
 # Written as text: Sheets would otherwise read "+44 ..." as a formula and
 # drop the leading zero from phone and company numbers.
 # Free text is protected too: an ad hook starting with "+" or "=" would
 # otherwise be read as a formula.
-_TEXT_FIELDS = {"phone", "company_number", "postcode", "meta_ad_hook", "competitor_ranking"}
+_TEXT_FIELDS = {"phone", "company_number", "postcode", "meta_ad_hook", "competitor_ranking", "address"}
 
 
 def _cell(field, value):
@@ -62,7 +73,7 @@ class Plan:
       postcode area) only has its blank input cells filled. Your edits are
       never overwritten.
     - A new prospect goes into the first row whose Company Name is blank.
-      (Rows are pre-filled with formulas down to row 3003, so appending
+      (Rows are pre-filled with formulas down to row 10003, so appending
       after the last row would land below the formulas.)
     """
 
@@ -72,17 +83,21 @@ class Plan:
         self.free = []
         for n, r in existing_rows.items():
             if str(r.get("company", "")).strip():
-                self.index.setdefault(prospect_key(r.get("website", ""), r["company"], r.get("postcode", "")), n)
+                for k in keys_for(r):
+                    self.index.setdefault(k, n)
             else:
                 self.free.append(n)
-        self.updates = {}  # row -> {field: value}
+        self.updates = {}  # row -> {field: value}, not yet written
         self.new_rows = set()
+        self.updated_rows = set()
         self.added = 0
         self.out_of_room = 0
 
     def row_for(self, prospect):
-        key = prospect_key(prospect.get("website", ""), prospect["company"], prospect.get("postcode", ""))
-        return self.index.get(key)
+        for k in keys_for(prospect):
+            if k in self.index:
+                return self.index[k]
+        return None
 
     def upsert(self, prospect):
         """Returns the sheet row the prospect lives on, or None if the tab is full."""
@@ -93,10 +108,10 @@ class Plan:
                 return None
             row = self.free.pop(0)
             self.rows[row] = {f: "" for f in INPUT_COLUMNS}
-            key = prospect_key(prospect.get("website", ""), prospect["company"], prospect.get("postcode", ""))
-            self.index[key] = row
             self.new_rows.add(row)
             self.added += 1
+        for k in keys_for(prospect):
+            self.index.setdefault(k, row)
         self.fill(row, prospect)
         return row
 
@@ -108,6 +123,7 @@ class Plan:
             if str(current.get(field, "")).strip() == "":
                 current[field] = value
                 self.updates.setdefault(row, {})[field] = value
+                self.updated_rows.add(row)
 
     def set(self, row, values):
         """Overwrite cells, including clearing them with "". Only used for
@@ -119,31 +135,62 @@ class Plan:
             if str(current.get(field, "")) != str(value):
                 current[field] = value
                 self.updates.setdefault(row, {})[field] = value
+                self.updated_rows.add(row)
 
     @property
     def filled(self):
         """Existing rows that had blank cells filled in."""
-        return len(set(self.updates) - self.new_rows)
+        return len(self.updated_rows - self.new_rows)
 
     def value_ranges(self):
-        """Sheets API batchUpdate payload. None cells are skipped by the API,
-        so untouched cells inside a range keep their current value."""
+        """Sheets API batchUpdate payload for the pending updates. Runs of
+        consecutive rows are written as one range per column block; None
+        cells are skipped by the API, so untouched cells keep their value."""
         out = []
-        for row, fields in sorted(self.updates.items()):
+        rows = sorted(self.updates)
+        runs, run = [], []
+        for r in rows:
+            if run and r != run[-1] + 1:
+                runs.append(run)
+                run = []
+            run.append(r)
+        if run:
+            runs.append(run)
+        for run in runs:
             for first, last, block in contiguous_blocks():
-                if any(f in fields for f in block):
-                    out.append({
-                        "range": f"{TAB}!{first}{row}:{last}{row}",
-                        "values": [[_cell(f, fields.get(f)) for f in block]],
-                    })
+                if not any(f in self.updates[r] for r in run for f in block):
+                    continue
+                out.append({
+                    "range": f"{TAB}!{first}{run[0]}:{last}{run[-1]}",
+                    "values": [[_cell(f, self.updates[r].get(f)) for f in block] for r in run],
+                })
         return out
 
 
-def write(spreadsheet, plan, chunk=400):
+def write(spreadsheet, plan, chunk=200):
+    """Write pending updates and clear them, so a long run can save as it goes."""
+    import time
+
     ranges = plan.value_ranges()
     for i in range(0, len(ranges), chunk):
         spreadsheet.values_batch_update({
             "valueInputOption": "USER_ENTERED",
             "data": ranges[i:i + chunk],
         })
+        time.sleep(1.1)  # stay under the Sheets write quota
+    plan.updates = {}
     return len(ranges)
+
+
+SKIPPED_COLUMNS = ["reason", "company", "website", "phone", "postcode", "town", "google_category", "maps_url", "searched"]
+
+
+def write_skipped(spreadsheet, skipped, last_row=20003):
+    """Replace the Skipped tab's rows with this run's skipped businesses."""
+    ws = spreadsheet.worksheet(SKIPPED_TAB)
+    ws.batch_clear([f"B4:J{last_row}"])
+    rows = [[("'" + str(s.get(c, "")) if c == "phone" and s.get(c) else s.get(c, "")) for c in SKIPPED_COLUMNS]
+            for s in skipped[: last_row - 3]]
+    if rows:
+        ws.update(values=rows, range_name=f"B4:J{3 + len(rows)}", value_input_option="USER_ENTERED")
+    return len(rows)

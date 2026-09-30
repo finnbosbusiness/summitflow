@@ -1,19 +1,24 @@
 name: Prospect run
 
-# Run by hand (Actions -> Run workflow) when the Call Queue is running low,
-# one region at a time, so you only pay for leads you'll call.
+# Run by hand (Actions -> Run workflow). Finding showrooms uses the Google
+# Places API; the Google search and Meta ad checks use Apify and are off
+# unless "ad_checks" is ticked.
 on:
   workflow_dispatch:
     inputs:
       region:
-        description: "Region to run (blank = every town in England)"
-        default: "West Midlands"
+        description: "Region to run, or England for every town"
+        default: "England"
       only:
         description: "Only these towns, comma-separated (e.g. Birmingham,Solihull)"
         default: ""
       max_towns:
         description: "Only the first N towns (blank = all)"
         default: ""
+      ad_checks:
+        description: "Also run the Google search and Meta ad checks (uses Apify credit)"
+        type: boolean
+        default: false
       checks_only:
         description: "Don't search for new showrooms; only run the Meta and Google checks on rows already in the sheet"
         type: boolean
@@ -26,7 +31,9 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    # A whole-England run is mostly Companies House lookups, which are
+    # rate-limited; GitHub stops jobs at 6 hours.
+    timeout-minutes: 355
     defaults:
       run:
         working-directory: prospector
@@ -46,6 +53,7 @@ jobs:
           REGION: ${{ inputs.region }}
           ONLY: ${{ inputs.only }}
           MAX_TOWNS: ${{ inputs.max_towns }}
+          AD_CHECKS: ${{ inputs.ad_checks }}
           DRY_RUN: ${{ inputs.dry_run }}
           CHECKS_ONLY: ${{ inputs.checks_only }}
           PYTHONUNBUFFERED: "1"
@@ -58,4 +66,5 @@ jobs:
           [ -n "$MAX_TOWNS" ] && args+=(--max-towns "$MAX_TOWNS")
           [ "$DRY_RUN" = "true" ] && args+=(--dry-run)
           [ "$CHECKS_ONLY" = "true" ] && args+=(--no-maps)
+          [ "$AD_CHECKS" = "true" ] || [ "$CHECKS_ONLY" = "true" ] || args+=(--skip-google --skip-meta)
           python -m prospector.run "${args[@]}"
