@@ -23,7 +23,8 @@ def run_actor(token: str, actor: str, payload: dict, timeout_s: int = 4 * 3600):
         r.raise_for_status()
         run = r.json()["data"]
     if run["status"] != "SUCCEEDED":
-        raise RuntimeError(f"Apify {actor} run {run['id']} ended with status {run['status']}")
+        reason = run.get("statusMessage") or run.get("exitCode") or "no reason given"
+        raise RuntimeError(f"Apify {actor} run {run['id']} ended with status {run['status']}: {reason}")
 
     items, offset = [], 0
     while True:
