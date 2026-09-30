@@ -59,6 +59,14 @@ def name_similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, a, b).ratio()
 
 
+def phone_key(phone) -> str:
+    """'+44 1926 000000' and '01926 000000' -> '01926000000'."""
+    digits = re.sub(r"\D", "", str(phone or ""))
+    if digits.startswith("44"):
+        digits = "0" + digits[2:]
+    return digits if len(digits) >= 10 else ""
+
+
 def outward_postcode(postcode: str) -> str:
     """'CV34 4AB' -> 'CV34'."""
     parts = (postcode or "").upper().split()

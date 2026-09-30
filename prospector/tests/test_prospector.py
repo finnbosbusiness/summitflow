@@ -129,8 +129,8 @@ def test_plan_adds_to_first_blank_row_and_never_overwrites():
 
     ranges = plan.value_ranges()
     # Rows 4 and 5 are consecutive, so each column block is one two-row range
-    assert {"range": "Prospects!J4:N5", "values": [[None, 4.8, None, None, None], [None, None, None, None, None]]} in ranges
-    assert {"range": "Prospects!B4:H5", "values": [[None, None, None, None, None, None, None],
+    assert {"range": "'All Prospects'!J4:N5", "values": [[None, 4.8, None, None, None], [None, None, None, None, None]]} in ranges
+    assert {"range": "'All Prospects'!B4:H5", "values": [[None, None, None, None, None, None, None],
                                                   ["Beta Kitchens", None, None, None, "'CV34 1AA", None, None]]} in ranges
     assert all(":" in r["range"] for r in ranges)
 
@@ -505,7 +505,7 @@ def test_place_id_dedupe_and_new_fields():
     assert plan.updates[4] == {"address": "1 High St, Knowle", "maps_url": "https://maps.google.com/?cid=1"}
     assert plan.added == 0
     ranges = plan.value_ranges()
-    assert {"range": "Prospects!AO4:AR4", "values": [["'1 High St, Knowle", "https://maps.google.com/?cid=1", None, None]]} in ranges
+    assert {"range": "'All Prospects'!AO4:AR4", "values": [["'1 High St, Knowle", "https://maps.google.com/?cid=1", None, None]]} in ranges
 
 
 def test_places_paging_stops_when_results_stop_being_relevant():
@@ -558,71 +558,6 @@ def test_skipped_businesses_are_recorded(tmp_path, monkeypatch):
     assert sk == {"Howdens Joinery": "chain", "Brondi | Coffee & Kitchen": "not kitchen"}
 
 
-def row(**kw):
-    base = {"company": "Acme Kitchens", "website": "https://www.acmekitchens.co.uk/", "phone": "01926 000000",
-            "postcode": "CV34 4AB", "physical_showroom": "Y", "google_category": "Furniture store",
-            "company_status": "Active", "google_reviews": "52"}
-    base.update(kw)
-    return base
-
-
-def test_cleanse_keeps_kitchen_showrooms():
-    from prospector.cleanse import reason
-    assert reason(row()) == ""
-    assert reason(row(company="Leeds Trade Kitchens")) == ""  # trade-price showrooms sell to the public
-    assert reason(row(company="GM Kitchens and Worktops")) == ""
-    assert reason(row(company="Glotech Kitchen & Appliance Showroom")) == ""
-    assert reason(row(company="Charnay", website="http://www.charnaykitchens.co.uk/")) == ""
-    assert reason(row(company="Acme Kitchen Studio", physical_showroom="")) == ""
-
-
-def test_cleanse_removes_what_isnt_a_showroom():
-    from prospector.cleanse import reason
-    assert reason(row(company_status="Liquidation")) == "In liquidation"
-    assert reason(row(company="The Salad Kitchen", google_category="Salad shop")) == "Not a kitchen business"
-    assert reason(row(company="Fulcrum Commercial Kitchens Ltd")) == "Not a kitchen business"
-    assert reason(row(company="Quartz Kitchen Worktops - QuartzMatik")) == "Worktop or stone supplier"
-    assert reason(row(company="Wilson's Trade Kitchens & Components Wholesale")) == "Trade supplier"
-    assert reason(row(company="Northampton kitchen fitters")) == "Fitter or builder, no showroom"
-    assert reason(row(company="Chester Kitchen Revamps")) == "Fitter or builder, no showroom"
-    assert reason(row(company="Whitakers Of Shipley Kitchen Appliances")) == "Appliance shop"
-    assert reason(row(company="Cheap Furniture Warehouse", website="")) == "Furniture or homeware shop"
-    assert reason(row(company="ACR Woodworking", website="")) == "Joinery or furniture maker, not kitchens"
-    assert reason(row(physical_showroom="")) == "No showroom on Google Maps"
-    assert reason(row(company="Spires Interiors", website="https://spires.co.uk/")) == "Kitchens not in name or website"
-    assert reason(row(phone="")) == "No phone number"
-    assert reason(row(phone="(978) 466-9600", postcode="01453")) == "Not in the UK"
-
-
-def test_cleanse_duplicates_keep_the_fuller_row():
-    from prospector.cleanse import find_duplicates
-    rows = [
-        row(company="Your Beautiful Kitchen", website="", postcode="GU15 2QR", phone="01252 522400"),
-        row(company="Your Beautiful Kitchen", website="http://yourbeautifulkitchen.co.uk/", postcode="GU16 6EZ",
-            phone="+44 1252 522400"),
-        row(company="Victoria Kitchens", postcode="SE7 7AJ", phone="020 0000 0001", company_number="1"),
-        row(company="Victoria Kitchens", postcode="SM4 6EP", phone="020 0000 0002", company_number="1"),
-        row(company="Kitchen Studio Doncaster", postcode="DN2 4NY", phone="01302 000001", website=""),
-        row(company="Kitchen Studio Doncaster", postcode="DN2 5HU", phone="01302 000002", website=""),
-    ]
-    # Same phone, and same name in the same postcode area; a shared
-    # company number alone doesn't make two showrooms one business.
-    assert find_duplicates(rows) == {0: 1, 5: 4}
-
-
-def test_unreliable_company_numbers():
-    from prospector.cleanse import unreliable_company_numbers
-    rows = [
-        row(company="ASE Kitchens & Bathrooms", company_number="09626308"),
-        row(company="ATD Kitchens & Bathrooms", company_number="09626308"),
-        row(company="Victoria Kitchens", postcode="SE7 7AJ", company_number="2"),
-        row(company="Victoria Kitchens", postcode="SM4 6EP", company_number="2"),
-        row(company="The Kitchen Centre", company_number="3"),
-        row(company="Norton Kitchen & Bedroom", company_number="4"),
-    ]
-    assert unreliable_company_numbers(rows) == {"09626308", "2", "3"}
-
-
 def test_best_match_needs_the_distinctive_words():
     generic = [{"title": "KITCHENS & BATHROOMS LTD", "company_number": "09626308", "company_status": "active",
                 "address_snippet": "London N1 1AA", "company_type": "ltd"}]
@@ -638,24 +573,55 @@ def test_best_match_needs_the_distinctive_words():
     assert best_match("Sutton Kitchens", "LS1 1AA", sutton) is None
 
 
-def test_run_skips_showrooms_the_cleanse_removed(tmp_path, monkeypatch, capsys):
-    from prospector import run
-    items = [place(), place(title="Beta Kitchens", website="https://beta-kitchens.co.uk/", phone="01926 000009"),
-             place(title="Warwick Kitchen Fitters", website="https://wkf.co.uk/", phone="01926 000008")]
-    f = tmp_path / "items.json"
-    f.write_text(json.dumps(items))
-    towns = tmp_path / "towns.csv"
-    towns.write_text("town,region\nWarwick,West Midlands\n")
-    monkeypatch.setattr("prospector.location.lookup", lambda pcs, session=None: {})
-    monkeypatch.setattr(run, "open_sheet", lambda sheet_id: object())
-    monkeypatch.setattr(run, "read_chains", lambda s: [])
-    monkeypatch.setattr(run, "read_prospects", lambda s: {r: {f: "" for f in INPUT_COLUMNS} for r in range(4, 10)})
-    monkeypatch.setattr(run, "read_removed", lambda s: {"d:acmekitchens.co.uk"})
-    monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", "x")
-    monkeypatch.setattr("prospector.run.OUTPUT", tmp_path)
-    main(["--towns", str(towns), "--maps-json", str(f), "--skip-companies-house", "--skip-meta", "--skip-google",
-          "--dry-run"])
-    out = capsys.readouterr().out
-    assert "1 removed in cleanse" in out and "1 Fitter or builder, no showroom" in out
-    rows = list(csv.DictReader(next(tmp_path.glob("prospects-*.csv")).open()))
-    assert [r["company"] for r in rows] == ["Beta Kitchens"]
+
+def test_people_from_page_text():
+    from prospector.people import find_people
+    assert find_people("Meet the team\nDave Smith\nFounder\nSarah Jones\nDesigner") == [("Dave Smith", "Founder")]
+    assert find_people("Owner: Mark O'Neill") == [("Mark O'Neill", "Owner")]
+    assert find_people("Hi, I'm Dave, the owner of Acme Kitchens") == [("Dave", "Owner")]
+    assert find_people("Jane Doe - Managing Director") == [("Jane Doe", "Managing Director")]
+    # Headings and nav words next to a role aren't names
+    assert find_people("Meet Our Founder\nOur Showroom Director") == []
+    assert find_people("Company Director Services") == []
+
+
+def test_company_numbers_and_emails():
+    from prospector.people import company_numbers, emails
+    assert company_numbers("Acme Ltd. Registered in England & Wales No. 1234567. VAT 123456789") == ["01234567"]
+    assert company_numbers("Company number: 09626308") == ["09626308"]
+    assert company_numbers("Reg no SC123456") == ["SC123456"]
+    assert emails("info@gmail.com sales@acme.co.uk logo@2x.png", "acme.co.uk") == ["sales@acme.co.uk", "info@gmail.com"]
+
+
+def test_scan_website_reads_about_pages(monkeypatch):
+    from prospector import people
+    home = ('<html><body><a href="/about-us">About us</a><a href="/showroom">Showroom</a>'
+            '<a href="https://www.facebook.com/acmekitchens/">fb</a>'
+            '<a href="mailto:hello@acmekitchens.co.uk">Email</a>'
+            '<footer>Acme Kitchens Ltd, company no. 01234567</footer></body></html>')
+    about = '<html><body><h2>Our story</h2><p>Tom Baker, Founder, opened the showroom in 1998.</p></body></html>'
+    pages = {"https://www.acmekitchens.co.uk/": home, "https://www.acmekitchens.co.uk/about-us": about}
+    monkeypatch.setattr(people, "fetch", lambda session, url: (pages.get(url), url))
+    scan = people.scan_website("https://www.acmekitchens.co.uk/")
+    assert scan["people"] == [("Tom Baker", "Founder")]
+    assert scan["company_numbers"] == ["01234567"]
+    assert scan["emails"] == ["hello@acmekitchens.co.uk"]
+    assert scan["facebook"] == "https://www.facebook.com/acmekitchens"
+    assert scan["pages"] == 2
+
+    class CH:
+        def by_number(self, n):
+            return {"company_number": n, "company_status": "Active", "incorporated": "1998-01-01",
+                    "decision_maker_name": "Thomas Baker", "decision_maker_role": "Director"}
+
+    # A registration number on the site beats a name on the page
+    fields = people.decide(scan, CH())
+    assert fields["decision_maker_name"] == "Thomas Baker"
+    assert fields["decision_maker_role"] == "Director (Companies House, number from website)"
+    assert people.decide(scan)["decision_maker_role"] == "Founder (website)"
+
+
+def test_json_ld_founder():
+    from prospector.people import people_from_json_ld
+    ld = '{"@type": "LocalBusiness", "founder": {"@type": "Person", "name": "Anna Lee"}}'
+    assert people_from_json_ld([ld]) == [("Anna Lee", "Founder")]

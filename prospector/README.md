@@ -1,6 +1,6 @@
 # Prospector
 
-Finds independent kitchen showrooms and fills the **Prospects** tab of the Cold Lead Template.
+Finds independent kitchen showrooms and fills the **All Prospects** tab of the Cold Lead Template.
 The sheet's own formulas then do the scoring, tiering and Call Queue.
 
 | Stage | Source | Fills in |
@@ -19,29 +19,18 @@ Premium check (positioning, brands, budget signals) and TPS are still manual.
 - **Running Google Ads** is Y only when they have an ad on that search. They could be advertising on other searches; this measures the search their customers would type.
 - These six columns are refreshed whenever a run finds the showroom again, so they can change. Your edits to them will be overwritten; every other column is only ever filled when blank.
 
-## Showroom-only cleanse
+## Finding decision makers
 
-Every new find must pass the cleanse in `prospector/cleanse.py` before it's added. Anything that fails goes on the **Skipped** tab with the reason:
+Actions → Prospect run → tick **find decision makers**. For every row on All Prospects with no Decision maker name it:
 
-| Reason | What it catches |
-|---|---|
-| Not in the UK | US listings (zip-code postcode or non-UK phone) |
-| In liquidation | Companies House says so |
-| Not a kitchen business | Cafés, bars, cookware and gift shops, commercial and outdoor kitchens |
-| Worktop or stone supplier | Worktop, quartz and granite firms (unless the name also says "kitchens") |
-| Trade supplier | Wholesalers, component and door suppliers |
-| Fitter or builder, no showroom | Fitters, installers, builders, refurb and respray firms, unless the name says showroom or studio |
-| Appliance shop / Furniture or homeware shop | Appliance, range cooker, furniture, bed and antique shops |
-| Joinery or furniture maker, not kitchens | Joiners, carpenters and furniture makers without "kitchen" in the name or website |
-| No showroom on Google Maps | Google doesn't list it as a store or showroom |
-| Kitchens not in name or website | Interiors and design firms that don't say kitchens anywhere |
-| No phone number | Nothing to call |
+1. Reads the showroom's website: home page plus up to 4 About / Meet the team / Our story / Contact pages.
+2. If a page gives a company registration number (usually in the footer), looks it up on Companies House and uses the longest-serving director. Company number, status and incorporation date are filled in too, replacing a "Not found".
+3. Otherwise uses a name the site gives as Owner, Founder, Managing Director, Director or Proprietor ("Dave Smith, Founder", "Owner: Dave Smith", "Hi, I'm Dave, the owner").
+4. With **facebook** ticked (Apify credit), tries the Facebook page the website links to, with the same rules.
 
-A showroom with the same phone number as one already on the tab, or the same name in the same postcode area, is treated as the same business.
+Decision maker role says where the name came from, e.g. "Founder (website)" or "Director (Companies House, number from website)". Email is filled in from the site when blank. Nothing already filled in is overwritten. Use **max rows** for a small test first.
 
-The **All Prospects** tab is the full scrape from before the first cleanse (30 Sep 2026), with a Cleanse result column. Runs never re-add a showroom listed there as removed. To keep one, copy its row back to Prospects; a showroom already on Prospects is never cleansed out.
-
-Companies House matches now need the distinctive part of the name to agree ("ASE Kitchens & Bathrooms" no longer matches "KITCHENS & BATHROOMS LTD"). The cleanse cleared company details that failed that test, so the next run that finds those showrooms looks them up again.
+Companies House name matches need the distinctive part of the name to agree, so "ASE Kitchens & Bathrooms" no longer matches "KITCHENS & BATHROOMS LTD".
 
 ## What it will and won't touch
 

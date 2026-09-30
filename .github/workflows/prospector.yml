@@ -23,6 +23,17 @@ on:
         description: "Don't search for new showrooms; only run the Meta and Google checks on rows already in the sheet"
         type: boolean
         default: false
+      find_decision_makers:
+        description: "Only find decision makers (website, then Companies House number, then Facebook) for rows without one"
+        type: boolean
+        default: false
+      facebook:
+        description: "With find decision makers: also check Facebook pages (uses Apify credit)"
+        type: boolean
+        default: false
+      max_rows:
+        description: "With find decision makers: only the first N rows (blank = all)"
+        default: ""
       dry_run:
         description: "Dry run (don't write to the sheet)"
         type: boolean
@@ -56,10 +67,21 @@ jobs:
           AD_CHECKS: ${{ inputs.ad_checks }}
           DRY_RUN: ${{ inputs.dry_run }}
           CHECKS_ONLY: ${{ inputs.checks_only }}
+          FIND_PEOPLE: ${{ inputs.find_decision_makers }}
+          FACEBOOK: ${{ inputs.facebook }}
+          MAX_ROWS: ${{ inputs.max_rows }}
           PYTHONUNBUFFERED: "1"
         # Scraped data is never uploaded as a workflow artifact: this repo is
         # public, so artifacts would be downloadable by anyone.
         run: |
+          if [ "$FIND_PEOPLE" = "true" ]; then
+            args=()
+            [ -n "$MAX_ROWS" ] && args+=(--limit "$MAX_ROWS")
+            [ "$FACEBOOK" = "true" ] && args+=(--facebook)
+            [ "$DRY_RUN" = "true" ] && args+=(--dry-run)
+            python -m prospector.people "${args[@]}"
+            exit
+          fi
           args=()
           [ -n "$REGION" ] && args+=(--region "$REGION")
           [ -n "$ONLY" ] && args+=(--only "$ONLY")

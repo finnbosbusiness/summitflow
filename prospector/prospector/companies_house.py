@@ -66,6 +66,25 @@ class CompaniesHouse:
         return out
 
 
+    def by_number(self, number: str) -> dict:
+        """Company details and director for a registration number (e.g. one
+        printed on the showroom's website). {} if it isn't a live company."""
+        company = self._get(f"/company/{number}") or {}
+        if company.get("company_status") not in _STATUS:
+            return {}
+        out = {
+            "company_number": number,
+            "company_status": _STATUS[company["company_status"]],
+            "incorporated": company.get("date_of_creation", ""),
+        }
+        officers = self._get(f"/company/{number}/officers", items_per_page=50) or {}
+        director = pick_director(officers.get("items") or [])
+        if director:
+            out["decision_maker_name"] = director
+            out["decision_maker_role"] = "Director"
+        return out
+
+
 def best_match(name, postcode, candidates):
     """Pick the search result that is really this showroom.
 
