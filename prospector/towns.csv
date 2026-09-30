@@ -1,6 +1,359 @@
 town,region
+Westminster,London
+Kensington,London
+Chelsea,London
+Fulham,London
+Hammersmith,London
+Chiswick,London
+Ealing,London
+Acton,London
+Hounslow,London
+Twickenham,London
+Richmond,London
+Kingston upon Thames,London
+Wimbledon,London
+Putney,London
+Wandsworth,London
+Clapham,London
+Battersea,London
+Balham,London
+Streatham,London
+Brixton,London
+Dulwich,London
+Peckham,London
+Greenwich,London
+Blackheath,London
+Lewisham,London
+Bromley,London
+Beckenham,London
+Orpington,London
+Croydon,London
+Purley,London
+Sutton,London
+Cheam,London
+Morden,London
+Mitcham,London
+Bexleyheath,London
+Sidcup,London
+Eltham,London
+Woolwich,London
+Dagenham,London
+Romford,London
+Hornchurch,London
+Upminster,London
+Ilford,London
+Barking,London
+Stratford,London
+Walthamstow,London
+Leytonstone,London
+Woodford,London
+Chingford,London
+Enfield,London
+Southgate,London
+Edmonton,London
+Tottenham,London
+Wood Green,London
+Muswell Hill,London
+Crouch End,London
+Highgate,London
+Hampstead,London
+Islington,London
+Camden,London
+Kentish Town,London
+Hackney,London
+Stoke Newington,London
+Shoreditch,London
+Canary Wharf,London
+Bethnal Green,London
+Barnet,London
+Finchley,London
+Edgware,London
+Mill Hill,London
+Hendon,London
+Golders Green,London
+Kilburn,London
+Wembley,London
+Harrow,London
+Pinner,London
+Ruislip,London
+Uxbridge,London
+Hayes,London
+Southall,London
+Hillingdon,London
+Brighton,South East
+Hove,South East
+Worthing,South East
+Eastbourne,South East
+Hastings,South East
+Bexhill,South East
+Lewes,South East
+Crawley,South East
+Horsham,South East
+Haywards Heath,South East
+East Grinstead,South East
+Burgess Hill,South East
+Chichester,South East
+Bognor Regis,South East
+Littlehampton,South East
+Guildford,South East
+Woking,South East
+Epsom,South East
+Leatherhead,South East
+Dorking,South East
+Reigate,South East
+Redhill,South East
+Farnham,South East
+Godalming,South East
+Camberley,South East
+Weybridge,South East
+Esher,South East
+Cobham,South East
+Staines,South East
+Egham,South East
+Tunbridge Wells,South East
+Tonbridge,South East
+Sevenoaks,South East
+Maidstone,South East
+Ashford,South East
+Canterbury,South East
+Folkestone,South East
+Dover,South East
+Margate,South East
+Ramsgate,South East
+Whitstable,South East
+Faversham,South East
+Sittingbourne,South East
+Chatham,South East
+Rochester,South East
+Gillingham,South East
+Gravesend,South East
+Dartford,South East
+Southampton,South East
+Portsmouth,South East
+Winchester,South East
+Basingstoke,South East
+Andover,South East
+Fareham,South East
+Petersfield,South East
+Alton,South East
+Farnborough,South East
+Fleet,South East
+Eastleigh,South East
+Romsey,South East
+Lymington,South East
+Ringwood,South East
+Havant,South East
+Waterlooville,South East
+Newport Isle of Wight,South East
+Reading,South East
+Wokingham,South East
+Bracknell,South East
+Newbury,South East
+Maidenhead,South East
+Windsor,South East
+Ascot,South East
+Slough,South East
+High Wycombe,South East
+Amersham,South East
+Beaconsfield,South East
+Gerrards Cross,South East
+Marlow,South East
+Aylesbury,South East
+Milton Keynes,South East
+Buckingham,South East
+Oxford,South East
+Abingdon,South East
+Didcot,South East
+Wantage,South East
+Witney,South East
+Banbury,South East
+Bicester,South East
+Henley-on-Thames,South East
+Thame,South East
+Bristol,South West
+Clifton,South West
+Bath,South West
+Weston-super-Mare,South West
+Clevedon,South West
+Portishead,South West
+Keynsham,South West
+Chippenham,South West
+Trowbridge,South West
+Salisbury,South West
+Swindon,South West
+Marlborough,South West
+Devizes,South West
+Warminster,South West
+Frome,South West
+Yeovil,South West
+Taunton,South West
+Bridgwater,South West
+Wells,South West
+Glastonbury,South West
+Street,South West
+Minehead,South West
+Cheltenham,South West
+Gloucester,South West
+Cirencester,South West
+Stroud,South West
+Tewkesbury,South West
+Stow-on-the-Wold,South West
+Exeter,South West
+Exmouth,South West
+Sidmouth,South West
+Honiton,South West
+Plymouth,South West
+Torquay,South West
+Paignton,South West
+Newton Abbot,South West
+Totnes,South West
+Barnstaple,South West
+Bideford,South West
+Tiverton,South West
+Okehampton,South West
+Truro,South West
+Falmouth,South West
+Newquay,South West
+St Austell,South West
+Bodmin,South West
+Penzance,South West
+Launceston,South West
+Bournemouth,South West
+Poole,South West
+Christchurch,South West
+Wimborne,South West
+Ferndown,South West
+Dorchester,South West
+Weymouth,South West
+Bridport,South West
+Sherborne,South West
+Blandford Forum,South West
+Shaftesbury,South West
+Cambridge,East of England
+Ely,East of England
+Huntingdon,East of England
+St Neots,East of England
+St Ives,East of England
+Peterborough,East of England
+Wisbech,East of England
+March,East of England
+Norwich,East of England
+Great Yarmouth,East of England
+King's Lynn,East of England
+Dereham,East of England
+Wymondham,East of England
+Cromer,East of England
+Holt,East of England
+Fakenham,East of England
+Ipswich,East of England
+Bury St Edmunds,East of England
+Newmarket,East of England
+Sudbury,East of England
+Stowmarket,East of England
+Felixstowe,East of England
+Woodbridge,East of England
+Lowestoft,East of England
+Haverhill,East of England
+Chelmsford,East of England
+Colchester,East of England
+Braintree,East of England
+Brentwood,East of England
+Billericay,East of England
+Basildon,East of England
+Southend-on-Sea,East of England
+Leigh-on-Sea,East of England
+Rayleigh,East of England
+Wickford,East of England
+Harlow,East of England
+Epping,East of England
+Loughton,East of England
+Saffron Walden,East of England
+Witham,East of England
+Maldon,East of England
+Clacton-on-Sea,East of England
+Frinton-on-Sea,East of England
+St Albans,East of England
+Harpenden,East of England
+Hemel Hempstead,East of England
+Berkhamsted,East of England
+Tring,East of England
+Watford,East of England
+Rickmansworth,East of England
+Bushey,East of England
+Borehamwood,East of England
+Hertford,East of England
+Ware,East of England
+Bishop's Stortford,East of England
+Stevenage,East of England
+Hitchin,East of England
+Letchworth,East of England
+Welwyn Garden City,East of England
+Hatfield,East of England
+Potters Bar,East of England
+Luton,East of England
+Dunstable,East of England
+Leighton Buzzard,East of England
+Bedford,East of England
+Biggleswade,East of England
+Ampthill,East of England
+Nottingham,East Midlands
+West Bridgford,East Midlands
+Beeston,East Midlands
+Arnold,East Midlands
+Mansfield,East Midlands
+Newark-on-Trent,East Midlands
+Worksop,East Midlands
+Retford,East Midlands
+Southwell,East Midlands
+Derby,East Midlands
+Belper,East Midlands
+Ashbourne,East Midlands
+Matlock,East Midlands
+Bakewell,East Midlands
+Buxton,East Midlands
+Chesterfield,East Midlands
+Ilkeston,East Midlands
+Long Eaton,East Midlands
+Ripley,East Midlands
+Swadlincote,East Midlands
+Glossop,East Midlands
+Leicester,East Midlands
+Loughborough,East Midlands
+Hinckley,East Midlands
+Market Harborough,East Midlands
+Melton Mowbray,East Midlands
+Oakham,East Midlands
+Coalville,East Midlands
+Ashby-de-la-Zouch,East Midlands
+Lutterworth,East Midlands
+Oadby,East Midlands
+Wigston,East Midlands
+Lincoln,East Midlands
+Grantham,East Midlands
+Boston,East Midlands
+Spalding,East Midlands
+Stamford,East Midlands
+Sleaford,East Midlands
+Louth,East Midlands
+Skegness,East Midlands
+Gainsborough,East Midlands
+Northampton,East Midlands
+Kettering,East Midlands
+Corby,East Midlands
+Wellingborough,East Midlands
+Daventry,East Midlands
+Towcester,East Midlands
+Rushden,East Midlands
+Oundle,East Midlands
 Birmingham,West Midlands
+Edgbaston,West Midlands
+Harborne,West Midlands
+Moseley,West Midlands
+Kings Heath,West Midlands
+Erdington,West Midlands
 Solihull,West Midlands
+Knowle,West Midlands
+Dorridge,West Midlands
 Sutton Coldfield,West Midlands
 Coventry,West Midlands
 Warwick,West Midlands
@@ -9,20 +362,178 @@ Stratford-upon-Avon,West Midlands
 Kenilworth,West Midlands
 Rugby,West Midlands
 Nuneaton,West Midlands
+Bedworth,West Midlands
+Atherstone,West Midlands
+Alcester,West Midlands
+Shipston-on-Stour,West Midlands
 Wolverhampton,West Midlands
 Walsall,West Midlands
 Dudley,West Midlands
+West Bromwich,West Midlands
+Halesowen,West Midlands
 Stourbridge,West Midlands
 Lichfield,West Midlands
 Tamworth,West Midlands
+Cannock,West Midlands
+Stafford,West Midlands
+Stone,West Midlands
+Rugeley,West Midlands
+Uttoxeter,West Midlands
+Leek,West Midlands
+Stoke-on-Trent,West Midlands
+Newcastle-under-Lyme,West Midlands
+Burton upon Trent,West Midlands
 Worcester,West Midlands
+Malvern,West Midlands
+Evesham,West Midlands
+Pershore,West Midlands
+Droitwich,West Midlands
 Redditch,West Midlands
 Bromsgrove,West Midlands
 Kidderminster,West Midlands
+Bewdley,West Midlands
 Hereford,West Midlands
+Ledbury,West Midlands
+Ross-on-Wye,West Midlands
+Leominster,West Midlands
 Shrewsbury,West Midlands
 Telford,West Midlands
-Stoke-on-Trent,West Midlands
-Stafford,West Midlands
-Newcastle-under-Lyme,West Midlands
-Burton upon Trent,West Midlands
+Bridgnorth,West Midlands
+Ludlow,West Midlands
+Oswestry,West Midlands
+Market Drayton,West Midlands
+Newport Shropshire,West Midlands
+Whitchurch Shropshire,West Midlands
+Leeds,Yorkshire & Humber
+Harrogate,Yorkshire & Humber
+Wetherby,Yorkshire & Humber
+Otley,Yorkshire & Humber
+Ilkley,Yorkshire & Humber
+Bradford,Yorkshire & Humber
+Keighley,Yorkshire & Humber
+Shipley,Yorkshire & Humber
+Skipton,Yorkshire & Humber
+Halifax,Yorkshire & Humber
+Huddersfield,Yorkshire & Humber
+Holmfirth,Yorkshire & Humber
+Brighouse,Yorkshire & Humber
+Dewsbury,Yorkshire & Humber
+Wakefield,Yorkshire & Humber
+Pontefract,Yorkshire & Humber
+Castleford,Yorkshire & Humber
+Barnsley,Yorkshire & Humber
+Sheffield,Yorkshire & Humber
+Rotherham,Yorkshire & Humber
+Doncaster,Yorkshire & Humber
+York,Yorkshire & Humber
+Selby,Yorkshire & Humber
+Tadcaster,Yorkshire & Humber
+Malton,Yorkshire & Humber
+Pickering,Yorkshire & Humber
+Thirsk,Yorkshire & Humber
+Northallerton,Yorkshire & Humber
+Ripon,Yorkshire & Humber
+Richmond North Yorkshire,Yorkshire & Humber
+Scarborough,Yorkshire & Humber
+Whitby,Yorkshire & Humber
+Bridlington,Yorkshire & Humber
+Driffield,Yorkshire & Humber
+Beverley,Yorkshire & Humber
+Hull,Yorkshire & Humber
+Hessle,Yorkshire & Humber
+Goole,Yorkshire & Humber
+Grimsby,Yorkshire & Humber
+Cleethorpes,Yorkshire & Humber
+Scunthorpe,Yorkshire & Humber
+Brigg,Yorkshire & Humber
+Manchester,North West
+Didsbury,North West
+Chorlton,North West
+Salford,North West
+Stockport,North West
+Altrincham,North West
+Sale,North West
+Wilmslow,North West
+Alderley Edge,North West
+Knutsford,North West
+Macclesfield,North West
+Congleton,North West
+Bramhall,North West
+Cheadle,North West
+Hale,North West
+Oldham,North West
+Rochdale,North West
+Bury,North West
+Bolton,North West
+Wigan,North West
+Leigh,North West
+Ashton-under-Lyne,North West
+Hyde,North West
+Stalybridge,North West
+Chester,North West
+Crewe,North West
+Nantwich,North West
+Northwich,North West
+Warrington,North West
+Widnes,North West
+Runcorn,North West
+Ellesmere Port,North West
+Liverpool,North West
+Formby,North West
+Southport,North West
+Ormskirk,North West
+St Helens,North West
+Birkenhead,North West
+Wallasey,North West
+Heswall,North West
+Preston,North West
+Chorley,North West
+Leyland,North West
+Blackburn,North West
+Burnley,North West
+Accrington,North West
+Clitheroe,North West
+Blackpool,North West
+Lytham St Annes,North West
+Poulton-le-Fylde,North West
+Lancaster,North West
+Morecambe,North West
+Kendal,North West
+Windermere,North West
+Carlisle,North West
+Penrith,North West
+Keswick,North West
+Barrow-in-Furness,North West
+Ulverston,North West
+Workington,North West
+Whitehaven,North West
+Newcastle upon Tyne,North East
+Gateshead,North East
+Sunderland,North East
+South Shields,North East
+North Shields,North East
+Tynemouth,North East
+Whitley Bay,North East
+Ponteland,North East
+Morpeth,North East
+Hexham,North East
+Cramlington,North East
+Ashington,North East
+Blyth,North East
+Alnwick,North East
+Berwick-upon-Tweed,North East
+Durham,North East
+Chester-le-Street,North East
+Consett,North East
+Stanley,North East
+Bishop Auckland,North East
+Darlington,North East
+Newton Aycliffe,North East
+Barnard Castle,North East
+Middlesbrough,North East
+Stockton-on-Tees,North East
+Hartlepool,North East
+Redcar,North East
+Yarm,North East
+Guisborough,North East
+Billingham,North East

@@ -2,12 +2,15 @@ name: Weekly prospect run
 
 on:
   schedule:
-    - cron: "17 5 * * 1"   # Mondays 05:17 UTC
+    - cron: "17 5 * * 1"   # Mondays 05:17 UTC, one region per week (see "Pick region")
   workflow_dispatch:
     inputs:
       region:
-        description: "Only this region (blank = every town in towns.csv)"
+        description: "Region to run (blank = every town in England)"
         default: "West Midlands"
+      only:
+        description: "Only these towns, comma-separated (e.g. Birmingham,Solihull)"
+        default: ""
       max_towns:
         description: "Only the first N towns (blank = all)"
         default: ""
@@ -19,7 +22,7 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 330
     defaults:
       run:
         working-directory: prospector
@@ -29,13 +32,29 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
+      - name: Pick region
+        id: region
+        env:
+          INPUT_REGION: ${{ inputs.region }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # Rotate through England's regions, one per week, so every region
+            # is refreshed every 9 weeks at a steady weekly cost.
+            regions=("London" "South East" "South West" "East of England" "East Midlands" \
+                     "West Midlands" "Yorkshire & Humber" "North West" "North East")
+            week=$(( 10#$(date -u +%V) ))
+            echo "value=${regions[$(( week % 9 ))]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=$INPUT_REGION" >> "$GITHUB_OUTPUT"
+          fi
       - name: Run
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           COMPANIES_HOUSE_API_KEY: ${{ secrets.COMPANIES_HOUSE_API_KEY }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHEET_ID: ${{ vars.SHEET_ID }}
-          REGION: ${{ github.event_name == 'schedule' && 'West Midlands' || inputs.region }}
+          REGION: ${{ steps.region.outputs.value }}
+          ONLY: ${{ inputs.only }}
           MAX_TOWNS: ${{ inputs.max_towns }}
           DRY_RUN: ${{ inputs.dry_run }}
         # Scraped data is never uploaded as a workflow artifact: this repo is
@@ -43,6 +62,7 @@ jobs:
         run: |
           args=()
           [ -n "$REGION" ] && args+=(--region "$REGION")
+          [ -n "$ONLY" ] && args+=(--only "$ONLY")
           [ -n "$MAX_TOWNS" ] && args+=(--max-towns "$MAX_TOWNS")
           [ "$DRY_RUN" = "true" ] && args+=(--dry-run)
           python -m prospector.run "${args[@]}"
