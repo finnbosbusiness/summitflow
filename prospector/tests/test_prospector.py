@@ -179,6 +179,7 @@ def test_director():
     assert format_officer_name("ACME HOLDINGS LIMITED") == "ACME HOLDINGS LIMITED"
     assert format_officer_name("BRUNDRETT, Richard,") == "Richard Brundrett"
     assert format_officer_name("BOGUE, Seamus Anthony,") == "Seamus Anthony Bogue"
+    assert format_officer_name("BOGUE, Seamus Anthony, Mr") == "Seamus Anthony Bogue"
 
 
 def test_dry_run_end_to_end(tmp_path, monkeypatch, capsys):
