@@ -3,14 +3,21 @@
 Finds independent kitchen showrooms and fills the **Prospects** tab of the Cold Lead Template.
 The sheet's own formulas then do the scoring, tiering and Call Queue.
 
-This pilot covers two stages:
-
 | Stage | Source | Fills in |
 |---|---|---|
 | 1. Find showrooms | Apify Google Maps scraper, one "kitchen showroom [town]" search per town | Company, Website, Phone, Town, Postcode, Region, Source, Physical showroom, Google rating, Google reviews |
+| 2. Meta ads | Apify Facebook Ad Library scraper, one search per showroom name | Running Meta ads, Oldest live ad start, Meta ad hook |
+| 3. Google check | Apify Google Search scraper, one "kitchen showroom [town]" search per town, plus the top 3 on Google Maps for the map pack | Running Google Ads, Result for kitchen showroom [town], Competitor ranking instead |
 | 4. Company details | Companies House API (free) | Company number, Company status, Incorporated, Decision maker name, Decision maker role |
 
-Meta ads, Google gap, premium check and TPS are still manual (later stages).
+Premium check (positioning, brands, budget signals) and TPS are still manual.
+
+### How the Meta and Google checks decide
+
+- **Meta:** the Ad Library search matches loosely, so an active ad only counts if it links to the showroom's website or comes from a Facebook page with the showroom's name. Oldest live ad start is the earliest start date among its active ads (up to 30 checked), and the hook is the first sentence of that ad.
+- **Google:** Result is where the showroom shows for "kitchen showroom [its town]": Google Ads if it has an ad there, else Map pack if it's in the top 3 on Google Maps, else Organic top 10, else Not found. Competitor ranking instead is the top map pack showroom that isn't them (or the top organic result that isn't a directory like Houzz or Checkatrade).
+- **Running Google Ads** is Y only when they have an ad on that search. They could be advertising on other searches; this measures the search their customers would type.
+- These six columns are refreshed whenever a run finds the showroom again (every 9 weeks with the region rotation), so they can change. Your edits to them will be overwritten; every other column is only ever filled when blank.
 
 ## What it will and won't touch
 
@@ -43,7 +50,7 @@ Meta ads, Google gap, premium check and TPS are still manual (later stages).
 
 ## Running it
 
-**From GitHub**: Actions → Weekly prospect run → Run workflow. For a first test, use region `West Midlands`, max towns `2`, and tick dry run. Then run it for real.
+**From GitHub**: Actions → Weekly prospect run → Run workflow. Tick "only run the Meta and Google checks" to refresh the ad columns on rows already in the sheet without searching for new showrooms. For a first test, use region `West Midlands`, max towns `2`, and tick dry run. Then run it for real.
 
 It runs automatically every Monday at 05:17 UTC, one English region per week in turn, so every region is refreshed every 9 weeks. To run specific towns, fill in the "Only these towns" box, e.g. `Birmingham,Solihull`.
 

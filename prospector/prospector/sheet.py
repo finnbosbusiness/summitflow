@@ -11,13 +11,15 @@ _READ_RANGE = f"B{FIRST_ROW}:AE{LAST_ROW}"
 _OFFSET = col_index("B")
 # Written as text: Sheets would otherwise read "+44 ..." as a formula and
 # drop the leading zero from phone and company numbers.
-_TEXT_FIELDS = {"phone", "company_number", "postcode"}
+# Free text is protected too: an ad hook starting with "+" or "=" would
+# otherwise be read as a formula.
+_TEXT_FIELDS = {"phone", "company_number", "postcode", "meta_ad_hook", "competitor_ranking"}
 
 
 def _cell(field, value):
     if value is None:
         return None
-    if field in _TEXT_FIELDS:
+    if field in _TEXT_FIELDS and value != "":
         return "'" + str(value)
     return value
 
@@ -104,6 +106,17 @@ class Plan:
             if field not in INPUT_COLUMNS or value in ("", None):
                 continue
             if str(current.get(field, "")).strip() == "":
+                current[field] = value
+                self.updates.setdefault(row, {})[field] = value
+
+    def set(self, row, values):
+        """Overwrite cells, including clearing them with "". Only used for
+        the ad and search columns, which the script owns and refreshes."""
+        current = self.rows[row]
+        for field, value in values.items():
+            if field not in INPUT_COLUMNS or value is None:
+                continue
+            if str(current.get(field, "")) != str(value):
                 current[field] = value
                 self.updates.setdefault(row, {})[field] = value
 
