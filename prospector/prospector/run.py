@@ -13,7 +13,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from . import google, location, maps, meta
+from . import google, location, maps, meta, places
 from .chains import FALLBACK_CHAINS, is_chain
 from .columns import INPUT_COLUMNS
 from .companies_house import CompaniesHouse
@@ -51,14 +51,14 @@ def main(argv=None):
     ap.add_argument("--region", help="only run towns in this region, e.g. 'West Midlands'")
     ap.add_argument("--only", help="comma-separated towns to run, e.g. 'Birmingham,Solihull'")
     ap.add_argument("--max-towns", type=int, help="only the first N towns (for a cheap test)")
-    ap.add_argument("--max-per-town", type=int, default=40, help="Google Maps results per town (default 40)")
+    ap.add_argument("--max-per-town", type=int, default=20, help="Google Places results per town (default 20, one page)")
     ap.add_argument("--maps-json", help="reuse a saved Apify result instead of scraping again")
     ap.add_argument("--skip-companies-house", action="store_true")
     ap.add_argument("--skip-meta", action="store_true", help="skip stage 2 (Meta Ad Library)")
     ap.add_argument("--skip-google", action="store_true", help="skip stage 3 (Google search check)")
     ap.add_argument("--no-maps", action="store_true",
                     help="don't search for new showrooms; only fill in ad and search checks for rows already on the sheet")
-    ap.add_argument("--ads-per-search", type=int, default=30, help="Meta ads fetched per showroom (default 30)")
+    ap.add_argument("--ads-per-search", type=int, default=5, help="Meta ads fetched per showroom (default 5; you pay per ad)")
     ap.add_argument("--dry-run", action="store_true", help="write a CSV to output/ instead of the sheet")
     args = ap.parse_args(argv)
 
@@ -92,16 +92,17 @@ def main(argv=None):
 
     # Stage 1: Google Maps
     token = os.environ.get("APIFY_TOKEN", "")
+    places_key = os.environ.get("GOOGLE_PLACES_API_KEY", "")
     if args.no_maps:
         items = []
     elif args.maps_json:
         items = json.loads(Path(args.maps_json).read_text())
     else:
-        token or sys.exit("APIFY_TOKEN is not set.")
-        items = maps.run_search(token, list(towns), args.max_per_town)
+        places_key or sys.exit("GOOGLE_PLACES_API_KEY is not set.")
+        items = places.run_search(places_key, [maps.QUERY.format(town=t) for t in towns], args.max_per_town)
         raw = OUTPUT / f"maps-{stamp}.json"
         raw.write_text(json.dumps(items))
-        print(f"Saved raw Maps results to {raw} (reuse with --maps-json)")
+        print(f"Saved raw Places results to {raw} (reuse with --maps-json)")
 
     counts = Counter()
     prospects, seen = [], set()
@@ -122,10 +123,10 @@ def main(argv=None):
         prospects.append(p)
 
     # Region from each showroom's own postcode, not from the search.
-    places = location.lookup(p["postcode"] for p in prospects)
+    postcode_info = location.lookup(p["postcode"] for p in prospects)
     kept = []
     for p in prospects:
-        info = places.get(location.normalise(p["postcode"]))
+        info = postcode_info.get(location.normalise(p["postcode"]))
         region = (info or {}).get("region") or location.region_from_area(p["postcode"]) or p["_searched_region"]
         if location.country_of_region(region) not in COUNTRIES:
             counts["outside England"] += 1
@@ -173,39 +174,25 @@ def main(argv=None):
 
     failures = []
 
-    # Stage 2: Meta Ad Library
-    try:
-        if not args.skip_meta:
-            todo = targets("running_meta_ads")
-            if todo:
-                token or sys.exit("APIFY_TOKEN is not set (or use --skip-meta).")
-                print(f"Meta: searching the Ad Library for {len(todo)} showrooms")
-                ads = meta.run_search(token, [plan.rows[r]["company"] for r in todo], args.ads_per_search)
-                running = 0
-                for r in todo:
-                    v = plan.rows[r]
-                    res = meta.result_for(v["company"], v.get("website", ""), ads)
-                    running += res["running_meta_ads"] == "Y"
-                    plan.set(r, res)
-                print(f"Meta: {running} of {len(todo)} running Meta ads ({len(ads)} ads checked)")
-    except Exception as e:  # keep going: the other stages' results still get written
-        failures.append("Meta")
-        print(f"Meta: FAILED, skipped this run ({e})")
-
+    # Stage 3 runs before stage 2 so Meta is only checked where there's a gap.
     # Stage 3: Google search for "kitchen showroom [town]"
     try:
         if not args.skip_google:
             todo = [r for r in targets("search_result") if str(plan.rows[r].get("town", "")).strip()]
             if todo:
-                token or sys.exit("APIFY_TOKEN is not set (or use --skip-google).")
+                if not token:
+                    raise RuntimeError("APIFY_TOKEN is not set (or use --skip-google)")
                 check_towns = sorted({plan.rows[r]["town"].strip() for r in todo})
                 print(f"Google: searching 'kitchen showroom [town]' for {len(check_towns)} towns ({len(todo)} showrooms)")
                 searches = google.run_searches(token, check_towns)
-                # Stage 1 already ran the same search on Maps for its towns; reuse
+                # Stage 1 already ran the same Places search for its towns; reuse
                 # its top 3 as the map pack and only look up the rest.
                 packs = google.map_packs_from_items(items, [t for t in check_towns if t in towns])
                 missing = [t for t in check_towns if t not in packs]
-                packs.update(google.run_map_packs(token, missing))
+                if missing:
+                    if not places_key:
+                        raise RuntimeError("GOOGLE_PLACES_API_KEY is not set (or use --skip-google)")
+                    packs.update(google.run_map_packs(places_key, missing))
                 found = Counter()
                 for r in todo:
                     v = plan.rows[r]
@@ -219,6 +206,30 @@ def main(argv=None):
     except Exception as e:  # keep going: the other stages' results still get written
         failures.append("Google")
         print(f"Google: FAILED, skipped this run ({e})")
+
+    # Stage 2: Meta Ad Library (runs after the Google check, see above)
+    try:
+        if not args.skip_meta:
+            # Only showrooms with a Google gap: the ones already in the map
+            # pack or running Google Ads aren't the prospects you want, and
+            # every Ad Library result costs money.
+            todo = [r for r in targets("running_meta_ads")
+                    if plan.rows[r].get("search_result") in ("Not found", "Organic top 10")]
+            if todo:
+                if not token:
+                    raise RuntimeError("APIFY_TOKEN is not set (or use --skip-meta)")
+                print(f"Meta: searching the Ad Library for {len(todo)} showrooms")
+                ads = meta.run_search(token, [plan.rows[r]["company"] for r in todo], args.ads_per_search)
+                running = 0
+                for r in todo:
+                    v = plan.rows[r]
+                    res = meta.result_for(v["company"], v.get("website", ""), ads)
+                    running += res["running_meta_ads"] == "Y"
+                    plan.set(r, res)
+                print(f"Meta: {running} of {len(todo)} running Meta ads ({len(ads)} ads checked)")
+    except Exception as e:  # keep going: the other stages' results still get written
+        failures.append("Meta")
+        print(f"Meta: FAILED, skipped this run ({e})")
 
     if plan.out_of_room:
         print(f"WARNING: Prospects tab is full; {plan.out_of_room} prospects not added. Extend formulas past row 3003.")

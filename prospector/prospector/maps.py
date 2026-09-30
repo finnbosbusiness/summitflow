@@ -1,14 +1,12 @@
-"""Stage 1: find kitchen showrooms on Google Maps via the Apify
-Google Maps scraper (compass/crawler-google-places)."""
+"""Turn a Google Maps / Places result into a Prospects row, and decide
+whether it is an independent kitchen showroom at all."""
 
 import re
 from urllib.parse import urlparse
 
-from .apify import run_actor
 from .location import normalise
 from .matching import domain
 
-ACTOR = "compass/crawler-google-places"
 QUERY = "kitchen showroom {town}"
 
 _RELEVANT = ("kitchen", "cabinet")
@@ -22,17 +20,6 @@ _NOT_SHOWROOM = (
 )
 # A website path like /showrooms/solihull means one branch of a bigger business.
 _BRANCH_PATH = re.compile(r"/(showrooms?|branch(es)?|stores?|locations?)/[^/]+", re.I)
-
-
-def run_search(token: str, towns, max_per_town: int = 40):
-    """Run one Apify job covering every town and return the raw place items."""
-    return run_actor(token, ACTOR, {
-        "searchStringsArray": [QUERY.format(town=t) for t in towns],
-        "countryCode": "gb",
-        "language": "en",
-        "maxCrawledPlacesPerSearch": max_per_town,
-        "skipClosedPlaces": True,
-    })
 
 
 def uk_phone(phone: str) -> str:
@@ -78,6 +65,11 @@ def to_prospect(item, town_regions):
     cats = _categories(item)
     lname = name.lower()
     kitchen = "kitchen" in lname or any(k in c for c in cats for k in _RELEVANT)
+    if item.get("_trusted") and not kitchen:
+        # Google matched it to "kitchen showroom"; only drop names that say
+        # they are something else, like a bathroom-only showroom.
+        kitchen = not any(w in lname for w in ("bathroom", "bedroom", "tile", "flooring", "door", "window"))
+        kitchen = kitchen or "kbb" in lname
     # The main Maps category decides it ("Appliance store", "Coffee machine
     # supplier"). The name only counts when it doesn't say kitchen, so
     # "Connelly's Kitchens & Appliances" stays in.

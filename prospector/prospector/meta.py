@@ -1,9 +1,10 @@
 """Stage 2: is the showroom running Meta (Facebook/Instagram) ads, since when,
 and what does the ad say? Uses the Apify Facebook Ad Library scraper.
 
-The Ad Library keyword search is loose (searching "Madina Kitchens" also
-returns other advertisers' ads), so an ad only counts when it links to the
-showroom's own website or comes from a Facebook page with the showroom's name.
+Each showroom is searched as an exact phrase, and you pay per ad returned,
+so only a few ads are fetched per showroom. The search still returns other
+advertisers' ads that mention the name, so an ad only counts when it links
+to the showroom's own website or comes from a Facebook page with its name.
 """
 
 import datetime as dt
@@ -16,7 +17,7 @@ from .matching import clean_name, domain, name_similarity
 ACTOR = "apify/facebook-ads-scraper"
 LIBRARY = (
     "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=GB"
-    "&search_type=keyword_unordered&media_type=all&q={q}"
+    "&search_type=keyword_exact_phrase&media_type=all&q={q}"
 )
 PAGE_NAME_MATCH = 0.85
 

@@ -3,8 +3,8 @@
 
 One search per town covers every showroom in that town. The organic top 10
 and ads come from the Apify Google Search scraper. That scraper doesn't list
-the businesses in the map pack, so the map pack is taken from the top 3
-Google Maps results for the same search, which is what the pack shows.
+the businesses in the map pack, so the map pack is the top 3 from Google's
+Places search for the same query.
 
 Running Google Ads = Y only when the showroom has an ad on this search. A
 showroom could be advertising on other searches; this measures the search a
@@ -14,8 +14,8 @@ customer in their town would actually type.
 import re
 from urllib.parse import quote_plus
 
+from . import places
 from .apify import run_actor
-from .maps import ACTOR as MAPS_ACTOR
 from .maps import QUERY
 from .matching import domain, name_similarity
 
@@ -59,17 +59,10 @@ def run_searches(token: str, towns):
     return out
 
 
-def run_map_packs(token: str, towns):
-    """{town: [top 3 Maps places]}"""
+def run_map_packs(places_key: str, towns):
+    """{town: [top 3 places]} from Google's Places search for the same query."""
     towns = sorted(set(towns))
-    if not towns:
-        return {}
-    items = run_actor(token, MAPS_ACTOR, {
-        "searchStringsArray": [query(t) for t in towns],
-        "countryCode": "gb",
-        "language": "en",
-        "maxCrawledPlacesPerSearch": PACK_SIZE,
-    })
+    items = places.run_search(places_key, [query(t) for t in towns], PACK_SIZE) if towns else []
     return map_packs_from_items(items, towns)
 
 
