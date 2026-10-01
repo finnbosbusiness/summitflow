@@ -34,6 +34,9 @@ NICHES = {
             "Toolstation", "Wickes", "B&Q", "Homebase", "IKEA", "Howdens", "Magnet", "Wren", "Jewson",
             "Travis Perkins", "Selco", "Benchmarx", "BSS", "Bathroom Showroom Direct", "Tap Warehouse",
             "Bathroom Mountain", "Mypad", "Soak.com", "John Lewis", "Dunelm", "Harvey Norman",
+            "Tippers", "Bradfords", "EH Smith", "Victoria + Albert", "Victoria and Albert Baths", "Huws Gray",
+            "Clifton Trade", "James Hargreaves", "Plumbing World", "Fryers", "Edwards Bathrooms", "Grant & Stone",
+            "Bathroom Studio by Graham", "Bathroom Village", "Ashton & Bentley",
         ],
     },
 }
@@ -68,7 +71,7 @@ _NOT_BATHROOM = re.compile(
     r"\b(plumbing (supplies|merchants?|centre|center)|plumbers? merchants?|builders? merchants?|merchants?|"
     r"supplies|wholesale|trade counter|heating supplies|boiler|radiators?|tiles? only|"
     r"restaurant|cafe|café|pub|hotel|salon|beauty|nails?|gym|care home|toilets? hire|portable toilets?|"
-    r"loo hire|cleaning|cleaners?|resurfacing|re-?enamel)\b",
+    r"loo hire|cleaning|cleaners?|resurfacing|re-?enamel|head office)\b",
     re.I,
 )
 _NOT_BATHROOM_CATEGORY = re.compile(
