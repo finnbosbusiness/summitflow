@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       niche:
-        description: "Which trade: kitchen (All Prospects tab) or roofing (Roofing Prospects tab)"
+        description: "Which trade: kitchen (All Prospects), roofing (Roofing Prospects) or bathroom (Bathroom Prospects)"
         type: choice
-        options: [kitchen, roofing]
+        options: [kitchen, roofing, bathroom]
         default: kitchen
       region:
         description: "Region to run, or England for every town"

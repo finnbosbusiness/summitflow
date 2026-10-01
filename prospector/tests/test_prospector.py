@@ -697,3 +697,20 @@ def test_people_filters_non_names():
     assert _is_name("Steven Atkins", "Atkins Roofing")
     scan = {"people": [("Prestige Roof", "Founder"), ("Jane Doe", "Owner")], "company_numbers": [], "emails": []}
     assert decide(scan, company="Prestige Roof LTD")["decision_maker_name"] == "Jane Doe"
+
+
+def test_bathroom_filter():
+    def reason(**kw):
+        kw = {"categoryName": "Bathroom supply store", "categories": ["Bathroom supply store", "store"], **kw}
+        return maps.to_prospect(place(searchString="bathroom showroom Warwick", **kw), TOWNS, "bathroom",
+                                "bathroom showroom {town}")
+    p, why = reason(title="Warwick Bathroom Studio", website="https://warwickbathrooms.co.uk/")
+    assert why is None and p["physical_showroom"] == "Y"
+    assert reason(title="Acme Kitchens & Bathrooms")[1] is None
+    assert reason(title="City Plumbing Supplies")[1] == "not a bathroom showroom"
+    assert reason(title="Bath Spa Hotel", categoryName="Hotel", categories=["Hotel"])[1] == "not a bathroom showroom"
+    assert reason(title="Smith Builders", categoryName="General contractor", categories=["General contractor"])[1] == "not bathroom"
+    gc = {"categoryName": "General contractor", "categories": ["General contractor"]}
+    assert reason(title="Bath Kitchen Company", **gc)[1] == "not bathroom"
+    assert reason(title="Leamington Spa Bathrooms")[1] is None
+    assert reason(title="Mobility Bathrooms Direct")[1] is None

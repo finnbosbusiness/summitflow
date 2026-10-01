@@ -375,7 +375,8 @@ def main(argv=None):
     from .sheet import Plan, configure, open_sheet, read_prospects, tidy, write
 
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--niche", default="kitchen", choices=["kitchen", "roofing"], help="which trade's tab")
+    ap.add_argument("--niche", default="kitchen", choices=["kitchen", "roofing", "bathroom"],
+                    help="which trade's tab")
     ap.add_argument("--limit", type=int, help="only the first N rows without a name (for a test)")
     ap.add_argument("--facebook", action="store_true", help="also check Facebook pages via Apify (paid)")
     ap.add_argument("--workers", type=int, default=8, help="websites read at once")

@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 from .location import clean_town, normalise
 from .matching import domain
-from .niches import roofing_reason
+from .niches import bathroom_reason, roofing_reason
 
 QUERY = "kitchen showroom {town}"
 
@@ -83,6 +83,13 @@ def to_prospect(item, town_regions, niche="kitchen", query=QUERY):
         if not name or why:
             return None, why or "not roofing"
         return _row(item, name, town_regions, query, showroom=False), None
+    if niche == "bathroom":
+        why = bathroom_reason(name, cats, item.get("categoryName") or "")
+        if not name or why:
+            return None, why or "not bathroom"
+        if is_branch_page(item.get("website") or ""):
+            return None, "branch"
+        return _row(item, name, town_regions, query, showroom=True), None
     kitchen = "kitchen" in lname or any(k in c for c in cats for k in _RELEVANT)
     if item.get("_trusted") and not kitchen:
         # Google matched it to "kitchen showroom", but without "kitchen" in

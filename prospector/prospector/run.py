@@ -50,7 +50,7 @@ def load_towns(path, region=None):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--niche", default="kitchen", choices=["kitchen", "roofing"],
+    ap.add_argument("--niche", default="kitchen", choices=["kitchen", "roofing", "bathroom"],
                     help="which trade to search for; each has its own tab (see niches.py)")
     ap.add_argument("--towns", default=str(HERE / "towns.csv"), help="CSV with town,region columns")
     ap.add_argument("--region", help="only run towns in this region, e.g. 'West Midlands'")
@@ -94,7 +94,10 @@ def main(argv=None):
 
     # Existing sheet state
     spreadsheet = open_sheet(sheet_id) if has_sheet else None
-    chains = (read_chains(spreadsheet) if spreadsheet else FALLBACK_CHAINS) if niche["chains"] else []
+    if isinstance(niche["chains"], list):
+        chains = niche["chains"]
+    else:
+        chains = (read_chains(spreadsheet) if spreadsheet else FALLBACK_CHAINS) if niche["chains"] else []
     plan = Plan(read_prospects(spreadsheet) if spreadsheet else {})
     if not spreadsheet:
         plan.free = list(range(FIRST_ROW, sheet.ROWS[0] + 1))
