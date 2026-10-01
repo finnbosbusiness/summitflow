@@ -708,7 +708,8 @@ def test_bathroom_filter():
     assert why is None and p["physical_showroom"] == "Y"
     assert reason(title="Acme Kitchens & Bathrooms")[1] is None
     assert reason(title="City Plumbing Supplies")[1] == "not a bathroom showroom"
-    assert reason(title="Bath Spa Hotel", categoryName="Hotel", categories=["Hotel"])[1] == "not a bathroom showroom"
+    assert reason(title="Bath Spa Hotel", categoryName="Hotel", categories=["Hotel"])[1] == "not bathroom"
+    assert reason(title="Hotel Bathrooms", categoryName="Hotel", categories=["Hotel"])[1] == "not a bathroom showroom"
     assert reason(title="Smith Builders", categoryName="General contractor", categories=["General contractor"])[1] == "not bathroom"
     gc = {"categoryName": "General contractor", "categories": ["General contractor"]}
     assert reason(title="Bath Kitchen Company", **gc)[1] == "not bathroom"
