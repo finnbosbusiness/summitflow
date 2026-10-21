@@ -589,11 +589,392 @@ footer{background:var(--panel);border-top:1px solid var(--line);padding:26px 0;}
 .followup-visual{max-width:100%;}
 @media(max-width:800px){.guarantee-grid{grid-template-columns:1fr;gap:34px}.guarantee-copy .h2{max-width:15ch}.guarantee-card{max-width:580px}}
 @media(max-width:600px){.guarantee-card{padding:23px;border-radius:19px}.guarantee-number{gap:16px}.guarantee-number strong{font-size:78px}.guarantee-card-bottom{gap:12px}.guarantee-protection{padding-left:12px}.guarantee-card-bottom b{font-size:15px}.guarantee-protection b{font-size:13px}}
+
+/* Cleaner How it works follow-up flow */
+.hero .h1{max-width:12ch;}
+.followup-bottom--clean{margin-top:28px;padding-top:26px;grid-template-columns:minmax(230px,.68fr) minmax(0,1.32fr);gap:38px;align-items:center;}
+.followup-bottom--clean .followup-bottom-intro h3{font-size:clamp(24px,2.2vw,31px);line-height:1.08;letter-spacing:-.045em;margin:0 0 10px;color:var(--ink-d);}
+.followup-bottom--clean .followup-bottom-intro p{max-width:32ch;margin:0;color:var(--mute-d);font-size:14px;line-height:1.55;}
+.followup-visual--clean{margin:0;padding:18px;border:1px solid rgba(18,25,38,.1);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(246,247,249,.96));box-shadow:0 14px 36px rgba(15,23,42,.06);}
+.followup-visual--clean .followup-flow{gap:10px;}
+.followup-visual--clean .followup-node{min-height:104px;padding:14px 12px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:7px;background:#fff;border:1px solid rgba(18,25,38,.1);border-radius:14px;box-shadow:0 3px 10px rgba(15,23,42,.025);}
+.followup-visual--clean .followup-node strong{font-size:12px;color:#111827;line-height:1.25;}
+.followup-visual--clean .followup-node span{font-size:10.5px;color:#6b7280;line-height:1.35;}
+.followup-visual--clean .mini-icon{width:30px;height:30px;display:grid;place-items:center;background:#eaf0ff;color:#3478f6;border-radius:9px;}
+.followup-visual--clean .followup-node--booked .mini-icon{background:#e3f7ea;color:#16834a;}
+.followup-visual--clean .flow-arrow{color:#3478f6;font-size:19px;}
+.followup-foot--clean{display:flex;align-items:center;justify-content:center;gap:9px;border-top:1px solid rgba(18,25,38,.09);padding-top:14px;margin-top:15px;color:#374151;font-size:12px;}
+.done-check{width:19px;height:19px;display:grid;place-items:center;background:#20a65a;color:white;border-radius:50%;font-size:12px;font-weight:800;}
+@media(max-width:760px){.hero .h1{max-width:13ch}.followup-bottom--clean{grid-template-columns:1fr;gap:18px;margin-top:24px;padding-top:22px}.followup-visual--clean{padding:12px}.followup-visual--clean .followup-flow{grid-template-columns:1fr;gap:8px}.followup-visual--clean .followup-node{min-height:0;display:grid;grid-template-columns:30px 1fr;column-gap:10px;align-items:center}.followup-visual--clean .mini-icon{grid-row:1 / span 2}.followup-visual--clean .followup-node span{grid-column:2}.followup-visual--clean .flow-arrow{transform:rotate(90deg);justify-self:center;line-height:14px}.followup-foot--clean{font-size:11px}}
+
+
+.guarantee-card{box-shadow:0 22px 56px rgba(0,0,0,.2);}
+.guarantee-number strong{letter-spacing:-.075em;}
+.guarantee-card-top{margin-bottom:20px;}
+
+
+
+/* Final visual tidy-up: stronger first fold, tighter process section, calmer guarantee */
+@media (min-width: 761px) {
+  .hero {
+    min-height: 86vh;
+    padding-top: 142px;
+    padding-bottom: 78px;
+    display: flex;
+    align-items: center;
+  }
+  .hero-grid { width: 100%; }
+}
+
+/* Make How it works feel like one compact, intentional section */
+#offer.sect--air { padding-top: 76px; padding-bottom: 82px; }
+#offer .split { gap: clamp(42px, 5vw, 70px); }
+#offer .sticky-head { top: 96px; }
+#offer .sticky-head .h2 { max-width: 10ch; font-size: clamp(38px, 3.6vw, 52px); line-height: 1.02; margin-bottom: 18px !important; }
+#offer .offer-note { margin-top: 26px; padding-top: 18px; max-width: 32ch; font-size: 13px; line-height: 1.55; }
+#offer .row-item { padding: 23px 0; grid-template-columns: 36px minmax(0,1fr); gap: 18px; }
+#offer .row-item h3 { font-size: clamp(18px, 1.5vw, 21px); margin-bottom: 5px; }
+#offer .row-item p { max-width: 46ch; font-size: 14.5px; line-height: 1.55; }
+#offer .followup-bottom--clean { margin-top: 28px; padding-top: 24px; gap: 28px; align-items: center; }
+#offer .followup-bottom-intro h3 { font-size: clamp(23px, 2vw, 28px); }
+#offer .followup-visual--clean { margin-top: 0; padding: 18px; border-radius: 18px; background: #fff; border: 1px solid rgba(10,14,22,.10); box-shadow: 0 12px 34px rgba(10,14,22,.06); }
+#offer .followup-flow { gap: 8px; }
+#offer .followup-node { min-height: 88px; padding: 13px 11px; border-radius: 12px; background: #f7f8fa; border: 1px solid rgba(10,14,22,.08); }
+#offer .followup-node strong { display:block; font-size: 12px; line-height: 1.3; margin: 7px 0 4px; color: #111827; }
+#offer .followup-node span { display:block; font-size: 10.5px; line-height: 1.4; color: #68707d; }
+#offer .followup-node .mini-icon { display:grid; place-items:center; width:27px; height:27px; border-radius:8px; background:#e9f0ff; color:#2867e8; }
+#offer .followup-node--booked { background:#f1fbf5; border-color:rgba(22,163,74,.17); }
+#offer .followup-node--booked .mini-icon { background:#d9f7e4; color:#168348; }
+#offer .followup-foot--clean { display:flex; justify-content:center; align-items:center; gap:8px; padding-top:13px; margin-top:13px; border-top:1px solid rgba(10,14,22,.08); color:#333b47; font-size:12px; }
+#offer .done-check { display:grid; place-items:center; width:19px; height:19px; border-radius:50%; background:#21ad65; color:white; font-size:12px; }
+
+/* Give the commitment room to breathe, without turning it into a dashboard */
+#guarantee.sect--tight { padding-top: 88px; padding-bottom: 88px; }
+#guarantee .guarantee-grid { grid-template-columns:minmax(0,1fr) minmax(340px,.88fr); gap: clamp(42px,6vw,84px); }
+#guarantee .guarantee-copy .h2 { max-width: 14ch; font-size: clamp(36px,3.7vw,50px); line-height:1.06; margin-bottom:18px; }
+#guarantee .guarantee-copy .lead { max-width: 48ch; font-size:16px; line-height:1.65; }
+#guarantee .guarantee-note { margin-top:14px; font-size:12px; }
+#guarantee .guarantee-card { padding: clamp(24px,2.6vw,32px); border-radius:20px; }
+#guarantee .guarantee-card-top { margin-bottom:14px; }
+#guarantee .guarantee-number { margin:22px 0 20px; gap:17px; }
+#guarantee .guarantee-number strong { font-size:clamp(72px,7.5vw,98px); }
+#guarantee .guarantee-number span { font-size:17px; }
+#guarantee .guarantee-card-bottom { padding-top:18px; gap:14px; }
+#guarantee .guarantee-card-bottom b { font-size:15px; }
+#guarantee .guarantee-card-bottom small { font-size:11px; margin-top:5px; }
+#guarantee .guarantee-disclaimer { margin-top:16px; }
+
+@media (max-width: 760px) {
+  .hero { min-height:0; padding:118px 0 38px; display:block; }
+  #offer.sect--air { padding-top:54px; padding-bottom:58px; }
+  #offer .row-item { padding:19px 0; }
+  #offer .followup-bottom--clean { margin-top:24px; padding-top:22px; }
+  #offer .followup-visual--clean { padding:12px; }
+  #offer .followup-node { min-height:0; }
+  #guarantee.sect--tight { padding-top:60px; padding-bottom:60px; }
+  #guarantee .guarantee-grid { grid-template-columns:1fr; gap:28px; }
+  #guarantee .guarantee-card { padding:24px; }
+}
+
+
+/* Final spacing pass: make How it works and FAQs feel balanced, not stretched */
+#offer.sect--air { padding-top: 64px !important; padding-bottom: 62px !important; }
+#offer .split { align-items: start; gap: clamp(38px, 4.2vw, 58px) !important; }
+#offer .sticky-head { position: relative; top: auto !important; }
+#offer .sticky-head .h2 { max-width: 12ch !important; font-size: clamp(36px, 3.3vw, 46px) !important; line-height: 1.04 !important; margin-bottom: 16px !important; }
+#offer .row-item { padding: 19px 0 !important; gap: 16px !important; }
+#offer .row-item p { max-width: 42ch; font-size: 14px !important; line-height: 1.5 !important; }
+#offer .followup-bottom--clean { margin-top: 22px !important; padding-top: 20px !important; gap: 24px !important; }
+#offer .followup-bottom-intro h3 { font-size: clamp(22px, 2vw, 27px) !important; margin-bottom: 8px !important; }
+#offer .followup-visual--clean { padding: 14px !important; }
+#offer .followup-node { min-height: 82px !important; }
+#faq.sect--air { padding-top: 64px !important; padding-bottom: 68px !important; }
+#faq .split--faq { align-items: start; gap: clamp(42px, 5vw, 68px) !important; }
+#faq .sticky-head { position: relative; top: auto !important; }
+#faq .sticky-head .h2 { max-width: 17ch !important; font-size: clamp(36px, 3.4vw, 48px) !important; line-height: 1.04 !important; margin-bottom: 14px !important; }
+#faq .faq-intro { max-width: 35ch !important; font-size: 15px !important; line-height: 1.6 !important; }
+#faq .faq-list, #faq .accordion, #faq .faq-items { align-self: start; }
+@media(max-width:760px){
+ #offer.sect--air,#faq.sect--air { padding-top: 48px !important; padding-bottom: 50px !important; }
+ #offer .sticky-head .h2,#faq .sticky-head .h2 { max-width: 18ch !important; font-size: clamp(32px, 8vw, 40px) !important; }
+ #offer .followup-bottom--clean { margin-top: 18px !important; padding-top: 18px !important; }
+}
+
+
+/* Final polish: visible continuous colour blend, consistent market columns, and clear clickable Google Ads row */
+#market, #the-market, .market-section {
+  background: linear-gradient(180deg, #f2eee5 0%, #f5f3ed 38%, #f1f4fa 100%) !important;
+}
+#offer {
+  background: linear-gradient(180deg, #f1f4fa 0%, #f5f7fb 32%, #fbfcfe 72%, #ffffff 100%) !important;
+  position: relative;
+}
+#offer .market-signals { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#offer .market-signals > div { min-width: 0; width: 100%; box-sizing: border-box; }
+#offer .row-item--dropdown { cursor: pointer; }
+#offer .row-accordion summary { position: relative; transition: background .25s ease, padding-left .25s ease; border-radius: 12px; }
+#offer .row-accordion summary:hover { background: rgba(255,255,255,.62); padding-left: 10px; }
+#offer .row-accordion summary:focus-visible { outline: 2px solid #4d83ff; outline-offset: 3px; }
+#offer .row-accordion .row-ic { display:grid; place-items:center; background: #10141c; color:#78a9ff; border-radius: 12px; }
+#offer .row-accordion .accordion-chevron {
+  display:grid; place-items:center; width:30px; height:30px; flex:0 0 30px;
+  border:1px solid rgba(18,25,38,.15); border-radius:50%; color:#1d2737;
+  font-size:19px; line-height:1; transition:transform .3s ease, background .3s ease, color .3s ease;
+}
+#offer .row-accordion[open] summary .accordion-chevron { transform:rotate(45deg); background:#172033; color:#fff; }
+#offer .row-accordion .accordion-body { padding-left:58px; padding-right:38px; }
+#offer .row-accordion .accordion-body p { max-width:66ch; }
+@media (prefers-reduced-motion: reduce) {
+  #offer .row-accordion summary, #offer .row-accordion .accordion-chevron { transition:none !important; }
+}
+@media(max-width:600px) {
+  #offer .market-signals { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #offer .row-accordion .accordion-body { padding-left:0; padding-right:0; }
+}
+
 </style>
-<noscript><style>.rv{opacity:1;transform:none;}.ha{opacity:1;animation:none;}.panel{display:grid;}.q-body{height:auto;}
+<noscript><style>.rv{opacity:1;transform:none;}.ha{opacity:1;animation:none;}.panel{display:grid;}.q-body{height:auto;}</style></noscript>
+<style>
 
 
-</style></noscript>
+
+
+/* ══ SUMMITFLOW VISUAL REFRESH ══ */
+:root{--blue:#3478f6;--blue-deep:#1d4ed8;--paper:#f5f2eb;--paper-2:#eeeae1;}
+.hero{padding:142px 0 42px;background:#070e18;isolation:isolate;}
+.hero::before{inset:0;background:linear-gradient(90deg,#070e18 0%,rgba(7,14,24,.98) 34%,rgba(7,14,24,.82) 54%,rgba(7,14,24,.34) 100%),url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=85') center right/cover no-repeat;opacity:1;mask-image:none;-webkit-mask-image:none;z-index:-1;}
+.hero-grid{grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);gap:52px;align-items:center;}
+.hero .pill{margin-bottom:23px;font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:rgba(237,241,248,.58);background:transparent;border:0;padding:0;}
+.hero .pill i{display:inline-block;width:22px;height:1px;border-radius:0;background:var(--blue);margin-right:2px;}
+.hero .h1{font-size:clamp(43px,4.15vw,68px);line-height:.99;letter-spacing:-.055em;max-width:12ch;text-wrap:balance;margin-bottom:20px;}
+.hero .h1 em{font-style:normal;color:#e9d8c0;}
+.hero .lead{font-size:clamp(16px,1.35vw,19px);line-height:1.5;max-width:43ch;color:rgba(235,239,246,.76);margin-bottom:26px;}
+.hero-cta{gap:14px;}
+.hero .btn{min-height:50px;border-radius:999px;padding:0 25px;}
+.hero .btn:not(.btn--ghost){background:linear-gradient(135deg,#4285ff,#2463e8);box-shadow:0 9px 28px rgba(37,99,235,.28);}
+.hero .btn--ghost{border:1px solid rgba(255,255,255,.2);background:rgba(7,14,24,.24);}
+.hero-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:34px;}
+.hero-benefits>div{display:flex;align-items:center;gap:10px;min-width:0;}
+.benefit-icon{width:35px;height:35px;flex:0 0 35px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.07);border-radius:50%;color:#fff;font-size:17px;}
+.hero-benefits p{margin:0;display:flex;flex-direction:column;gap:3px;line-height:1.3;}
+.hero-benefits strong{font-size:11.5px;color:#fff;font-weight:600;}
+.hero-benefits small{font-size:10.5px;color:rgba(235,239,246,.56);}
+.hero-workflow{position:relative;min-height:360px;padding:12px 0 34px;display:flex;flex-direction:column;justify-content:center;}
+.glass-card{background:linear-gradient(145deg,rgba(16,27,42,.94),rgba(12,20,31,.88));border:1px solid rgba(180,201,231,.16);box-shadow:0 18px 44px rgba(0,0,0,.24);backdrop-filter:blur(14px);}
+.ads-card{width:60%;margin:0 auto 46px 8%;padding:17px;border-radius:18px;position:relative;z-index:2;}
+.ads-card-head{display:flex;align-items:center;gap:12px;}
+.google-mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#fff;color:#4285f4;font-size:26px;font-weight:800;flex:0 0 40px;}
+.ads-card-head>div{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
+.ads-card-head strong{font-size:15px;color:#f7f9fc;}
+.ads-card-head small,.enquiry-stat small{font-size:11.5px;line-height:1.4;color:rgba(235,239,246,.62);}
+.status-live{display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.16);color:#86efac;border-radius:99px;padding:5px 9px;font-size:10px;font-weight:700;}
+.status-live i{width:5px;height:5px;background:#4ade80;border-radius:50%;}
+.enquiry-stat{display:flex;align-items:center;gap:13px;background:rgba(126,153,190,.1);border-radius:12px;padding:11px;margin-top:15px;}
+.enquiry-stat>div:last-child{display:flex;flex-direction:column;gap:3px;}
+.enquiry-stat strong{font-size:12px;color:#f7f9fc;}
+.bars{height:30px;display:flex;align-items:end;gap:4px;flex:0 0 45px;}
+.bars i{width:8px;border-radius:4px 4px 2px 2px;background:linear-gradient(#64a5ff,#3478f6);height:40%;}.bars i:nth-child(2){height:60%}.bars i:nth-child(3){height:82%}.bars i:nth-child(4){height:100%}
+.workflow-connector{position:absolute;left:24%;right:21%;top:36%;height:44%;border:2px solid rgba(220,231,248,.7);border-left-color:transparent;border-bottom-color:rgba(220,231,248,.7);border-radius:0 28px 28px 0;pointer-events:none;z-index:0;}
+.workflow-connector span{display:none;}
+.workflow-cards{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1.08fr) 20px minmax(0,1.12fr);align-items:center;gap:7px;position:relative;z-index:1;}
+.workflow-card{padding:15px 13px;border-radius:16px;min-height:148px;position:relative;}
+.workflow-card strong{display:block;font-size:12.5px;color:#f8fafc;letter-spacing:-.02em;margin:8px 0 4px;}
+.workflow-card small{display:block;font-size:10.5px;color:rgba(235,239,246,.56);}
+.workflow-card p{font-size:11.5px;line-height:1.45;color:rgba(235,239,246,.72);margin:13px 0 0;}
+.workflow-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:20px;font-weight:700;color:#fff;background:#3478f6;box-shadow:0 5px 16px rgba(52,120,246,.2);}
+.human-icon{background:#2563eb}.done-icon{background:#20a65a;}
+.workflow-card--done{border-color:rgba(74,222,128,.42);background:linear-gradient(145deg,rgba(17,42,38,.95),rgba(12,27,30,.9));}
+.workflow-arrow{color:#fff;font-size:20px;text-align:center;}
+.done-pill{position:absolute;bottom:0;left:48%;transform:translateX(-10%);display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:99px;background:rgba(18,31,39,.97);border:1px solid rgba(180,201,231,.15);box-shadow:0 12px 26px rgba(0,0,0,.25);color:#f8fafc;font-size:12px;white-space:nowrap;z-index:3;}
+.done-pill span{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#22b565;color:#fff;font-size:12px;font-weight:800;}
+.market-redesign{padding:56px 0 64px;background:#f5f2eb;color:#10131a;min-height:0;}
+.market-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:66px;align-items:center;}
+.market-copy .eyebrow{color:rgba(10,14,22,.58);font-size:11px;text-transform:uppercase;letter-spacing:.1em;}
+.market-copy .h2{font-size:clamp(34px,3vw,47px);line-height:1.04;letter-spacing:-.05em;max-width:14ch;margin:0 0 17px;color:#0c1420;}
+.market-lead{font-size:17px;line-height:1.52;color:#666b73;max-width:49ch;margin-bottom:26px;}
+.market-signals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 0 26px;}
+.market-signals>div{padding:0 15px;border-left:1px solid rgba(10,14,22,.16);}
+.market-signals>div:first-child{padding-left:0;border-left:0;}
+.signal-icon{display:block;color:#3478f6;font-size:21px;height:28px;}
+.market-signals strong{display:block;color:#0c1420;font-size:17px;letter-spacing:-.03em;margin-bottom:4px;}
+.market-signals p{font-size:12px;line-height:1.45;color:#686d75;margin:0;}
+.market-copy .btn--dark{background:#0a0d13;color:#fff;border-radius:99px;padding:0 23px;min-height:46px;}
+.kitchen-gallery{display:grid;grid-template-columns:1.12fr .88fr;grid-template-rows:1fr 1fr;gap:9px;height:330px;min-width:0;}
+.kitchen-photo{position:relative;overflow:hidden;border-radius:13px;background-color:#c7b9a6;background-size:cover;background-position:center;box-shadow:0 10px 26px rgba(10,14,22,.08);}
+.kitchen-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(0,0,0,.27));pointer-events:none;}
+.kitchen-photo--large{grid-row:1 / 3;background-image:url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=85');}
+.kitchen-photo--top{background-image:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=85');}
+.kitchen-photo--bottom{background-image:url('https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=700&q=85');}
+.photo-label,.search-chip{position:absolute;z-index:1;bottom:14px;left:14px;max-width:calc(100% - 28px);background:rgba(255,255,255,.93);color:#17191d;border-radius:99px;padding:9px 12px;font-size:10px;box-shadow:0 5px 14px rgba(0,0,0,.12);}
+.search-chip{left:auto;right:10px;bottom:12px;font-size:10px;white-space:nowrap;}
+.search-chip b{font-size:14px;margin-right:5px;}
+@media(max-width:1120px){.hero-grid{grid-template-columns:1fr;gap:38px}.hero .h1{max-width:14ch}.hero-workflow{max-width:760px;width:100%;margin:0 auto}.market-layout{gap:38px}.workflow-card{min-height:140px}}
+@media(max-width:760px){.hero{padding:118px 0 34px}.hero::before{background:linear-gradient(90deg,rgba(7,14,24,.96),rgba(7,14,24,.84)),url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat}.hero-grid{gap:30px}.hero .h1{font-size:clamp(39px,10vw,56px);max-width:12ch}.hero-benefits{gap:10px;margin-top:26px}.hero-benefits>div{align-items:flex-start;gap:7px}.benefit-icon{width:28px;height:28px;flex-basis:28px;font-size:13px}.hero-benefits strong{font-size:10px}.hero-benefits small{font-size:9.5px}.hero-workflow{min-height:0;padding:8px 0 28px}.ads-card{width:78%;margin:0 auto 25px 0;padding:13px}.workflow-connector{display:none}.workflow-cards{grid-template-columns:1fr;gap:8px}.workflow-card{min-height:0;display:grid;grid-template-columns:36px 1fr;column-gap:10px;align-items:center;padding:12px}.workflow-icon{grid-row:1 / span 3;margin:0}.workflow-card strong{margin:0}.workflow-card small{margin-top:2px}.workflow-card p{grid-column:2;margin:5px 0 0}.workflow-arrow{transform:rotate(90deg);font-size:17px;line-height:14px}.done-pill{left:50%;transform:translateX(-50%);font-size:11px}.market-redesign{padding:48px 0}.market-layout{grid-template-columns:1fr;gap:30px}.market-copy .h2{font-size:37px;max-width:15ch}.market-lead{font-size:15.5px}.market-signals{gap:8px}.market-signals>div{padding:0 8px}.market-signals strong{font-size:14px}.market-signals p{font-size:11px}.kitchen-gallery{height:280px;gap:7px}.photo-label,.search-chip{font-size:9px;padding:7px 9px}.search-chip{right:6px;bottom:7px}}
+
+
+/* Layout refinements: keep the original diary in the hero and the follow-up journey inside How it works. */
+.followup-bottom{margin-top:34px; padding-top:28px; border-top:1px solid var(--line-d); display:grid; grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr); gap:34px; align-items:start;}
+.followup-bottom-intro{max-width:300px;}
+.followup-bottom-intro p{margin-top:9px; max-width:28ch;}
+.followup-details{min-width:0; width:100%;}
+.followup-summary{width:100%;}
+.followup-visual{margin-top:14px;}
+.followup-flow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;}
+.followup-node{min-width:0;}
+.flow-arrow{color:var(--blue);font-size:20px;font-weight:600;}
+@media(max-width:760px){.followup-bottom{grid-template-columns:1fr;gap:16px;margin-top:26px;padding-top:22px}.followup-bottom-intro{max-width:none}.followup-bottom-intro p{max-width:45ch}.followup-flow{grid-template-columns:1fr;gap:8px}.flow-arrow{transform:rotate(90deg);justify-self:center}}
+</style>
+
+<style id="faq-cta-spacing-final">
+  /* Give the FAQ CTA a clear visual pause after the intro copy. */
+  #faq .sticky-head > p.faq-intro { margin-bottom: 0 !important; }
+  #faq .sticky-head > a.btn {
+    display: inline-flex !important;
+    margin-top: 38px !important;
+    align-self: flex-start;
+  }
+  @media (max-width: 700px) {
+    #faq .sticky-head > a.btn { margin-top: 28px !important; }
+  }
+</style>
+
+<style id="summitflow-premium-polish">
+
+/* Premium 2026 polish: distinguish the market from the process section. */
+#market.market-redesign {
+  background: #f5f1e9;
+  position: relative;
+  isolation: isolate;
+}
+#offer.sect {
+  background: linear-gradient(135deg, #eef3fb 0%, #f5f7fb 52%, #edf2f8 100%);
+  position: relative;
+  isolation: isolate;
+  padding-top: clamp(68px, 7vw, 100px);
+  padding-bottom: clamp(64px, 6.5vw, 92px);
+  overflow: hidden;
+}
+#offer.sect::before {
+  content: ""; position:absolute; width:520px; height:520px; border-radius:50%;
+  right:-230px; top:10%; background:radial-gradient(circle, rgba(73,128,244,.10), transparent 68%);
+  pointer-events:none; z-index:-1;
+}
+#offer .wrap { position:relative; }
+#offer .rows { gap:0; }
+#offer .row-item { padding:22px 0; border-color:rgba(19,34,58,.12); }
+#offer .row-item:first-child { padding-top:0; }
+#offer .row-item h3 { letter-spacing:-.035em; }
+#offer .offer-note { margin-top:30px; max-width:30ch; }
+#offer .followup-bottom--clean { margin-top:34px; padding-top:28px; border-top:1px solid rgba(19,34,58,.13); }
+.followup-details--premium {
+  width:100%; min-width:0; border:1px solid rgba(26,43,70,.12); border-radius:18px;
+  background:rgba(255,255,255,.72); box-shadow:0 12px 32px rgba(24,44,78,.055);
+  overflow:hidden; transition:box-shadow .28s ease, border-color .28s ease, transform .28s ease;
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+}
+.followup-details--premium:hover { border-color:rgba(53,112,235,.28); box-shadow:0 18px 42px rgba(24,44,78,.09); transform:translateY(-2px); }
+.followup-summary--premium { padding:17px 18px; gap:13px; }
+.followup-summary--premium .summary-icon { background:linear-gradient(145deg,#eaf0ff,#dce7ff); color:#2766e8; }
+.followup-summary--premium .summary-copy strong { font-size:13px; letter-spacing:-.015em; }
+.followup-summary--premium .summary-copy strong, .followup-summary--premium:hover .summary-copy strong, .followup-summary--premium:focus-visible .summary-copy strong { color:#111827 !important; }
+.followup-summary--premium .summary-copy small { color:#697386; }
+.followup-summary--premium .summary-toggle { border-color:rgba(26,43,70,.14); background:#fff; color:#34425b; transition:transform .35s cubic-bezier(.2,.8,.2,1), background .2s, color .2s; }
+.followup-details--premium[open] .summary-toggle { transform:rotate(45deg); background:#1b2638; color:#fff; }
+.followup-details--premium[open] .followup-visual { animation:flowReveal .42s cubic-bezier(.2,.75,.25,1) both; }
+.followup-details--premium .followup-visual--clean { margin:0 14px 14px; padding:17px; background:linear-gradient(145deg,#fff, #f6f8fc); border-color:rgba(26,43,70,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.95); }
+.followup-details--premium .followup-node { transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+.followup-details--premium .followup-node:hover { transform:translateY(-3px); border-color:rgba(53,112,235,.28); box-shadow:0 9px 20px rgba(24,44,78,.08); }
+@keyframes flowReveal { from { opacity:0; transform:translateY(-7px) scale(.99); } to { opacity:1; transform:translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .followup-details--premium, .followup-details--premium *, #offer .row-item { animation:none !important; transition:none !important; } }
+@media(max-width:760px) {
+  #offer.sect { padding-top:54px; padding-bottom:54px; }
+  #offer .row-item { padding:18px 0; }
+  #offer .followup-bottom--clean { margin-top:26px; padding-top:22px; }
+  .followup-summary--premium { padding:14px; }
+  .followup-details--premium .followup-visual--clean { margin:0 8px 8px; padding:10px; }
+}
+
+
+/* SummitFlow refinement: warm-to-white section transition and full-width process accordions */
+.market-gradient { background:linear-gradient(180deg,#f4f0e7 0%,#f7f6f1 58%,#f2f6fc 100%); }
+#offer { background:linear-gradient(180deg,#f2f6fc 0%,#f8faff 48%,#ffffff 100%); }
+#offer .wrap.split { row-gap:30px; column-gap:64px; }
+#offer .row-item { padding:22px 0; }
+#offer .row-item p { max-width:48ch; }
+#offer .row-item:first-child p { max-width:42ch; }
+#offer .row-item--dropdown { display:block; border-top:1px solid rgba(19,31,50,.13); padding:0; }
+#offer .row-item--dropdown:last-child { border-bottom:1px solid rgba(19,31,50,.13); }
+#offer .row-accordion { width:100%; }
+#offer .row-accordion summary { display:flex; align-items:center; gap:16px; padding:20px 4px; cursor:pointer; list-style:none; }
+#offer .row-accordion summary::-webkit-details-marker { display:none; }
+#offer .row-accordion summary .row-ic { width:38px; height:38px; flex:0 0 38px; }
+#offer .row-accordion .row-accordion-copy { flex:1; min-width:0; }
+#offer .row-accordion h3 { margin:0; font-size:clamp(18px,1.5vw,21px); }
+#offer .row-accordion .accordion-sub { margin:4px 0 0; color:var(--mute-d); font-size:14px; line-height:1.5; }
+#offer .row-accordion .accordion-chevron { width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(19,31,50,.15);border-radius:50%;font-size:20px;line-height:1;color:var(--text);transition:transform .25s,background .25s,color .25s;flex:0 0 28px; }
+#offer .row-accordion[open] .accordion-chevron { transform:rotate(45deg);background:#10131b;color:#fff; }
+#offer .row-accordion .accordion-body { padding:0 48px 22px 54px; max-width:850px; color:var(--mute-d); line-height:1.7; animation:accordionIn .28s ease both; }
+#offer .row-accordion .accordion-body p { margin:0; max-width:70ch; }
+#offer .followup-bottom { margin-top:22px; padding-top:22px; }
+#offer .followup-bottom-intro p { max-width:38ch; }
+#offer .followup-details { width:100%; transition:box-shadow .25s,border-color .25s,transform .25s; }
+#offer .followup-details:hover { border-color:rgba(57,112,255,.35); box-shadow:0 12px 34px rgba(18,37,72,.07); }
+@keyframes accordionIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+@media(max-width:760px){
+ #offer .wrap.split { row-gap:24px; }
+ #offer .row-accordion summary { gap:12px; padding:17px 0; }
+ #offer .row-accordion .accordion-body { padding:0 8px 18px 50px; }
+ #offer .followup-bottom { margin-top:18px; padding-top:18px; }
+}
+@media(prefers-reduced-motion:reduce){#offer .row-accordion .accordion-chevron,#offer .followup-details{transition:none}#offer .row-accordion .accordion-body{animation:none}}
+
+
+/* SummitFlow refinement: warm-to-white section transition and full-width process accordions */
+#market, .market-section, #the-market { background:linear-gradient(180deg,#f4f0e7 0%,#f7f6f1 58%,#f2f6fc 100%); }
+#offer { background:linear-gradient(180deg,#f2f6fc 0%,#f8faff 48%,#ffffff 100%); }
+#offer .wrap.split { row-gap:30px; column-gap:64px; }
+#offer .row-item { padding:22px 0; }
+#offer .row-item p { max-width:48ch; }
+#offer .row-item:first-child p { max-width:42ch; }
+#offer .row-item--dropdown { display:block; border-top:1px solid rgba(19,31,50,.13); padding:0; }
+#offer .row-item--dropdown:last-child { border-bottom:1px solid rgba(19,31,50,.13); }
+#offer .row-accordion { width:100%; }
+#offer .row-accordion summary { display:flex; align-items:center; gap:16px; padding:20px 4px; cursor:pointer; list-style:none; }
+#offer .row-accordion summary::-webkit-details-marker { display:none; }
+#offer .row-accordion summary .row-ic { width:38px; height:38px; flex:0 0 38px; }
+#offer .row-accordion .row-accordion-copy { flex:1; min-width:0; }
+#offer .row-accordion h3 { margin:0; font-size:clamp(18px,1.5vw,21px); }
+#offer .row-accordion .accordion-sub { margin:4px 0 0; color:var(--mute-d); font-size:14px; line-height:1.5; }
+#offer .row-accordion .accordion-chevron { width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(19,31,50,.15);border-radius:50%;font-size:20px;line-height:1;color:var(--text);transition:transform .25s,background .25s,color .25s;flex:0 0 28px; }
+#offer .row-accordion[open] .accordion-chevron { transform:rotate(45deg);background:#10131b;color:#fff; }
+#offer .row-accordion .accordion-body { padding:0 48px 22px 54px; max-width:850px; color:var(--mute-d); line-height:1.7; animation:accordionIn .28s ease both; }
+#offer .row-accordion .accordion-body p { margin:0; max-width:70ch; }
+#offer .followup-bottom { margin-top:22px; padding-top:22px; }
+#offer .followup-bottom-intro p { max-width:38ch; }
+#offer .followup-details { width:100%; transition:box-shadow .25s,border-color .25s,transform .25s; }
+#offer .followup-details:hover { border-color:rgba(57,112,255,.35); box-shadow:0 12px 34px rgba(18,37,72,.07); }
+@keyframes accordionIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+@media(max-width:760px){
+ #offer .wrap.split { row-gap:24px; }
+ #offer .row-accordion summary { gap:12px; padding:17px 0; }
+ #offer .row-accordion .accordion-body { padding:0 8px 18px 50px; }
+ #offer .followup-bottom { margin-top:18px; padding-top:18px; }
+}
+@media(prefers-reduced-motion:reduce){#offer .row-accordion .accordion-chevron,#offer .followup-details{transition:none}#offer .row-accordion .accordion-body{animation:none}}
+
+</style>
+
+<style id="summitflow-final-hover-polish">
+/* Keep the service accordion calm: no pale hover box, just a subtle icon cue. */
+#offer .row-accordion summary:hover { background: transparent !important; padding-left: 4px !important; }
+#offer .row-accordion summary .accordion-chevron { background: transparent; box-shadow: none; }
+#offer .row-accordion summary:hover .accordion-chevron { border-color: rgba(53,112,235,.55); color: #3478f6; background: rgba(53,112,235,.07); }
+#offer .row-accordion summary:focus-visible { outline: 2px solid #4d83ff; outline-offset: 4px; border-radius: 8px; }
+.market-signals { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.market-signals > div { min-width: 0; }
+.market-signals strong { white-space: nowrap; }
+@media (max-width: 560px) { .market-signals { grid-template-columns: 1fr; } .market-signals strong { white-space: normal; } }
+</style>
 </head>
 
 <body>
@@ -622,23 +1003,18 @@ footer{background:var(--panel);border-top:1px solid var(--line);padding:26px 0;}
   <div class="wrap hero-grid">
     <div>
       <div class="pill ha a1"><i></i>Built for independent kitchen showrooms</div>
-      <h1 class="h1 ha a2">Turn local searches into kitchen design appointments.</h1>
-      <p class="lead ha a3">We run targeted Google Ads, qualify homeowner enquiries and book design appointments directly into your showroom diary.</p>
+      <h1 class="h1 ha a2">More qualified kitchen appointments.</h1>
+      <p class="lead ha a3">We bring local homeowners to your showroom with Google Ads, fast AI responses and personal follow-up.</p>
       <div class="hero-cta ha a4">
         <a href="apply.html" class="btn">Work with us
           <svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
         <a href="#offer" class="btn btn--ghost">See how it works</a>
       </div>
-      <div class="hero-foot ha a5">
-        <span class="ch">
-          <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="2.1" y="4.4" width="6.3" height="15.2" rx="3.15" fill="#FBBC04" transform="rotate(-30 5.25 12)"/>
-            <rect x="15.6" y="4.4" width="6.3" height="15.2" rx="3.15" fill="#4285F4" transform="rotate(30 18.75 12)"/>
-            <circle cx="6.3" cy="18.2" r="3.5" fill="#34A853"/>
-          </svg>
-          Google Ads
-        </span>
+      <div class="hero-benefits ha a5">
+        <div><span class="benefit-icon">✓</span><p><strong>20 qualified appointments</strong><small>in your first 90 days</small></p></div>
+        <div><span class="benefit-icon">▣</span><p><strong>No management fee</strong><small>if we fall short</small></p></div>
+        <div><span class="benefit-icon">▥</span><p><strong>Ad spend separate</strong><small>clear from day one</small></p></div>
       </div>
     </div>
 
@@ -685,52 +1061,23 @@ footer{background:var(--panel);border-top:1px solid var(--line);padding:26px 0;}
 </section>
 
 <!-- ══ MARKET ══ -->
-<section class="market" id="market">
-  <div class="wrap">
-    <div class="market-head rv">
+<section class="market market-redesign market-gradient" id="market">
+  <div class="wrap market-layout">
+    <div class="market-copy rv">
       <p class="eyebrow">The market</p>
-      <h2 class="h2">Homeowners have options. Make sure your showroom is one of them.</h2>
-      <p class="lead">Choosing a kitchen is a considered purchase. Homeowners compare designs, prices and showrooms before deciding who they trust with the project.</p>
+      <h2 class="h2">A growing market of motivated homeowners.</h2>
+      <p class="market-lead">When people start planning a new kitchen, they compare designs, prices and local showrooms. We help put your showroom in front of them while they’re actively looking.</p>
+      <div class="market-signals">
+        <div><span class="signal-icon">⌕</span><strong>High intent</strong><p>Reach people already searching for a new kitchen.</p></div>
+        <div><span class="signal-icon">▥</span><strong>Local demand</strong><p>Focus campaigns on the area your showroom serves.</p></div>
+        <div><span class="signal-icon">⌂</span><strong>Purchase</strong><p>Help turn early research into a real conversation.</p></div>
+      </div>
+      <a href="apply.html" class="btn btn--dark">Work with us <span aria-hidden="true">→</span></a>
     </div>
-
-    <div class="race rv dl1">
-      <div class="race-switch" role="tablist" aria-label="Two routes to the same homeowner">
-        <button class="rs" role="tab" id="rs-0" aria-controls="rt-0" aria-selected="true">The showroom they find first</button>
-        <button class="rs" role="tab" id="rs-1" aria-controls="rt-1" aria-selected="false" tabindex="-1">Your showroom</button>
-        <i class="rs-glide" aria-hidden="true"></i>
-      </div>
-
-      <div class="tracks">
-      <div class="track on" id="rt-0" role="tabpanel" aria-labelledby="rs-0">
-        <div class="rail"><i class="rail-fill"></i></div>
-        <ol class="nodes">
-          <li style="--i:0"><span class="node"></span><b>Finds their advert</b></li>
-          <li style="--i:1"><span class="node"></span><b>Books a design visit</b></li>
-          <li style="--i:2"><span class="node"></span><b>Gets a consultation</b></li>
-          <li style="--i:3"><span class="node"></span><b>Design begins</b></li>
-        </ol>
-        <p class="outcome outcome--win">They got the appointment. You missed the opportunity.</p>
-      </div>
-
-      <div class="track track--stall" id="rt-1" role="tabpanel" aria-labelledby="rs-1" hidden>
-        <div class="rail"><i class="rail-fill"></i></div>
-        <ol class="nodes">
-          <li style="--i:0"><span class="node"></span><b>Hears your name</b><span>If someone recommends you</span></li>
-          <li style="--i:1"><span class="node"></span><b>Finds your details</b><span>If they search the right terms</span></li>
-          <li style="--i:2"><span class="node"></span><b>Reaches you</b><span>If you are free to take the call</span></li>
-          <li style="--i:3"><span class="node"></span><b>Books a design appointment</b><span>If they have not chosen another showroom</span></li>
-        </ol>
-        <p class="outcome outcome--lose">Every extra step is a chance to lose their interest.</p>
-      </div>
-      </div>
-    </div>
-
-    <div class="verdict rv dl2">
-      <p class="verdict-line">Get in front of homeowners while they’re actively looking.</p>
-      <p class="verdict-sub">We use Google Ads to reach local homeowners searching for a new kitchen and help turn that interest into booked design appointments.</p>
-      <a href="apply.html" class="btn">Work with us
-        <svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
+    <div class="kitchen-gallery rv dl1" aria-label="Examples of contemporary kitchen styles">
+      <div class="kitchen-photo kitchen-photo--large"><span class="photo-label">Designed around the homeowner</span></div>
+      <div class="kitchen-photo kitchen-photo--top"><span class="search-chip"><b>⌕</b> kitchen showroom near me</span></div>
+      <div class="kitchen-photo kitchen-photo--bottom"><span class="search-chip"><b>⌕</b> new kitchen design</span></div>
     </div>
   </div>
 </section>
@@ -746,57 +1093,59 @@ footer{background:var(--panel);border-top:1px solid var(--line);padding:26px 0;}
     </div>
 
     <div class="rows">
-      <div class="row-item rv dl1">
-        <div class="row-ic">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="6.6" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="9" r="2.9" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="9" r="1" fill="currentColor"/></svg>
-        </div>
-        <div>
-          <h3>We run targeted Google Ads</h3>
-          <p>Reach homeowners in your area who are actively searching for a new kitchen, with campaigns built around local demand.</p>
-        </div>
+      <div class="row-item row-item--dropdown rv dl1">
+        <details class="row-accordion">
+          <summary>
+            <span class="row-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.6" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="9" r="2.9" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="9" r="1" fill="currentColor"/></svg></span>
+            <span class="row-accordion-copy"><h3>We run targeted Google Ads</h3><p class="accordion-sub">Reach local homeowners actively searching for a new kitchen.</p></span>
+            <span class="accordion-chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="accordion-body"><p>We build campaigns around relevant local searches, helping your showroom appear when homeowners are actively researching their next kitchen.</p></div>
+        </details>
       </div>
-      <div class="row-item rv dl2">
-        <div class="row-ic">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 1.8 10.8 6l4.4 1.2-4.4 1.6L9 13l-1.8-4.2L2.8 7.2 7.2 6 9 1.8Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="m14.2 11.8.9 2.1 2.1.8-2.1.8-.9 2-.8-2-2.1-.8 2.1-.8.8-2.1Z" fill="currentColor"/></svg>
-        </div>
-        <div>
-          <h3>AI speed. Human follow-up.</h3>
-          <p>AI helps respond quickly and keep enquiries moving. Human follow-up adds context, checks suitability and helps turn genuine interest into a booked design appointment.</p>
-
-        </div>
+      <div class="row-item row-item--dropdown rv dl2">
+        <details class="row-accordion">
+          <summary>
+            <span class="row-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.8 10.8 6l4.4 1.2-4.4 1.6L9 13l-1.8-4.2L2.8 7.2 7.2 6 9 1.8Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="m14.2 11.8.9 2.1 2.1.8-2.1.8-.9 2-.8-2-2.1-.8 2.1-.8.8-2.1Z" fill="currentColor"/></svg></span>
+            <span class="row-accordion-copy"><h3>AI speed. Human follow-up.</h3><p class="accordion-sub">Every enquiry gets a timely, personal response.</p></span>
+            <span class="accordion-chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="accordion-body"><p>AI helps respond quickly, while human follow-up understands the homeowner’s plans and checks suitability before moving them towards a design appointment.</p></div>
+        </details>
       </div>
-      <div class="row-item rv dl3">
-        <div class="row-ic">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="2.4" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7h13M6 2.2v2.6M12 2.2v2.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="m6.6 11.2 1.6 1.6 3.2-3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div>
-          <h3>We book the design appointment</h3>
-          <p>We work to get suitable homeowners booked into your showroom diary, rather than simply handing you a list of leads to chase.</p>
-        </div>
+      <div class="row-item row-item--dropdown rv dl3">
+        <details class="row-accordion">
+          <summary>
+            <span class="row-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.4" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7h13M6 2.2v2.6M12 2.2v2.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="m6.6 11.2 1.6 1.6 3.2-3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="row-accordion-copy"><h3>We book the design appointment</h3><p class="accordion-sub">Suitable homeowners, booked into your showroom diary.</p></span>
+            <span class="accordion-chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="accordion-body"><p>We follow up with interested homeowners and work to book qualified design appointments directly into your diary — not just hand over a list of leads to chase.</p></div>
+        </details>
       </div>
     </div>
-    <div class="followup-bottom rv">
+    <div class="followup-bottom followup-bottom--clean rv">
       <div class="followup-bottom-intro">
-        <span class="followup-bottom-kicker">THE FOLLOW-UP JOURNEY</span>
-        <p>See how a new enquiry moves from first response to a booked design appointment.</p>
+        <span class="followup-bottom-kicker">FROM ENQUIRY TO APPOINTMENT</span>
+        <h3>All done on your behalf.</h3>
+        <p>Every enquiry gets a timely response, thoughtful follow-up and a clear next step.</p>
       </div>
-            <details class="followup-details">
-            <summary class="followup-summary">
-              <span class="summary-icon" aria-hidden="true">↗</span>
-              <span class="summary-copy"><strong>From enquiry to appointment</strong><small>Explore how AI and human follow-up work together</small></span>
-              <span class="summary-toggle" aria-hidden="true">+</span>
-            </summary>
-            <div class="followup-visual" aria-label="Illustration of the enquiry follow-up process">
-              <div class="followup-top"><span>THE FOLLOW-UP JOURNEY</span><span class="live-pill"><i></i> A joined-up process</span></div>
-              <div class="followup-flow">
-                <div class="followup-node"><div class="mini-icon"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 1.8 10.8 6l4.4 1.2-4.4 1.6L9 13l-1.8-4.2L2.8 7.2 7.2 6 9 1.8Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div><strong>Quick AI response</strong><span>Prompt first contact</span></div>
-                <div class="flow-arrow" aria-hidden="true">→</div>
-                <div class="followup-node"><div class="mini-icon"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 3.5h12v8H8l-3.5 3v-3H3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 6.5h6M6 8.8h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><strong>Human follow-up</strong><span>Understand their plans</span></div>
-                <div class="flow-arrow" aria-hidden="true">→</div>
-                <div class="followup-node"><div class="mini-icon"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M6 2.5v2M12 2.5v2M5.5 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><strong>Booked appointment</strong><span>Suitable homeowner</span></div>
-              </div>
-              <div class="followup-foot"><span aria-hidden="true">✦</span><span><b>Technology for speed. People for understanding.</b> The aim is a better handover, not just another lead.</span></div>
-            </div>
+      <details class="followup-details followup-details--premium">
+        <summary class="followup-summary followup-summary--premium">
+          <span class="summary-icon" aria-hidden="true">↗</span>
+          <span class="summary-copy"><strong>From enquiry to appointment</strong><small>Explore how AI and human follow-up work together</small></span>
+          <span class="summary-toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="followup-visual followup-visual--clean" aria-label="Google Ads enquiries move through AI response and human follow-up to a booked appointment">
+          <div class="followup-flow">
+          <div class="followup-node"><div class="mini-icon"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 1.8 10.8 6l4.4 1.2-4.4 1.6L9 13l-1.8-4.2L2.8 7.2 7.2 6 9 1.8Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div><strong>AI response</strong><span>Fast first contact</span></div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="followup-node"><div class="mini-icon"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 3.5h12v8H8l-3.5 3v-3H3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 6.5h6M6 8.8h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><strong>Human follow-up</strong><span>Plans and suitability checked</span></div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="followup-node followup-node--booked"><div class="mini-icon"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M6 2.5v2M12 2.5v2M5.5 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><strong>Booked appointment</strong><span>Added to your diary</span></div>
+        </div>
+          <div class="followup-foot followup-foot--clean"><span class="done-check" aria-hidden="true">✓</span><b>All done on your behalf.</b></div>
+        </div>
       </details>
     </div>
   </div>
